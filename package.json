@@ -1,0 +1,8 @@
+{
+  "name": "gaso-mx",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@netlify/database": "^1.0.0"
+  }
+}

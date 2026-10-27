@@ -1,0 +1,30 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# El nombre de usuario (ADMIN_USER) no es un secreto y suele ser una palabra común ("admin") que
+# aparece en el código. Sin esto, el escáner de secretos de Netlify detiene el deploy.
+# Las demás variables (contraseñas y llaves) SIGUEN siendo escaneadas.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "ADMIN_USER,ADMIN_EMAIL,VENTAS_USER"
+
+[functions]
+  # El empaquetador por defecto (zisi) falla con EISDIR al recorrer las dependencias de @netlify/database
+  node_bundler = "esbuild"
+
+# Nada dentro de /netlify/ (código de funciones y catálogos privados) debe servirse como archivo estático
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
