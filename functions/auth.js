@@ -42,8 +42,14 @@ async function safeEq(a, b) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function cookie(value, maxAge) {
-  return `gaso_session=${encodeURIComponent(value)}; HttpOnly; Secure; SameSite=Strict; Path=/`
-    + (maxAge != null ? `; Max-Age=${maxAge}` : "");
+  // SameSite=Lax: login same-origin OK; evita rarezas con Strict + recargas/tabs.
+  // Secure + HttpOnly: la cookie no es legible desde JS (XSS).
+  let c = `gaso_session=${encodeURIComponent(value)}; HttpOnly; Secure; SameSite=Lax; Path=/`;
+  if (maxAge != null) {
+    c += `; Max-Age=${maxAge}`;
+    if (maxAge <= 0) c += "; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }
+  return c;
 }
 
 function requestHeaders(request) {

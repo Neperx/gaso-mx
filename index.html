@@ -8024,8 +8024,13 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "login", username: userRaw, password: passRaw, remember })
         });
-        status = res.status; data = await res.json();
-      } catch (err) { showErr("❌ No se pudo contactar al servidor de acceso. Verifica tu conexión."); return; }
+        status = res.status;
+        const raw = await res.text();
+        try { data = JSON.parse(raw); } catch (parseErr) {
+          showErr("❌ Respuesta inválida del servidor (HTTP " + status + "). Recarga con Ctrl+F5 para limpiar caché.");
+          return;
+        }
+      } catch (err) { showErr("❌ No se pudo contactar al servidor de acceso. Verifica tu conexión o recarga con Ctrl+F5."); return; }
 
       if (!data || !data.ok) {
         showErr((status === 429 ? "⛔ " : "❌ ") + ((data && data.message) || "No se pudo iniciar sesión."));
