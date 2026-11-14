@@ -1,0 +1,23 @@
+﻿CREATE TABLE IF NOT EXISTS gaso_clients (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  data TEXT NOT NULL DEFAULT '{}',
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS gaso_quotes (
+  number TEXT PRIMARY KEY,
+  client_name TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'draft',
+  quote_date TEXT NOT NULL DEFAULT '',
+  total REAL NOT NULL DEFAULT 0,
+  data TEXT NOT NULL DEFAULT '{}',
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_gaso_quotes_client ON gaso_quotes (client_name);
+
+CREATE TABLE IF NOT EXISTS gaso_folio_seq (
+  year INTEGER PRIMARY KEY,
+  seq INTEGER NOT NULL DEFAULT 0
+);

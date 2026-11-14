@@ -1,0 +1,11 @@
+# Cloudflare Pages — sin `main` (eso convertiría el proyecto en Worker y
+# impediría registrar automáticamente ./functions/*.js como Pages Functions).
+name = "gaso-mx"
+compatibility_date = "2026-11-13"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gaso-db"
+database_id = "24fdd4fb-a51d-4742-84f7-10d78b6e08a1"

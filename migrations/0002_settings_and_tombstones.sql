@@ -1,0 +1,12 @@
+﻿CREATE TABLE IF NOT EXISTS gaso_settings (
+  name TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS gaso_tombstones (
+  kind TEXT NOT NULL,
+  key TEXT NOT NULL,
+  deleted_at INTEGER NOT NULL,
+  PRIMARY KEY (kind, key)
+);

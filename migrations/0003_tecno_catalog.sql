@@ -1,0 +1,14 @@
+﻿CREATE TABLE IF NOT EXISTS gaso_tecno_meta (
+  id INTEGER PRIMARY KEY,
+  status TEXT NOT NULL,
+  total INTEGER NOT NULL DEFAULT 0,
+  chunks INTEGER NOT NULL DEFAULT 0,
+  message TEXT NOT NULL DEFAULT '',
+  started_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  finished_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS gaso_tecno_chunks (
+  idx INTEGER PRIMARY KEY,
+  data TEXT NOT NULL
+);
