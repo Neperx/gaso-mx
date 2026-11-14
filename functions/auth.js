@@ -88,6 +88,14 @@ export async function onRequestGet(context) {
  *   { action: "ping" }
  */
 export async function onRequestPost(context) {
+  try {
+    return await handleAuthPost(context);
+  } catch (e) {
+    return resp(500, { ok: false, message: "Error interno de auth: " + (e && e.message ? e.message : String(e)) });
+  }
+}
+
+async function handleAuthPost(context) {
   const request = context.request;
   const env = context.env;
   const headers = requestHeaders(request);
@@ -193,3 +201,4 @@ export async function onRequestPost(context) {
     { "Set-Cookie": cookie(token, ttl) }
   );
 }
+
