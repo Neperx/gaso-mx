@@ -1,12 +1,6 @@
-export async function onRequestPost(context) {
-  const request = context.request;
-  const env = context.env;
-
-  const headers = {};
-  req.headers.forEach((v, k) => { headers[k] = v; });
 import session from "../lib/session.js";
-import settings from "../lib/settings.js";
-import llm from "../lib/llm.js";
+import * as settings from "../lib/settings.js";
+import * as llm from "../lib/llm.js";
 
 const { requireAuth } = session;
 
@@ -22,7 +16,8 @@ function toEvent(req) {
 }
 
 const chk = (name, ok, detail, fix) => ({ name, ok, detail, fix: ok ? "" : (fix || "") });
-const secretsList = (env) => settings.NAMES.filter((n) => settings.SECRET.has(n)).map((n) => settings.get(n)).concat([env.SESSION_SECRET]);
+const secretsList = (env) =>
+  settings.NAMES.filter((n) => settings.SECRET.has(n)).map((n) => settings.get(n)).concat([env.SESSION_SECRET]);
 const snippet = (txt, env) => {
   let t = String(txt || "").replace(/\s+/g, " ").slice(0, 220);
   secretsList(env).filter(Boolean).forEach((s) => { t = t.split(s).join("***"); });
@@ -30,30 +25,37 @@ const snippet = (txt, env) => {
 };
 const MODEL_RE = /^[a-z0-9][a-z0-9.\-_]{1,60}$/i;
 
-async function timed(url, opts) {
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), 15000);
-  try { return await fetch(url, Object.assign({ signal: ctl.signal }, opts)); } finally { clearTimeout(t); }
-}
 async function testGemini(env) {
-  if (!settings.get("GEMINI_API_KEY")) return chk("Gemini", false, "No hay llave de Gemini.", "Pega tu llave de Google AI Studio en ⚙️ Configuración → Inteligencia Artificial y guarda.");
+  if (!settings.get("GEMINI_API_KEY") && !env.GEMINI_API_KEY) {
+    return chk("Gemini", false, "No hay llave de Gemini.", "Pega tu llave de Google AI Studio en ⚙️ Configuración → Inteligencia Artificial y guarda.");
+  }
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), 25000);
   try {
     const r = await llm.geminiRaw("Responde solo: OK", ctl.signal, { maxTokens: 64 }, env);
     if (r.status === 200) return chk("Gemini", true, "Responde correctamente (llave " + settings.source("GEMINI_API_KEY") + ").");
     const d = snippet(r.text, env);
-    if (r.status === 401 || r.status === 403 || /API key/i.test(d)) return chk("Gemini", false, `Google rechazó la llave (HTTP ${r.status}): ${d}`, "Crea una llave nueva en aistudio.google.com/apikey y pégala en Configuración.");
-    if (r.status === 404) return chk("Gemini", false, `Modelo no disponible: ${d}`, "Cambia el modelo en Configuración (deja el campo vacío para usar gemini-flash-latest).");
-    if (r.status === 429) return chk("Gemini", false, `Límite de uso alcanzado: ${d}`, "Espera unos minutos o revisa la cuota en Google AI Studio.");
+    if (r.status === 401 || r.status === 403 || /API key/i.test(d)) {
+      return chk("Gemini", false, `Google rechazó la llave (HTTP ${r.status}): ${d}`, "Crea una llave nueva en aistudio.google.com/apikey y pégala en Configuración.");
+    }
+    if (r.status === 404) {
+      return chk("Gemini", false, `Modelo no disponible: ${d}`, "Cambia el modelo en Configuración (deja el campo vacío para usar gemini-flash-latest).");
+    }
+    if (r.status === 429) {
+      return chk("Gemini", false, `Límite de uso alcanzado: ${d}`, "Espera unos minutos o revisa la cuota en Google AI Studio.");
+    }
     return chk("Gemini", false, `Error HTTP ${r.status}: ${d}`, "Revisa el detalle en Google AI Studio.");
   } catch (e) {
     return chk("Gemini", false, "Sin conexión con Google (" + (e.name === "AbortError" ? "tiempo agotado" : e.message) + ").", "Reintenta en un momento.");
-  } finally { clearTimeout(t); }
+  } finally {
+    clearTimeout(t);
+  }
 }
 
 async function testAnthropic(env) {
-  if (!settings.get("ANTHROPIC_API_KEY")) return chk("Claude", false, "No hay llave de Claude.", "Pega tu llave de console.anthropic.com en ⚙️ Configuración y guarda.");
+  if (!settings.get("ANTHROPIC_API_KEY") && !env.ANTHROPIC_API_KEY) {
+    return chk("Claude", false, "No hay llave de Claude.", "Pega tu llave de console.anthropic.com en ⚙️ Configuración y guarda.");
+  }
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), 20000);
   try {
@@ -63,11 +65,16 @@ async function testAnthropic(env) {
     return chk("Claude", false, `Error HTTP ${r.status}: ${d}`, "Revisa tu llave de Anthropic.");
   } catch (e) {
     return chk("Claude", false, "Sin conexión con Anthropic (" + (e.name === "AbortError" ? "tiempo agotado" : e.message) + ").", "Reintenta en un momento.");
-  } finally { clearTimeout(t); }
+  } finally {
+    clearTimeout(t);
+  }
 }
+
 async function testTecno(env) {
-  const token = settings.get("TECNO_API_TOKEN");
-  if (!token) return chk("Tecnosinergia", false, "No hay token de Tecnosinergia.", "Pégalo en ⚙️ Configuración → Tecnosinergia y guarda.");
+  const token = settings.get("TECNO_API_TOKEN") || env.TECNO_API_TOKEN || "";
+  if (!token) {
+    return chk("Tecnosinergia", false, "No hay token de Tecnosinergia.", "Pégalo en ⚙️ Configuración → Tecnosinergia y guarda.");
+  }
   try {
     const ctl = new AbortController();
     const t = setTimeout(() => ctl.abort(), 15000);
@@ -80,7 +87,9 @@ async function testTecno(env) {
       const text = await r.text();
       if (r.status === 200) return chk("Tecnosinergia", true, "Responde correctamente.");
       return chk("Tecnosinergia", false, `HTTP ${r.status}: ${text.slice(0, 100)}`, "Verifica el token en Cloudflare.");
-    } finally { clearTimeout(t); }
+    } finally {
+      clearTimeout(t);
+    }
   } catch (e) {
     return chk("Tecnosinergia", false, e.name === "AbortError" ? "Tiempo de espera agotado" : e.message, "Verifica conectividad.");
   }
@@ -99,18 +108,28 @@ async function testCatalogs(env) {
   const counts = {};
   try {
     const r = await env.DB.prepare("SELECT name, COALESCE(SUM(n),0) AS total FROM gaso_catalog_parts GROUP BY name").all();
-    (r.results || []).forEach(x => { counts[x.name] = x.total; });
+    (r.results || []).forEach((x) => { counts[x.name] = x.total; });
   } catch (e) { /* tabla aún no existe */ }
   const ok = !!(counts.syscom && counts.ct);
-  return chk("Catálogos Syscom / CT", ok, ok ? `Syscom: ${counts.syscom?.toLocaleString?.("es-MX") ?? counts.syscom} · CT: ${counts.ct?.toLocaleString?.("es-MX") ?? counts.ct} productos.` : `Faltan catálogos en D1.`, "Impórtalos en ⚙️ Configuración → Catálogos Syscom / CT.");
+  return chk(
+    "Catálogos Syscom / CT",
+    ok,
+    ok
+      ? `Syscom: ${counts.syscom?.toLocaleString?.("es-MX") ?? counts.syscom} · CT: ${counts.ct?.toLocaleString?.("es-MX") ?? counts.ct} productos.`
+      : "Faltan catálogos en D1.",
+    "Impórtalos en ⚙️ Configuración → Catálogos Syscom / CT."
+  );
 }
 
 function status(env) {
   const out = {};
   settings.NAMES.forEach((n) => {
     const secret = settings.SECRET.has(n);
-    const v = settings.get(n);
-    out[n] = { source: settings.source(n), secret, value: secret ? settings.mask(v) : v };
+    const fromPanel = settings.get(n);
+    const fromEnv = env[n] || "";
+    const v = fromPanel || fromEnv;
+    const source = fromPanel ? "panel" : (fromEnv ? "env" : "none");
+    out[n] = { source, secret, value: secret ? settings.mask(v) : v };
   });
   return out;
 }
@@ -121,19 +140,27 @@ function validate(name, v) {
   return /^[\x21-\x7E]{8,400}$/.test(v) ? "" : "La llave debe tener 8-400 caracteres sin espacios";
 }
 
-export default async function (req, env, ctx) {
-  const auth = await requireAuth(toEvent(req), env.SESSION_SECRET || "");
+async function handle(context) {
+  const request = context.request;
+  const env = context.env;
+  const auth = await requireAuth(toEvent(request), env.SESSION_SECRET || "", env);
   if (auth.error) return auth.error;
   const s = auth.session;
-  if (s.r !== "SUPERADMIN") return json(403, { status: false, message: "Solo el superusuario puede abrir la configuración." });
+  if (s.r !== "SUPERADMIN") {
+    return json(403, { status: false, message: "Solo el superusuario puede abrir la configuración." });
+  }
 
   await settings.load(env.DB, true, env.SESSION_SECRET || "");
 
-  if (req.method === "GET") return json(200, { status: true, settings: status(env) });
-  if (req.method !== "POST") return json(405, { status: false, message: "Método no permitido" });
+  if (request.method === "GET") return json(200, { status: true, settings: status(env) });
+  if (request.method !== "POST") return json(405, { status: false, message: "Método no permitido" });
 
   let b = {};
-  try { b = await req.json(); } catch (e) { return json(400, { status: false, message: "JSON inválido" }); }
+  try {
+    b = await request.json();
+  } catch (e) {
+    return json(400, { status: false, message: "JSON inválido" });
+  }
 
   if (b.op === "save") {
     const values = b.values && typeof b.values === "object" ? b.values : {};
@@ -147,8 +174,12 @@ export default async function (req, env, ctx) {
         if (err) return json(400, { status: false, message: n + ": " + err });
         await settings.set(n, v, env.DB, env.SESSION_SECRET || "");
       }
-      for (const n of clear) if (settings.NAMES.includes(n)) await settings.set(n, "", env.DB, env.SESSION_SECRET || "");
-    } catch (e) { return json(500, { status: false, message: "No se pudo guardar: " + e.message }); }
+      for (const n of clear) {
+        if (settings.NAMES.includes(n)) await settings.set(n, "", env.DB, env.SESSION_SECRET || "");
+      }
+    } catch (e) {
+      return json(500, { status: false, message: "No se pudo guardar: " + e.message });
+    }
     await settings.load(env.DB, true, env.SESSION_SECRET || "");
     return json(200, { status: true, settings: status(env) });
   }
@@ -160,7 +191,7 @@ export default async function (req, env, ctx) {
       anthropic: () => testAnthropic(env),
       tecno: () => testTecno(env),
       db: () => testDb(env),
-      catalogs: async () => await testCatalogs(env)
+      catalogs: () => testCatalogs(env)
     };
     let checks;
     if (t === "all") {
@@ -181,4 +212,12 @@ export default async function (req, env, ctx) {
   }
 
   return json(400, { status: false, message: "Operación inválida" });
+}
+
+export async function onRequestGet(context) {
+  return handle(context);
+}
+
+export async function onRequestPost(context) {
+  return handle(context);
 }
