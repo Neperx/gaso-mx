@@ -137,6 +137,18 @@ function status(env) {
 function validate(name, v) {
   if (name === "AI_PROVIDER") return v === "gemini" || v === "anthropic" ? "" : "Proveedor inválido";
   if (name === "GEMINI_MODEL" || name === "AI_MODEL") return MODEL_RE.test(v) ? "" : "Nombre de modelo inválido";
+  if (name === "SYSCOM_CSV_URL") {
+    try {
+      const u = new URL(v);
+      if (u.protocol !== "https:") return "El enlace Syscom debe ser https://";
+      if (!/(^|\.)syscom\.mx$/i.test(u.hostname)) return "El enlace debe ser de syscom.mx";
+      if (!/reportes-csv/i.test(u.pathname)) return "Usa el enlace de descarga automática (reportes-csv/publico/…)";
+      if (v.length > 2000) return "URL demasiado larga";
+      return "";
+    } catch (e) {
+      return "URL de Syscom inválida";
+    }
+  }
   return /^[\x21-\x7E]{8,400}$/.test(v) ? "" : "La llave debe tener 8-400 caracteres sin espacios";
 }
 
@@ -167,7 +179,8 @@ async function handle(context) {
     const clear = Array.isArray(b.clear) ? b.clear : [];
     try {
       for (const n of Object.keys(values)) {
-        if (!settings.NAMES.includes(n) || settings.SECRET.has(n)) continue;
+        if (!settings.NAMES.includes(n)) continue;
+        // Secretos (Gemini/Tecno/Syscom URL) sí se pueden guardar cifrados desde el panel.
         const v = String(values[n] == null ? "" : values[n]).trim().replace(/^["']|["']$/g, "");
         if (!v) continue;
         const err = validate(n, v);
