@@ -3137,7 +3137,9 @@
 
         <div class="setting-group">
           <label for="exchange-rate">Tipo Cambio USD:</label>
-          <input type="number" id="exchange-rate" class="form-input" value="19.80" min="1" step="0.05" style="width:75px;" oninput="updateExchangeRate()" title="Tipo de cambio del día para convertir productos importados en USD">
+          <input type="number" id="exchange-rate" class="form-input" value="19.80" min="1" step="0.0001" style="width:88px;" oninput="updateExchangeRate()" title="Se actualiza solo cada mañana; puedes ajustarlo manualmente si hace falta">
+          <button type="button" class="btn btn-outline btn-sm no-print" onclick="refreshExchangeRate(true)" title="Actualizar tipo de cambio ahora" style="padding:0.2rem 0.45rem;">↻</button>
+          <span id="fx-rate-meta" class="no-print" style="font-size:0.68rem; color:#64748b;"></span>
         </div>
 
         <div class="setting-group" style="background:#eff6ff; border:1px solid #bfdbfe; padding:0.25rem 0.6rem; border-radius:6px;">
@@ -4013,10 +4015,15 @@ CLABE: 722969010514249300</textarea>
         </div>
         <div style="padding:1.25rem;">
           <p style="font-size:0.85rem; color:var(--gray-600); margin-bottom:0.75rem;">
-            Pega aquí el contenido copiado de la lista de precios de CT Internacional (formato Excel, CSV o texto). El sistema detectará automáticamente la clave (SKU), descripción, si el precio es en <strong>Moneda Nacional (m)</strong> o <strong>USD</strong>, y su valor.
+            Sube el Excel oficial de CT (<code>.xlsx</code>) o pega texto. Detecta clave, descripción y si el precio es <strong>MXN (columna m)</strong> o <strong>USD</strong>.
           </p>
+          <div style="margin-bottom:0.75rem; padding:0.65rem; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px;">
+            <label style="font-size:0.8rem; font-weight:800; color:#1e40af; display:block; margin-bottom:0.35rem;">📂 Actualizar desde Excel CT (recomendado)</label>
+            <input type="file" id="import-ct-xlsx" accept=".xlsx,.xls" onchange="importCtExcelFile(this)" style="font-size:0.78rem;">
+            <div id="import-ct-xlsx-status" style="font-size:0.75rem; color:#1e3a8a; margin-top:0.35rem;"></div>
+          </div>
           <div style="margin-bottom:0.75rem;">
-            <label style="font-size:0.8rem; font-weight:700; color:var(--gray-700);">Categoría por defecto para los productos pegados:</label>
+            <label style="font-size:0.8rem; font-weight:700; color:var(--gray-700);">Categoría por defecto (solo si pegas texto):</label>
             <select id="import-ct-default-cat" class="form-select" style="margin-top:0.25rem;">
               <option value="General">General / Varios</option>
               <option value="Procesadores">Procesadores</option>
@@ -4371,12 +4378,35 @@ CLABE: 722969010514249300</textarea>
         try { document.getElementById('quote-number').value = computeNextFolio(); updateQRStamp(); } catch (e2) {}
       }
       try { setupQuoteAutosave(); } catch (e) {}
+      try { await refreshExchangeRate(false); } catch (e) {}
       let ok = await loadProtectedCatalogs();
       if (!ok) { await new Promise(r => setTimeout(r, 2500)); ok = await loadProtectedCatalogs(); }
       try { populateDynamicStoreCategories(); renderStoreProducts(); } catch (e) {}
       try { quickSyncTecnosinergia(false); } catch (e) {}
+      try { maybeRunDailyCatalogSync(); } catch (e) {}
     }
     function retryCatalogs() { _bootstrapped = false; _catalogsLoaded = false; _postLoginBootstrap(); }
+    function catalogFinishedAt(iso) {
+      if (!iso) return 0;
+      const t = new Date(iso).getTime();
+      return Number.isFinite(t) ? t : 0;
+    }
+    async function maybeRunDailyCatalogSync() {
+      // Si el último sync tiene >18 h, dispara actualización en segundo plano (Syscom+Tecno+FX).
+      try {
+        const st = await fetch('/catalog-cron', { credentials: 'same-origin' }).then(r => r.json()).catch(() => null);
+        const sysAt = catalogFinishedAt(st && st.syscom && st.syscom.finishedAt);
+        const tecAt = catalogFinishedAt(st && st.tecno && st.tecno.finishedAt);
+        const fxAt = catalogFinishedAt(st && st.fx && st.fx.at);
+        const oldest = Math.min(sysAt || 0, tecAt || 0, fxAt || 0);
+        const stale = !oldest || (Date.now() - oldest > 18 * 3600 * 1000);
+        const sysEmpty = !(st && st.syscom && st.syscom.total > 0);
+        if (!stale && !sysEmpty) return;
+        if (!(currentAuthUser && currentAuthUser.role === 'SUPERADMIN')) return;
+        fetch('/catalog-cron?async=1', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => {});
+        showToast('Actualizando catálogos Syscom/Tecnosinergia en segundo plano…');
+      } catch (e) { /* silencioso */ }
+    }
 
     const LEGACY_DEFAULT_TECNO_SKUS = new Set([
       "DH-HAC-HFW1200TLP-A","DH-HAC-HDW1200EM-A","DH-HAC-HFW1509TLM-IL",
@@ -4692,6 +4722,36 @@ CLABE: 722969010514249300</textarea>
       calculateTotals();
     }
 
+    async function refreshExchangeRate(force) {
+      try {
+        const r = await fetch('/fx' + (force ? '?refresh=1' : ''), { credentials: 'same-origin' });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok || !d.status || !(d.rate > 0)) throw new Error(d.message || 'FX HTTP ' + r.status);
+        applyExchangeRate(d.rate, d.source || '', d.at || '');
+        if (force) showToast('Tipo de cambio actualizado: $' + d.rate.toFixed(4) + ' MXN por USD');
+        return d.rate;
+      } catch (e) {
+        const cached = parseFloat(safeStorage.getItem('gaso_exchange_rate'));
+        if (cached > 10) applyExchangeRate(cached, 'caché local', '');
+        if (force) showToast('No se pudo actualizar el tipo de cambio: ' + e.message);
+        return cached || exchangeRate;
+      }
+    }
+    function applyExchangeRate(rate, source, at) {
+      exchangeRate = parseFloat(rate) || exchangeRate || 19.80;
+      const el = document.getElementById('exchange-rate');
+      if (el) el.value = exchangeRate;
+      const storeRateEl = document.getElementById('store-exchange-rate');
+      if (storeRateEl) storeRateEl.value = exchangeRate;
+      safeStorage.setItem('gaso_exchange_rate', exchangeRate);
+      const meta = document.getElementById('fx-rate-meta');
+      if (meta) {
+        const when = at ? new Date(at).toLocaleString('es-MX', { dateStyle: 'short', timeStyle: 'short' }) : '';
+        meta.textContent = (when ? when + ' · ' : '') + (source || 'auto');
+      }
+      try { renderStoreProducts(); } catch (e) {}
+      try { calculateTotals(); } catch (e) {}
+    }
     function updateExchangeRate() {
       const prevRate = exchangeRate || 19.80;
       const newRate = parseFloat(document.getElementById('exchange-rate').value) || 19.80;
@@ -6258,9 +6318,9 @@ function updateDashboardKPIs() { renderDashboard(); }
           : `$${p.rawPrice.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2})} MXN`;
 
         tr.innerHTML = `
-          <td class="store-c-sku"><strong style="color:var(--primary-dark); font-family:monospace; font-size:0.88rem;">${escapeHtml(p.sku)}</strong><div style="margin-top:3px;"><span class="store-badge ${storeBadgeClass}">${p.store}</span></div></td>
+          <td class="store-c-sku"><strong style="color:var(--primary-dark); font-family:monospace; font-size:0.88rem;">${escapeHtml(p.sku)}</strong><div style="margin-top:3px;"><span class="store-badge ${storeBadgeClass}">${p.store}</span></div>${stockBadgeHtml(p)}</td>
           <td class="store-c-brand"><strong>${escapeHtml(p.brand || "N/A")}</strong></td>
-          <td class="store-c-desc" style="max-width:360px; font-size:0.8rem; color:var(--gray-700);">${escapeHtml(p.desc)}</td>
+          <td class="store-c-desc" style="max-width:360px; font-size:0.8rem; color:var(--gray-700);">${escapeHtml(p.desc)}${p.taxNote === 'sin_iva_usd' ? '<div style="font-size:0.68rem;color:#64748b;margin-top:2px;">Precio distribuidor USD (sin IVA)</div>' : ''}</td>
           <td class="store-c-cost" style="text-align:right;"><div style="font-weight:600; color:var(--gray-800);">$${baseCostMxn.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2})} MXN</div><div style="font-family:monospace; font-size:0.7rem; color:var(--gray-500);">${rawPriceLabel}</div></td>
           <td class="store-c-price" style="text-align:right; font-weight:800; color:var(--primary-dark); font-size:0.95rem;">$${finalSellPrice.toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2})} MXN</td>
           <td class="store-col-action" style="text-align:center;">
@@ -6317,7 +6377,11 @@ function updateDashboardKPIs() { renderDashboard(); }
       });
 
       try { markQuoteDirty(); } catch (e) {}
-      showToast(`Producto ${p.sku} agregado a la cotización (${currentCurrency.code}).`);
+      if (p.store === 'Syscom' && !(Number(p.stockPuebla) > 0) && ((Number(p.stockOther) > 0) || (Number(p.stockTotal) > 0))) {
+        showToast('Agregado ' + p.sku + '. Aviso: sin existencia en Puebla; hay en otra sucursal.');
+      } else {
+        showToast(`Producto ${p.sku} agregado a la cotización (${currentCurrency.code}).`);
+      }
       switchTab('cotizador');
     }
 
@@ -6328,8 +6392,120 @@ function updateDashboardKPIs() { renderDashboard(); }
       showToast("Catálogos base restablecidos (Tecnosinergia solo vía API).");
     }
 
+    function stockBadgeHtml(p) {
+      if (!p || p.store !== 'Syscom') return '';
+      const pue = Number(p.stockPuebla) || 0;
+      const oth = Number(p.stockOther) || 0;
+      const tot = Number(p.stockTotal) || (pue + oth);
+      if (pue > 0) {
+        return '<div style="margin-top:4px;"><span style="background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:6px;padding:1px 6px;font-size:0.66rem;font-weight:800;">Puebla: ' + pue + '</span></div>';
+      }
+      if (oth > 0 || tot > 0) {
+        return '<div style="margin-top:4px;"><span style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:6px;padding:1px 6px;font-size:0.66rem;font-weight:800;" title="Puedes agregarlo igual; surte desde otra sucursal">Sin existencia en Puebla · hay en otra sucursal</span></div>';
+      }
+      if (p.stockLabel) {
+        return '<div style="margin-top:4px;"><span style="background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;border-radius:6px;padding:1px 6px;font-size:0.66rem;font-weight:700;">' + escapeHtml(p.stockLabel) + '</span></div>';
+      }
+      return '';
+    }
     function openImportCTModal() {
       openModal('modal-import-ct');
+    }
+    async function ensureXlsxLib() {
+      if (window.XLSX) return window.XLSX;
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('No se pudo cargar el lector Excel'));
+        document.head.appendChild(s);
+      });
+      if (!window.XLSX) throw new Error('SheetJS no disponible');
+      return window.XLSX;
+    }
+    async function importCtExcelFile(input) {
+      const status = document.getElementById('import-ct-xlsx-status');
+      const file = input && input.files && input.files[0];
+      if (!file) return;
+      try {
+        if (status) status.textContent = '⏳ Leyendo Excel…';
+        const XLSX = await ensureXlsxLib();
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+        const sheetCat = {
+          "COMPONENTES DE ENSAMBLE": 0, "EQUIPOS DE MARCA": 1, "IMPRESION, DIG. DE IMAGENES": 2, "CONSUMIBLES": 3,
+          "CONECTIVIDAD": 4, "TELEFONIA Y VIDEO VIGILANCIA": 5, "ELECTRONICA DE CONSUMO": 6, "LINEA BLANCA": 7,
+          "PUNTO DE VENTA": 8, "SOFTWARE": 9, "ACCESORIOS": 10, "ENERGIA": 11, "OUTLET": 12, "OUTLET EQUIPOS DE MARCA": 12
+        };
+        const sat = ["43201503","43211500","43212100","44103100","43222600","46171610","52161500","52141500","43212100","43231500","43211600","39121000","43211500"];
+        const catDesc = _ctCategories;
+        const brandFrom = (sku, desc) => {
+          const u = (sku + ' ' + desc).toUpperCase();
+          if (/INTEL|CPUINT/.test(u)) return 'Intel';
+          if (/AMD|RYZEN|CPUAMD/.test(u)) return 'AMD';
+          if (/APPLE|MACBOOK|COMMAC/.test(u)) return 'Apple';
+          if (/SAMSUNG|MONSMG/.test(u)) return 'Samsung';
+          if (/\bHP\b|CARHPD|IMPHPI/.test(u)) return 'HP';
+          if (/DELL|COMDDL/.test(u)) return 'Dell';
+          if (/LENOVO|COMLEV/.test(u)) return 'Lenovo';
+          if (/TP-?LINK|TARTPL/.test(u)) return 'TP-Link';
+          if (/TRIPP|REGTRL/.test(u)) return 'Tripp Lite';
+          if (/KINGSTON|MEMKGN/.test(u)) return 'Kingston';
+          return 'CT';
+        };
+        let tuples = [];
+        Object.keys(sheetCat).forEach(name => {
+          if (!wb.Sheets[name]) return;
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1, defval: '' });
+          const cat = sheetCat[name];
+          rows.forEach(r => {
+            const cells = Array.isArray(r) ? r : [];
+            const isMxn = cells.some(c => String(c || '').trim().toLowerCase() === 'm');
+            let sku = '', desc = '', price = 0;
+            for (let i = 0; i < cells.length; i++) {
+              const v = String(cells[i] ?? '').trim();
+              if (!/^[A-Z0-9][A-Z0-9\-_\/]{4,24}$/i.test(v) || /^ver ficha$/i.test(v)) continue;
+              let p = null;
+              for (let j = i + 1; j < Math.min(cells.length, i + 8); j++) {
+                if (typeof cells[j] === 'number' && cells[j] > 0) { p = cells[j]; break; }
+              }
+              if (!(p > 0)) continue;
+              sku = v; desc = String(cells[i + 1] || '').trim();
+              if (desc.length < 6) desc = String(cells[i + 2] || desc).trim();
+              price = p; break;
+            }
+            if (!sku || !(price > 0)) return;
+            tuples.push([cat, sku, brandFrom(sku, desc), (desc || sku).slice(0, 500), Math.round(price * 100) / 100, isMxn ? 1 : 0, sat[cat] || '43211500', catDesc[cat] || 'General']);
+          });
+        });
+        const map = new Map();
+        tuples.forEach(t => map.set(t[1], t));
+        tuples = [...map.values()];
+        if (!tuples.length) throw new Error('No se detectaron productos en el Excel.');
+        if (status) status.textContent = '⏳ Subiendo ' + tuples.length.toLocaleString('es-MX') + ' productos a la nube…';
+        const SIZE = 3000, parts = Math.ceil(tuples.length / SIZE);
+        for (let p = 0; p < parts; p++) {
+          if (status) status.textContent = '⏳ Subiendo CT parte ' + (p + 1) + '/' + parts + '…';
+          const r = await fetch('/catalog-import', {
+            method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: 'ct', part: p, rows: tuples.slice(p * SIZE, (p + 1) * SIZE) })
+          });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok) throw new Error(d.message || ('HTTP ' + r.status));
+        }
+        _ctTuples = tuples;
+        sampleCTProducts = _mapCT(tuples);
+        storeProducts = storeProducts.filter(p => p.store !== 'CT Internacional').concat(sampleCTProducts);
+        populateDynamicStoreCategories();
+        renderStoreProducts();
+        if (status) status.textContent = '✅ CT actualizado: ' + tuples.length.toLocaleString('es-MX') + ' productos.';
+        showToast('Lista CT importada (' + tuples.length.toLocaleString('es-MX') + ').');
+        closeModal('modal-import-ct');
+      } catch (e) {
+        if (status) status.textContent = '❌ ' + e.message;
+        showToast('Error al importar Excel CT: ' + e.message);
+      }
+      if (input) input.value = '';
     }
 
     function processImportedCTText() {

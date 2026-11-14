@@ -1,0 +1,11 @@
+name = "gaso-catalog-scheduler"
+main = "index.js"
+compatibility_date = "2026-11-14"
+workers_dev = false
+
+# 14:00 UTC = 08:00 hora Ciudad de México (invierno UTC-6)
+[triggers]
+crons = ["0 14 * * *"]
+
+[vars]
+GASO_BASE_URL = "https://gaso-mx.pages.dev"
