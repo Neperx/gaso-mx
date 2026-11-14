@@ -3097,7 +3097,9 @@
             <button type="button" role="menuitem" id="btn-share-wa" onclick="closeActionsMenu(); shareQuoteViaWhatsApp()">📲 WhatsApp</button>
           </div>
         </div>
-
+        <div id="quote-autosave-chip" title="La cotización se guarda sola y puedes reabrirla desde el Dashboard" style="display:none; max-width:min(280px,42vw); padding:0.28rem 0.55rem; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:0.68rem; font-weight:700; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          ● Auto-guardado
+        </div>
 
         <div class="user-chip-top" id="active-user-chip" title="Usuario con sesión activa" style="padding:0.25rem 0.55rem; font-size:0.74rem;">
           <span id="active-user-role-icon">👑</span>
@@ -4344,7 +4346,16 @@ CLABE: 722969010514249300</textarea>
       startSessionKeepAlive();
       try { ensureDefaultPublicClients(); refreshCRMViews(); } catch (e) {}
       try { await cloudBootstrap(); refreshCRMViews(); } catch (e) {}
-      try { document.getElementById('quote-number').value = computeNextFolio(); updateQRStamp(); } catch (e) {}
+      try {
+        if (!resumeLastOpenQuote()) {
+          document.getElementById('quote-number').value = computeNextFolio();
+          updateQRStamp();
+          updateQuoteEditChip('Nueva · se auto-guarda al escribir');
+        }
+      } catch (e) {
+        try { document.getElementById('quote-number').value = computeNextFolio(); updateQRStamp(); } catch (e2) {}
+      }
+      try { setupQuoteAutosave(); } catch (e) {}
       let ok = await loadProtectedCatalogs();
       if (!ok) { await new Promise(r => setTimeout(r, 2500)); ok = await loadProtectedCatalogs(); }
       try { populateDynamicStoreCategories(); renderStoreProducts(); } catch (e) {}
@@ -5124,6 +5135,7 @@ ${JSON.stringify(list)}`;
       tbody.appendChild(tr);
       syncPrintMirrors();
       calculateTotals();
+      try { if (data) markQuoteDirty(); } catch (e) {}
     }
 
     function removeRow(btn) {
@@ -5151,14 +5163,17 @@ ${JSON.stringify(list)}`;
         }
         syncPrintMirrors();
         calculateTotals();
+        try { markQuoteDirty(); } catch (e) {}
         showToast("Partida limpiada ($0.00).");
       }
+      try { markQuoteDirty(); } catch (e) {}
     }
 
     function clearAllQuoteRows() {
       const tbody = document.getElementById('items-body');
       tbody.innerHTML = '';
       addNewRow();
+      try { markQuoteDirty(); } catch (e) {}
       showToast("Todas las partidas han sido eliminadas.");
     }
 
@@ -5809,7 +5824,7 @@ function updateDashboardKPIs() { renderDashboard(); }
           const link = r.status === 'sales_note' && r.refCotFolio ? '<div style="font-size:0.66rem; color:#64748b;">↔ ' + escapeHtml(r.refCotFolio) + '</div>' : '';
           const fbtn = (r.status === 'approved' || r.status === 'sales_note') ? '<button type="button" class="btn btn-primary btn-sm" onclick="openInvoiceSheet(' + idx + ')">🧾 Facturar</button> ' : '';
           const inv = r.invoice ? '<div style="font-size:0.66rem; color:#15803d;">🧾 Facturada ' + escapeHtml(r.invoice.date || '') + (r.invoice.uuid ? ' · ' + escapeHtml(String(r.invoice.uuid).slice(0, 8)) + '…' : '') + '</div>' : '';
-          const acts = '<button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + idx + ')">📂 Abrir</button> ' + fbtn +
+          const acts = '<button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + idx + ')" title="Cargar en el cotizador para seguir editando el mismo folio">✏️ Editar</button> ' + fbtn +
             (r.status === 'draft' ? (isAdmin ? '<button type="button" class="btn btn-outline btn-sm" style="color:#b91c1c;" onclick="dashDeleteQuote(' + idx + ')">🗑️ Eliminar</button>' : '')
               : r.status === 'cancelled' ? '<button type="button" class="btn btn-outline btn-sm" onclick="dashRestoreQuote(' + idx + ')">↩️ Restaurar</button>'
               : '<button type="button" class="btn btn-outline btn-sm" style="color:#b45309;" onclick="dashCancelQuote(' + idx + ')">🚫 Cancelar</button>');
@@ -5887,7 +5902,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         '<div class="dash-card"><h3>🧭 Embudo por etapa</h3>' + m.stages.map(x => '<div style="margin-bottom:0.5rem;"><div style="display:flex; justify-content:space-between; font-size:0.74rem;"><b style="color:' + DASH_STATUS[x.k][1] + ';">' + DASH_STATUS[x.k][0] + ' (' + x.n + ')</b><span>' + dashFmt(x.amt) + '</span></div><div class="dash-bar"><i style="width:' + Math.round(x.amt / maxS * 100) + '%; background:' + DASH_STATUS[x.k][1] + ';"></i></div></div>').join('') + '</div></div>' +
 
         '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:0.9rem; margin-bottom:0.9rem;">' +
-        '<div class="dash-card"><h3>📞 Dar seguimiento (enviadas 5+ días)</h3>' + (m.follow.length ? m.follow.slice(0, 6).map(q => '<div class="dash-row"><span><b>' + E(q.number) + '</b> · ' + E((q.client && q.client.name) || '') + '<br><span style="color:#64748b;">' + dashFmt(dashMxn(q)) + ' · ' + E(q.date || '') + '</span></span><span style="white-space:nowrap;">' + wa((q.client && q.client.phone) || dashCrmPhone(q.client && q.client.name), 'Hola ' + ((q.client && q.client.name) || '') + ', te escribo de GASO Ingeniería para dar seguimiento a la cotización ' + q.number + '. ¿Pudiste revisarla? Quedo atento a tus comentarios.') + ' <button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + quotesHistory.indexOf(q) + ')">Abrir</button></span></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Nada pendiente de seguimiento.</p>') + '</div>' +
+        '<div class="dash-card"><h3>📞 Dar seguimiento (enviadas 5+ días)</h3>' + (m.follow.length ? m.follow.slice(0, 6).map(q => '<div class="dash-row"><span><b>' + E(q.number) + '</b> · ' + E((q.client && q.client.name) || '') + '<br><span style="color:#64748b;">' + dashFmt(dashMxn(q)) + ' · ' + E(q.date || '') + '</span></span><span style="white-space:nowrap;">' + wa((q.client && q.client.phone) || dashCrmPhone(q.client && q.client.name), 'Hola ' + ((q.client && q.client.name) || '') + ', te escribo de GASO Ingeniería para dar seguimiento a la cotización ' + q.number + '. ¿Pudiste revisarla? Quedo atento a tus comentarios.') + ' <button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + quotesHistory.indexOf(q) + ')">✏️ Editar</button></span></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Nada pendiente de seguimiento.</p>') + '</div>' +
         '<div class="dash-card"><h3>🔁 Reactivar clientes (+90 días)</h3>' + (m.idle.length ? m.idle.slice(0, 6).map(c => '<div class="dash-row"><span><b>' + E(c.name) + '</b><br><span style="color:#64748b;">Compró ' + dashFmt(c.won) + ' · último contacto ' + E(c.last) + '</span></span>' + wa(c.phone, 'Hola ' + c.name + ', soy de GASO Ingeniería. Hace tiempo trabajamos juntos y quería saber si hay algún proyecto (cámaras, redes, mantenimiento) en el que podamos apoyarte. ¡Con gusto te preparo una cotización!') + '</div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Aún no hay clientes inactivos con compra previa.</p>') + '</div></div>' +
 
         '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0.9rem; margin-bottom:0.9rem;">' +
@@ -6286,6 +6301,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         price: calcPriceByMarginFormula(baseCostInQuoteCurr, markupPct)
       });
 
+      try { markQuoteDirty(); } catch (e) {}
       showToast(`Producto ${p.sku} agregado a la cotización (${currentCurrency.code}).`);
       switchTab('cotizador');
     }
@@ -6844,7 +6860,82 @@ function updateDashboardKPIs() { renderDashboard(); }
       }
       return cloudSync();
     }
+    /* ---- Auto-guardado / reabrir mismo folio ---- */
+    const QUOTE_AUTOSAVE = { timer: null, dirty: false, saving: false, suppress: false, wired: false, lastSavedAt: 0 };
+    function updateQuoteEditChip(msg) {
+      const el = document.getElementById('quote-autosave-chip');
+      if (!el) return;
+      const folio = (document.getElementById('quote-number') || {}).value || currentLoadedQuoteNumber || '';
+      el.style.display = 'block';
+      el.textContent = msg || (folio ? ('● Editando ' + folio) : '● Auto-guardado');
+    }
+    function markQuoteDirty() {
+      if (QUOTE_AUTOSAVE.suppress) return;
+      if (!document.body.classList.contains('app-authenticated')) return;
+      QUOTE_AUTOSAVE.dirty = true;
+      updateQuoteEditChip('⏳ Guardando… ' + ((document.getElementById('quote-number') || {}).value || ''));
+      clearTimeout(QUOTE_AUTOSAVE.timer);
+      QUOTE_AUTOSAVE.timer = setTimeout(function() { autosaveCurrentQuote(); }, 1800);
+    }
+    function quoteHasMeaningfulContent(data) {
+      if (!data) return false;
+      const name = ((data.client && data.client.name) || '').trim().toUpperCase();
+      const isDefaultPublic = !name || name.indexOf('VENTA AL PÚBLICO') === 0;
+      const hasText = (data.items || []).some(function(it) {
+        return String(it.description || '').trim().length > 8 || String(it.concept || '').trim().length > 2 || (parseFloat(it.price) || 0) > 0;
+      });
+      const hasClient = !isDefaultPublic || String((data.client && data.client.contact) || '').trim() || String((data.client && data.client.phone) || '').trim();
+      return hasText || hasClient || (parseFloat(data.totalAmount) || 0) > 0;
+    }
+    function autosaveCurrentQuote() {
+      if (QUOTE_AUTOSAVE.saving || QUOTE_AUTOSAVE.suppress) return;
+      if (!document.body.classList.contains('app-authenticated')) return;
+      let data;
+      try { data = getQuoteData(); } catch (e) { return; }
+      if (!quoteHasMeaningfulContent(data)) {
+        QUOTE_AUTOSAVE.dirty = false;
+        updateQuoteEditChip('Nueva · se auto-guarda al escribir');
+        return;
+      }
+      saveCurrentQuote({ silent: true, auto: true });
+    }
+    function setupQuoteAutosave() {
+      if (QUOTE_AUTOSAVE.wired) return;
+      QUOTE_AUTOSAVE.wired = true;
+      const pane = document.getElementById('pane-cotizador');
+      if (pane) {
+        pane.addEventListener('input', markQuoteDirty, true);
+        pane.addEventListener('change', markQuoteDirty, true);
+      }
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden && QUOTE_AUTOSAVE.dirty) autosaveCurrentQuote();
+      });
+      window.addEventListener('beforeunload', function() {
+        if (QUOTE_AUTOSAVE.dirty) {
+          try { saveCurrentQuote({ silent: true, auto: true, syncNow: false }); } catch (e) {}
+        }
+      });
+    }
+    function resumeLastOpenQuote() {
+      const folio = safeStorage.getItem('gaso_last_open_folio');
+      if (!folio) return false;
+      const idx = quotesHistory.findIndex(function(q) { return q && q.number === folio; });
+      if (idx < 0) return false;
+      QUOTE_AUTOSAVE.suppress = true;
+      try {
+        loadQuoteFromHistory(idx, { resume: true });
+        updateQuoteEditChip('Reanudada · ' + folio);
+        showToast('Se reanudó ' + folio + '. Puedes seguir editando el mismo folio.');
+        return true;
+      } finally {
+        setTimeout(function() { QUOTE_AUTOSAVE.suppress = false; QUOTE_AUTOSAVE.dirty = false; }, 400);
+      }
+    }
+
     function startNewQuote() {
+      QUOTE_AUTOSAVE.suppress = true;
+      clearTimeout(QUOTE_AUTOSAVE.timer);
+      QUOTE_AUTOSAVE.dirty = false;
       const nextFolio = computeNextFolio();
       currentLoadedQuoteNumber = null;
       applyTermsDefaults();
@@ -6869,47 +6960,71 @@ function updateDashboardKPIs() { renderDashboard(); }
 
       clearSignature('client');
       updateQRStamp();
+      try { safeStorage.removeItem('gaso_last_open_folio'); } catch (e) {}
+      updateQuoteEditChip('Nueva · ' + nextFolio);
+      setTimeout(function() { QUOTE_AUTOSAVE.suppress = false; QUOTE_AUTOSAVE.dirty = false; }, 300);
 
-      showToast("Nueva cotización limpia iniciada: " + nextFolio);
+      showToast("Nueva cotización limpia iniciada: " + nextFolio + ". Al escribir se auto-guarda; usa Dashboard → Editar para retomarla.");
     }
 
-    function saveCurrentQuote() {
-      const data = getQuoteData();
-      let existingIdx = quotesHistory.findIndex(q => q.number === data.number);
-      // Una Nota de Venta generada desde una cotización REEMPLAZA a esa cotización (un solo registro por operación)
-      if (existingIdx < 0 && data.status === 'sales_note' && data.refCotFolio) {
-        existingIdx = quotesHistory.findIndex(q => q.number === data.refCotFolio);
-      }
-      // Protección: no pisar en silencio un folio que ya existe y que no es el documento que estás editando
-      if (existingIdx >= 0 && quotesHistory[existingIdx].number === data.number && data.number !== currentLoadedQuoteNumber) {
-        const prev = quotesHistory[existingIdx];
-        if (!confirm('El folio ' + data.number + ' ya existe (cliente: ' + ((prev.client && prev.client.name) || '—') + '). ¿Reemplazarlo con esta cotización?\n\nSi no, cancela y usa "Nueva" para tomar el siguiente folio.')) return;
-      }
-      currentLoadedQuoteNumber = data.number;
-      bumpFolioSeq(data.number);
-      if (existingIdx >= 0 && quotesHistory[existingIdx].invoice) data.invoice = quotesHistory[existingIdx].invoice;
-      if (existingIdx >= 0) {
-        quotesHistory[existingIdx] = data;
-      } else {
-        quotesHistory.unshift(data);
-      }
-      safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
+    function saveCurrentQuote(opts) {
+      opts = opts || {};
+      const silent = !!opts.silent;
+      const auto = !!opts.auto;
+      if (QUOTE_AUTOSAVE.saving && auto) return false;
+      QUOTE_AUTOSAVE.saving = true;
+      try {
+        const data = getQuoteData();
+        if (auto && !quoteHasMeaningfulContent(data)) {
+          QUOTE_AUTOSAVE.dirty = false;
+          return false;
+        }
+        let existingIdx = quotesHistory.findIndex(q => q.number === data.number);
+        // Una Nota de Venta generada desde una cotización REEMPLAZA a esa cotización (un solo registro por operación)
+        if (existingIdx < 0 && data.status === 'sales_note' && data.refCotFolio) {
+          existingIdx = quotesHistory.findIndex(q => q.number === data.refCotFolio);
+        }
+        // Protección: no pisar en silencio un folio que ya existe y que no es el documento que estás editando
+        if (existingIdx >= 0 && quotesHistory[existingIdx].number === data.number && data.number !== currentLoadedQuoteNumber) {
+          if (auto) return false;
+          const prev = quotesHistory[existingIdx];
+          if (!confirm('El folio ' + data.number + ' ya existe (cliente: ' + ((prev.client && prev.client.name) || '—') + '). ¿Reemplazarlo con esta cotización?\n\nSi no, cancela y usa "Nueva" para tomar el siguiente folio.')) return false;
+        }
+        currentLoadedQuoteNumber = data.number;
+        bumpFolioSeq(data.number);
+        data.updatedAt = new Date().toISOString();
+        if (existingIdx >= 0 && quotesHistory[existingIdx].invoice) data.invoice = quotesHistory[existingIdx].invoice;
+        if (existingIdx >= 0) {
+          quotesHistory[existingIdx] = data;
+        } else {
+          quotesHistory.unshift(data);
+        }
+        safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
+        safeStorage.setItem('gaso_last_open_folio', data.number);
 
-      const clientName = data.client.name.trim();
-      const cli = crmClients.find(c => c.name.toLowerCase() === clientName.toLowerCase());
-      if (cli) {
-        const clientQuotes = quotesHistory.filter(q => q.client && q.client.name && q.client.name.toLowerCase() === cli.name.toLowerCase());
-        cli.lastDate = data.date;
-        cli.lastFolio = data.number;
-        cli.quotesCount = clientQuotes.length;
-        cli.totalQuoted = clientQuotes.reduce((acc, q) => acc + (parseFloat(q.totalAmount) || 0), 0);
-        cli.totalWon = clientQuotes.filter(q => q.status === 'approved' || q.status === 'sales_note').reduce((acc, q) => acc + (parseFloat(q.totalAmount) || 0), 0);
-        safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients));
-      }
+        const clientName = data.client.name.trim();
+        const cli = crmClients.find(c => c.name.toLowerCase() === clientName.toLowerCase());
+        if (cli) {
+          const clientQuotes = quotesHistory.filter(q => q.client && q.client.name && q.client.name.toLowerCase() === cli.name.toLowerCase());
+          cli.lastDate = data.date;
+          cli.lastFolio = data.number;
+          cli.quotesCount = clientQuotes.length;
+          cli.totalQuoted = clientQuotes.reduce((acc, q) => acc + (parseFloat(q.totalAmount) || 0), 0);
+          cli.totalWon = clientQuotes.filter(q => q.status === 'approved' || q.status === 'sales_note').reduce((acc, q) => acc + (parseFloat(q.totalAmount) || 0), 0);
+          safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients));
+        }
 
-      refreshCRMViews();
-      try { cloudPushSoon(); } catch (e) {}
-      showToast(`Cotización ${data.number} guardada exitosamente.`);
+        refreshCRMViews();
+        try { cloudPushSoon(); } catch (e) {}
+        QUOTE_AUTOSAVE.dirty = false;
+        QUOTE_AUTOSAVE.lastSavedAt = Date.now();
+        const hh = new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        updateQuoteEditChip((auto ? '● Auto-guardado ' : '● Guardada ') + hh + ' · ' + data.number);
+        if (!silent) showToast(`Cotización ${data.number} guardada. Puedes seguir editándola o reabrirla desde Dashboard → Editar.`);
+        return true;
+      } finally {
+        QUOTE_AUTOSAVE.saving = false;
+      }
     }
 
     function handleStatusChange() {
@@ -7136,9 +7251,13 @@ function updateDashboardKPIs() { renderDashboard(); }
       };
     }
 
-    function loadQuoteFromHistory(idx) {
+    function loadQuoteFromHistory(idx, opts) {
+      opts = opts || {};
       const q = quotesHistory[idx];
       if (!q) return;
+      QUOTE_AUTOSAVE.suppress = true;
+      clearTimeout(QUOTE_AUTOSAVE.timer);
+      QUOTE_AUTOSAVE.dirty = false;
       currentLoadedQuoteNumber = q.number;
       document.getElementById('quote-number').value = q.number || 'COT-2026-001';
       if (q.refCotFolio && document.getElementById('ref-cot-folio')) {
@@ -7185,8 +7304,11 @@ function updateDashboardKPIs() { renderDashboard(); }
 
       handleStatusChange();
       calculateTotals();
+      try { safeStorage.setItem('gaso_last_open_folio', q.number); } catch (e) {}
+      updateQuoteEditChip('Editando · ' + q.number);
       switchTab('cotizador');
-      showToast(`Documento ${q.number} cargado en el editor.`);
+      if (!opts.resume) showToast(`Documento ${q.number} cargado. Puedes agregar partidas o texto y se actualiza el mismo folio (no se crea uno nuevo).`);
+      setTimeout(function() { QUOTE_AUTOSAVE.suppress = false; QUOTE_AUTOSAVE.dirty = false; }, 400);
     }
 
     function printQuote() {
