@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GASO INGENIERÍA - Cotizador Profesional, CRM, QR & Multi-Tienda</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>�a�</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
   <style>
     :root {
       --primary: #0077b6;
@@ -1071,7 +1071,7 @@
     }
 
     /* ========================================================= */
-    /* OPTIMIZACI�N DE IMPRESI�N / PDF FORMATO FACTURA CFDI 4.0  */
+    /* OPTIMIZACIÓN DE IMPRESIÓN / PDF FORMATO FACTURA CFDI 4.0  */
     /* ========================================================= */
     @media print {
       .internal-control-th,
@@ -1082,30 +1082,6 @@
       .items-table th.col-desc, .items-table td.col-desc { width: 62% !important; }
       .items-table th.col-unit-price, .items-table td.col-unit-price { width: 15% !important; }
       .items-table th.col-total, .items-table td.col-total { width: 15% !important; }
-
-      /* Evitar que conceptos con descripciones largas se recorten en el PDF */
-      .print-mirror,
-      .print-mirror-title,
-      .print-mirror-desc,
-      #print-banking-mirror,
-      #print-terms-mirror {
-        white-space: pre-wrap !important;
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
-        max-height: none !important;
-        overflow: visible !important;
-      }
-      .print-mirror-desc,
-      #print-banking-mirror,
-      #print-terms-mirror {
-        word-break: break-word !important;
-      }
-
-      /* No partir una fila de concepto entre dos páginas */
-      .items-table tr {
-        break-inside: avoid !important;
-        page-break-inside: avoid !important;
-      }
 
       input[type="date"]::-webkit-calendar-picker-indicator,
       input::-webkit-inner-spin-button,
@@ -1548,20 +1524,11 @@
       line-height: 1.22 !important;
       color: #1e293b !important;
       white-space: normal !important;
-      word-wrap: break-word !important;
-      overflow-wrap: break-word !important;
-      max-height: none !important;
-      overflow: visible !important;
     }
     .quote-paper.exporting-pdf-mode .print-mirror-desc,
     .quote-paper.exporting-pdf-mode #print-banking-mirror,
     .quote-paper.exporting-pdf-mode #print-terms-mirror {
       white-space: pre-wrap !important;
-      word-wrap: break-word !important;
-      overflow-wrap: break-word !important;
-      word-break: break-word !important;
-      max-height: none !important;
-      overflow: visible !important;
     }
     .quote-paper.exporting-pdf-mode .print-client-type {
       display: block !important;
@@ -1690,7 +1657,7 @@
 
   
     /* =================================================================== */
-    /* PÁGINA EJECUTIVA P�aBLICA (ESTILO 2 ARQUITECT�NICO MINIMALISTA)      */
+    /* PÁGINA EJECUTIVA PÚBLICA (ESTILO 2 ARQUITECTÓNICO MINIMALISTA)      */
     /* =================================================================== */
     #public-landing-page {
       min-height: 100vh;
@@ -2056,7 +2023,7 @@
     }
 
     /* =================================================================== */
-    /* CINTA SUPERIOR SIM�0TRICA A LA RETÍCULA DE COTIZACI�N (1050PX)       */
+    /* CINTA SUPERIOR SIMÉTRICA A LA RETÍCULA DE COTIZACIÓN (1050PX)       */
     /* =================================================================== */
     .top-bar {
       background: var(--gray-900);
@@ -2117,7 +2084,7 @@
     }
 
     /* =================================================================== */
-    /* BOT�N DE CHAT FLOTANTE PARA EL ASISTENTE IA                         */
+    /* BOTÓN DE CHAT FLOTANTE PARA EL ASISTENTE IA                         */
     /* =================================================================== */
     #floating-ai-btn {
       position: fixed;
@@ -2144,7 +2111,7 @@
     }
 
     /* =================================================================== */
-    /* MODO SIN FACTURA (NOTA DE REMISI�N / NETO SIN IMPUESTOS)            */
+    /* MODO SIN FACTURA (NOTA DE REMISIÓN / NETO SIN IMPUESTOS)            */
     /* =================================================================== */
     .quote-paper.sin-factura-mode .company-regime-pill,
     .quote-paper.sin-factura-mode #print-client-type-tag,
@@ -2201,7 +2168,7 @@
 
   
     /* =================================================================== */
-    /* CORRECCI�N INTEGRAL DE VENTANAS EMERGENTES (MODALS & CLOSE BUTTON)  */
+    /* CORRECCIÓN INTEGRAL DE VENTANAS EMERGENTES (MODALS & CLOSE BUTTON)  */
     /* =================================================================== */
     .modal-box,
     .modal-card {
@@ -2360,7 +2327,7 @@
     }
 
     /* =================================================================== */
-    /* BOTONES Y VENTANAS FLOTANTES P�aBLICAS (WHATSAPP + IA COTIZADOR)     */
+    /* BOTONES Y VENTANAS FLOTANTES PÚBLICAS (WHATSAPP + IA COTIZADOR)     */
     /* =================================================================== */
     .public-floating-dock {
       position: fixed;
@@ -2652,7 +2619,7 @@
     .crm-only td:nth-child(1) { font-size: 1rem; }
     .crm-only td:not(:nth-child(1))::before { display: block; font-size: 0.68rem; font-weight: 700; color: #64748b; }
     .crm-only td:nth-child(2)::before { content: "Tipo"; } .crm-only td:nth-child(3)::before { content: "RFC"; }
-    .crm-only td:nth-child(4)::before { content: "Contacto"; } .crm-only td:nth-child(5)::before { content: "�altima cotización"; }
+    .crm-only td:nth-child(4)::before { content: "Contacto"; } .crm-only td:nth-child(5)::before { content: "Última cotización"; }
     .crm-only td:nth-child(6)::before { content: "Total cotizado"; } .crm-only td:nth-child(7)::before { content: "Total ganado"; }
     .crm-header { flex-direction: column !important; align-items: stretch !important; gap: 0.6rem; }
     .crm-header .btn { width: 100%; justify-content: center; min-height: 48px; }
@@ -2718,7 +2685,7 @@
   </script>
 
   <!-- =================================================================== -->
-  <!-- PÁGINA WEB EJECUTIVA P�aBLICA � GASO INGENIERÍA (DISE�O APROBADO)    -->
+  <!-- PÁGINA WEB EJECUTIVA PÚBLICA — GASO INGENIERÍA (DISEÑO APROBADO)    -->
   <!-- =================================================================== -->
   <div id="public-landing-page" class="no-print">
     <!-- Formulario oculto para que Netlify Forms detecte el registro de clientes (los datos llegan al panel Forms y por correo) -->
@@ -2745,7 +2712,7 @@
 
         <div class="exec-nav-actions">
           <button type="button" class="btn-exec-cotizador" style="background:#0284c7; border-color:#0284c7;" onclick="openCotizadorLogin()" title="Acceso exclusivo para personal de GASO INGENIERÍA">
-            �x Ingresar al Cotizador
+            🔒 Ingresar al Cotizador
           </button>
         </div>
       </div>
@@ -2755,7 +2722,7 @@
     <section class="exec-hero-split" id="inicio">
       <div>
         <h1 style="font-size:clamp(1.55rem, 7.4vw, 2.45rem); overflow-wrap:anywhere; font-weight:900; color:#0f172a; line-height:1.12; letter-spacing:-0.02em; margin:0 0 1rem; text-transform:uppercase;">
-          INGENIERÍA,<br>AUTOMATIZACI�N<br>Y TECNOLOGÍA
+          INGENIERÍA,<br>AUTOMATIZACIÓN<br>Y TECNOLOGÍA
         </h1>
         <div style="width:52px; height:4px; background:#0284c7; border-radius:2px; margin-bottom:1.1rem;"></div>
         <p style="font-size:1.02rem; color:#334155; line-height:1.62; margin:0 0 1.65rem;">
@@ -2764,7 +2731,7 @@
 
         <div style="display:flex; flex-wrap:wrap; gap:0.75rem;">
           <button type="button" class="btn-exec-wa" style="border:none; cursor:pointer;" onclick="togglePublicRegistration(true)">
-            �x9 Registrarme como cliente
+            📋 Registrarme como cliente
           </button>
           <button type="button" class="btn-exec-secondary" onclick="scrollToPublicSection('servicios')">
             Conoce más
@@ -2845,11 +2812,11 @@
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.85rem; font-size:0.82rem;">
           <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:0.85rem; border-radius:10px;">
-            <strong style="color:#0f172a; display:block; margin-bottom:0.2rem;">�S Atención Directa</strong>
+            <strong style="color:#0f172a; display:block; margin-bottom:0.2rem;">✓ Atención Directa</strong>
             <span style="color:#64748b;">Levantamiento técnico, diseño e ingeniería en Puebla.</span>
           </div>
           <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:0.85rem; border-radius:10px;">
-            <strong style="color:#0f172a; display:block; margin-bottom:0.2rem;">�S Equipos Originales</strong>
+            <strong style="color:#0f172a; display:block; margin-bottom:0.2rem;">✓ Equipos Originales</strong>
             <span style="color:#64748b;">Garantía de fábrica y soporte post-venta especializado.</span>
           </div>
         </div>
@@ -2881,15 +2848,15 @@
             <img src="logo.png" alt="GASO INGENIERÍA" style="height:34px; width:auto; display:block;">
           </div>
           <div style="font-size:0.84rem; color:#94a3b8; max-width:460px; line-height:1.5;">
-            <strong>GASO INGENIERÍA</strong> ⬢ RFC: GATM851209T92<br>
+            <strong>GASO INGENIERÍA</strong> • RFC: GATM851209T92<br>
             Aldama No. 2, Sanctorum, Cuautlancingo, Puebla, C.P. 72730<br>
-            Tel / WhatsApp: (222) 376-3195 ⬢ Correo: gaso.ingenieria@gmail.com
+            Tel / WhatsApp: (222) 376-3195 • Correo: gaso.ingenieria@gmail.com
           </div>
         </div>
 
         <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
           <a href="https://wa.me/522223763195?text=Hola%20GASO%20INGENIER%C3%8DA%2C%20solicito%20informaci%C3%B3n%20sobre%20un%20proyecto." target="_blank" rel="noopener" style="color:#38bdf8; text-decoration:none; font-size:0.85rem; font-weight:700;">
-            �x� WhatsApp Directo: (222) 376-3195
+            📲 WhatsApp Directo: (222) 376-3195
           </a>
           <span style="font-size:0.75rem; color:#64748b;">© 2026 GASO INGENIERÍA. Todos los derechos reservados.</span>
         </div>
@@ -2897,21 +2864,21 @@
     </footer>
 
     <!-- =============================================================== -->
-    <!-- VENTANA FLOTANTE DE ASISTENTE IA P�aBLICO (PRE-COTIZADOR WEB)    -->
+    <!-- VENTANA FLOTANTE DE ASISTENTE IA PÚBLICO (PRE-COTIZADOR WEB)    -->
     <!-- =============================================================== -->
     <div id="public-ai-chat-window">
       <div style="background:linear-gradient(135deg, #0f172a, #0284c7); color:#ffffff; padding:0.85rem 1rem; display:flex; justify-content:space-between; align-items:center;">
         <div>
-          <div style="font-weight:800; font-size:0.92rem;">�x9 Registro de Clientes</div>
+          <div style="font-weight:800; font-size:0.92rem;">📋 Registro de Clientes</div>
           <div style="font-size:0.72rem; color:#bae6fd;" id="pub-ai-subtitle">Déjanos tus datos y un asesor te contacta</div>
         </div>
-        <button type="button" class="modal-close" style="color:#ffffff; background:rgba(255,255,255,0.15);" onclick="togglePublicRegistration(false)">�S"</button>
+        <button type="button" class="modal-close" style="color:#ffffff; background:rgba(255,255,255,0.15);" onclick="togglePublicRegistration(false)">✕</button>
       </div>
 
       <!-- PASO 1: FORMULARIO DE ALTA DE CLIENTE EN CRM + VERIFICADOR HUMANO -->
       <div id="pub-ai-lead-gate" style="padding:0.95rem 1rem; background:#ffffff; display:flex; flex-direction:column; gap:0.55rem; font-size:0.8rem; max-height:420px; overflow-y:auto;">
         <div style="background:#f0f9ff; border:1px solid #bae6fd; color:#0369a1; padding:0.5rem 0.65rem; border-radius:8px; font-size:0.75rem; font-weight:600; line-height:1.35;">
-          �x9 Regístrate como cliente y un asesor te enviará tu cotización personalizada:
+          📋 Regístrate como cliente y un asesor te enviará tu cotización personalizada:
         </div>
 
         <div id="pub-lead-error" style="display:none; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:0.45rem 0.65rem; border-radius:6px; font-size:0.74rem; font-weight:700;"></div>
@@ -2920,17 +2887,17 @@
         <input type="text" id="pub-lead-website-hp" name="bot-field" style="display:none;" tabindex="-1" autocomplete="off">
 
         <div>
-          <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">�x� Nombre Completo o Empresa *</label>
+          <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">👤 Nombre Completo o Empresa *</label>
           <input type="text" id="pub-lead-name" class="form-input" placeholder="Ej. Ing. Carlos Méndez / Constructora Sur" style="width:100%; font-size:0.8rem; padding:0.42rem 0.6rem;">
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.45rem;">
           <div>
-            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">�x� WhatsApp / Teléfono *</label>
+            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">📱 WhatsApp / Teléfono *</label>
             <input type="tel" id="pub-lead-phone" class="form-input" placeholder="10 dígitos (ej. 2221234567)" maxlength="14" style="width:100%; font-size:0.8rem; padding:0.42rem 0.6rem;">
           </div>
           <div>
-            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">�x�� Tipo de Cliente</label>
+            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">🏢 Tipo de Cliente</label>
             <select id="pub-lead-type" class="form-select" onchange="onPublicRfcInput()" style="width:100%; font-size:0.78rem; padding:0.42rem 0.45rem;">
               <option value="fisica">Persona Física / Hogar</option>
               <option value="moral">Empresa / Persona Moral</option>
@@ -2939,24 +2906,24 @@
         </div>
 
         <div>
-          <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">�x�� RFC <span style="color:#dc2626;">*</span></label>
+          <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">🧾 RFC <span style="color:#dc2626;">*</span></label>
           <input type="text" id="pub-lead-rfc" class="form-input" placeholder="12 caracteres (Moral) o 13 (Física)" maxlength="13" autocomplete="off" autocapitalize="characters" oninput="onPublicRfcInput()" style="width:100%; font-size:0.78rem; padding:0.4rem 0.55rem; font-family:monospace; text-transform:uppercase;">
           <div id="pub-rfc-hint" style="font-size:0.68rem; color:#64748b; margin-top:2px;">Persona Física: 13 caracteres · Persona Moral: 12 caracteres.</div>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.45rem;">
           <div>
-            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">�S0️ Correo Electrónico</label>
+            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">✉️ Correo Electrónico</label>
             <input type="email" id="pub-lead-email" class="form-input" placeholder="correo@ejemplo.com" style="width:100%; font-size:0.78rem; padding:0.4rem 0.55rem;">
           </div>
           <div>
-            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">�x� Municipio / Zona</label>
+            <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">📍 Municipio / Zona</label>
             <input type="text" id="pub-lead-address" class="form-input" placeholder="Ej. Puebla / Cuautlancingo" style="width:100%; font-size:0.78rem; padding:0.4rem 0.55rem;">
           </div>
         </div>
 
         <div>
-          <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">�x� ¿Qué necesitas? (opcional)</label>
+          <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">📝 ¿Qué necesitas? (opcional)</label>
           <textarea id="pub-lead-need" class="form-input" rows="2" maxlength="400" placeholder="Ej. 4 cámaras CCTV para mi negocio e instalación" style="width:100%; font-size:0.78rem; padding:0.4rem 0.55rem; resize:vertical;"></textarea>
         </div>
         <label style="display:flex; gap:0.45rem; align-items:flex-start; font-size:0.72rem; color:#334155; line-height:1.35; cursor:pointer;">
@@ -2969,40 +2936,40 @@
         </label>
 
         <button type="button" class="btn btn-primary" id="btn-pub-lead-submit" onclick="submitPublicRegistration()" style="width:100%; justify-content:center; background:linear-gradient(135deg, #0f172a, #0284c7); border:none; padding:0.6rem; font-size:0.84rem; font-weight:800; margin-top:0.15rem;">
-          �S& Enviar mi registro
+          ✅ Enviar mi registro
         </button>
       </div>
 
-      <!-- CONFIRMACI�N DE REGISTRO -->
+      <!-- CONFIRMACIÓN DE REGISTRO -->
       <div id="pub-reg-success" style="display:none; padding:1.4rem 1.1rem; text-align:center; background:#ffffff;">
-        <div style="font-size:2.2rem;">�S&</div>
+        <div style="font-size:2.2rem;">✅</div>
         <div style="font-weight:800; font-size:1rem; color:#0f172a; margin:0.4rem 0;">¡Gracias por registrarte!</div>
         <p style="font-size:0.82rem; color:#475569; line-height:1.45; margin-bottom:0.9rem;">Recibimos tus datos. Un asesor de GASO Ingeniería te contactará muy pronto para preparar tu cotización.</p>
-        <a id="pub-reg-wa" href="#" target="_blank" rel="noopener" class="btn btn-success btn-sm" style="width:100%; justify-content:center; background:#16a34a; color:#ffffff; font-weight:800; text-decoration:none; border-radius:8px; padding:0.55rem;">�x� Escribirnos ahora por WhatsApp</a>
+        <a id="pub-reg-wa" href="#" target="_blank" rel="noopener" class="btn btn-success btn-sm" style="width:100%; justify-content:center; background:#16a34a; color:#ffffff; font-weight:800; text-decoration:none; border-radius:8px; padding:0.55rem;">📲 Escribirnos ahora por WhatsApp</a>
         <button type="button" onclick="resetPublicRegistration()" style="background:none; border:none; color:#0284c7; font-size:0.74rem; font-weight:700; cursor:pointer; text-decoration:underline; margin-top:0.7rem;">Registrar otro cliente</button>
       </div>
     </div>
 
     <!-- =============================================================== -->
-    <!-- DOCK FLOTANTE P�aBLICO: 1) ASISTENTE IA  +  2) WHATSAPP DIRECTO  -->
+    <!-- DOCK FLOTANTE PÚBLICO: 1) ASISTENTE IA  +  2) WHATSAPP DIRECTO  -->
     <!-- =============================================================== -->
     <div class="public-floating-dock">
       <a href="https://wa.me/522223763195?text=Hola%20GASO%20INGENIER%C3%8DA%2C%20me%20gustar%C3%ADa%20solicitar%20una%20cotizaci%C3%B3n." target="_blank" rel="noopener" class="pub-fab-btn pub-fab-wa">
-        <span>�x�</span>
+        <span>📲</span>
         <span>WhatsApp</span>
       </a>
     </div>
   </div>
 
   <!-- =================================================================== -->
-  <!-- PANTALLA DE BLOQUEO E INICIO DE SESI�N (SEGURIDAD DE ACCESO)        -->
+  <!-- PANTALLA DE BLOQUEO E INICIO DE SESIÓN (SEGURIDAD DE ACCESO)        -->
   <!-- =================================================================== -->
   <div id="auth-login-overlay" class="no-print hidden-gate">
     <div class="login-card">
       <div class="login-card-header">
         <img src="logo.png" alt="GASO INGENIERÍA">
         <div style="font-size:0.68rem; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:#38bdf8; margin-bottom:0.2rem;">
-          �x Acceso Restringido ⬢ Seguridad de Inicio
+          🔒 Acceso Restringido • Seguridad de Inicio
         </div>
         <h2 style="font-size:1.2rem; font-weight:800; margin:0; color:#ffffff;">GASO INGENIERÍA</h2>
         <p style="font-size:0.78rem; color:#cbd5e1; margin-top:0.2rem;">Sistema de Cotizaciones, Catálogo CT/Syscom & CRM</p>
@@ -3014,18 +2981,18 @@
         <form onsubmit="handleLoginSubmit(event)" autocomplete="off">
           <div style="margin-bottom:0.9rem;">
             <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">
-              �x� Usuario o Correo Electrónico:
+              👤 Usuario o Correo Electrónico:
             </label>
             <input type="text" id="login-username" class="form-input" style="width:100%; font-size:0.9rem; padding:0.55rem 0.75rem;" placeholder="Ej. admin o gaso.ingenieria@gmail.com" required>
           </div>
 
           <div style="margin-bottom:0.9rem;">
             <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">
-              �x Contraseña de Acceso:
+              🔑 Contraseña de Acceso:
             </label>
             <div style="display:flex; gap:0.4rem;">
               <input type="password" id="login-password" class="form-input" style="flex:1; font-size:0.9rem; padding:0.55rem 0.75rem;" placeholder="Ingresa tu contraseña..." required>
-              <button type="button" class="btn btn-outline btn-sm" onclick="toggleLoginPassword()" id="btn-toggle-login-pass" title="Mostrar u ocultar contraseña">�x�️</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="toggleLoginPassword()" id="btn-toggle-login-pass" title="Mostrar u ocultar contraseña">👁️</button>
             </div>
           </div>
 
@@ -3039,15 +3006,15 @@
           </div>
 
           <button type="submit" class="btn btn-primary" style="width:100%; padding:0.7rem; font-size:0.92rem; font-weight:800; justify-content:center; background:linear-gradient(135deg, #1e3a8a, #0284c7); border:none;">
-            �x� Iniciar Sesión en el Sistema
+            🔐 Iniciar Sesión en el Sistema
           </button>
           <button type="button" class="btn btn-outline" onclick="closeCotizadorLogin()" style="width:100%; margin-top:0.55rem; padding:0.5rem; font-size:0.8rem; font-weight:700; justify-content:center;">
-            � � Volver a la Página Web Ejecutiva
+            ← Volver a la Página Web Ejecutiva
           </button>
         </form>
 
         <div id="login-recovery-box" style="display:none; margin-top:1.1rem; padding-top:1rem; border-top:1px dashed #cbd5e1; font-size:0.78rem;">
-          <div style="font-weight:800; color:#0f172a; margin-bottom:0.35rem;">�x:�️ ¿Olvidaste tu contraseña?</div>
+          <div style="font-weight:800; color:#0f172a; margin-bottom:0.35rem;">🛠️ ¿Olvidaste tu contraseña?</div>
           <p style="color:#475569; line-height:1.35;">Por seguridad, las contraseñas se administran en el servidor. Solicita el cambio al administrador del sitio.</p>
         </div>
       </div>
@@ -3098,22 +3065,22 @@
       <!-- Quick Action Controls (Symmetric & Clean) -->
       <div class="toolbar-actions" style="gap:0.4rem;">
         <div class="actions-menu" id="actions-menu">
-          <button type="button" class="btn btn-primary btn-sm" id="btn-actions-toggle" onclick="toggleActionsMenu(event)" aria-haspopup="true" aria-expanded="false" style="font-weight:700;">�a� Acciones ��</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-actions-toggle" onclick="toggleActionsMenu(event)" aria-haspopup="true" aria-expanded="false" style="font-weight:700;">⚡ Acciones ▾</button>
           <div class="actions-menu-list" id="actions-menu-list" role="menu">
-            <button type="button" role="menuitem" onclick="closeActionsMenu(); startNewQuote()">�~" Nueva cotización</button>
-            <button type="button" role="menuitem" onclick="closeActionsMenu(); saveCurrentQuote()">�x� Guardar</button>
-            <button type="button" role="menuitem" id="btn-export-pdf" onclick="closeActionsMenu(); exportDirectPDF()">�x� PDF directo</button>
-            <button type="button" role="menuitem" id="btn-share-wa" onclick="closeActionsMenu(); shareQuoteViaWhatsApp()">�x� WhatsApp</button>
+            <button type="button" role="menuitem" onclick="closeActionsMenu(); startNewQuote()">➕ Nueva cotización</button>
+            <button type="button" role="menuitem" onclick="closeActionsMenu(); saveCurrentQuote()">💾 Guardar</button>
+            <button type="button" role="menuitem" id="btn-export-pdf" onclick="closeActionsMenu(); exportDirectPDF()">📥 PDF directo</button>
+            <button type="button" role="menuitem" id="btn-share-wa" onclick="closeActionsMenu(); shareQuoteViaWhatsApp()">📲 WhatsApp</button>
           </div>
         </div>
 
 
         <div class="user-chip-top" id="active-user-chip" title="Usuario con sesión activa" style="padding:0.25rem 0.55rem; font-size:0.74rem;">
-          <span id="active-user-role-icon">�x</span>
+          <span id="active-user-role-icon">👑</span>
           <span id="active-user-display">Admin</span>
         </div>
         <button class="btn btn-danger btn-sm" onclick="logoutSession()" title="Cerrar sesión y volver a la página ejecutiva" style="padding:0.35rem 0.6rem; font-weight:700;">
-          �x Salir
+          🔒 Salir
         </button>
       </div>
     </div>
@@ -3121,8 +3088,8 @@
 
   <!-- Botón de Chat Flotante del Asistente IA -->
   <button type="button" id="floating-ai-btn" class="no-print" onclick="openAIModal()" title="Abrir chat con Asistente de Inteligencia Artificial">
-    <span style="font-size:1.05rem;">�x�</span>
-    <span>�S� Asistente IA</span>
+    <span style="font-size:1.05rem;">💬</span>
+    <span>✨ Asistente IA</span>
   </button>
 
   <main class="app-container">
@@ -3150,7 +3117,7 @@
         <div class="setting-group" style="background:#eff6ff; border:1px solid #bfdbfe; padding:0.25rem 0.6rem; border-radius:6px;">
           <label style="display:flex; align-items:center; gap:0.35rem; cursor:pointer; color:#1e40af; font-weight:800; margin:0;" title="Marca si el cliente requiere factura con IVA o desmarca para nota sin impuestos">
             <input type="checkbox" id="billing-mode-toggle" checked onchange="toggleBillingInvoiceMode(this.checked)">
-            <span id="billing-mode-label">�x�� Con Factura (Aplica IVA)</span>
+            <span id="billing-mode-label">🧾 Con Factura (Aplica IVA)</span>
           </label>
         </div>
 
@@ -3173,7 +3140,7 @@
         </div>
 
         <button class="btn btn-success btn-sm" onclick="saveAsDefaultCompany()" title="Guardar mis datos fiscales y de contacto para que aparezcan siempre por defecto">
-          �x� Guardar Mis Datos Fiscales
+          💾 Guardar Mis Datos Fiscales
         </button>
       </div>
 
@@ -3182,7 +3149,7 @@
       <div id="sales-note-stamps-bar" class="no-print">
         <div style="display:flex; align-items:center; gap:0.45rem;">
           <span style="background:#15803d; color:#ffffff; font-size:0.72rem; font-weight:800; padding:0.25rem 0.6rem; border-radius:6px; text-transform:uppercase;">
-            �x�� Sellos de Nota de Venta (PDF)
+            🧾 Sellos de Nota de Venta (PDF)
           </span>
           <span style="font-size:0.75rem; color:#166534; font-weight:600;">
             Activa los sellos que deseas estampar en esta Nota de Venta:
@@ -3194,7 +3161,7 @@
           <div class="stamp-Check-pill" style="border-color:#86efac;">
             <label style="display:inline-flex; align-items:center; gap:0.3rem; cursor:pointer; color:#15803d;">
               <input type="checkbox" id="stamp-paid-chk" onchange="updateSalesNoteStamps()">
-              <span>�S& PAGADO</span>
+              <span>✅ PAGADO</span>
             </label>
             <input type="date" id="stamp-paid-date" class="form-input" style="font-size:0.72rem; padding:0.15rem 0.35rem; width:122px;" onchange="updateSalesNoteStamps()">
           </div>
@@ -3203,7 +3170,7 @@
           <div class="stamp-Check-pill" style="border-color:#93c5fd;">
             <label style="display:inline-flex; align-items:center; gap:0.3rem; cursor:pointer; color:#1d4ed8;">
               <input type="checkbox" id="stamp-delivered-chk" onchange="updateSalesNoteStamps()">
-              <span>�x� ENTREGADO</span>
+              <span>📦 ENTREGADO</span>
             </label>
             <input type="date" id="stamp-delivered-date" class="form-input" style="font-size:0.72rem; padding:0.15rem 0.35rem; width:122px;" onchange="updateSalesNoteStamps()">
           </div>
@@ -3212,7 +3179,7 @@
           <div class="stamp-Check-pill" style="border-color:#fcd34d;">
             <label style="display:inline-flex; align-items:center; gap:0.3rem; cursor:pointer; color:#b45309;">
               <input type="checkbox" id="stamp-advance-chk" onchange="updateSalesNoteStamps()">
-              <span>�x� ANTICIPO $</span>
+              <span>💰 ANTICIPO $</span>
             </label>
             <input type="number" id="stamp-advance-amount" class="form-input" placeholder="Monto $" min="0" step="100" value="0" style="font-size:0.74rem; padding:0.15rem 0.35rem; width:88px; font-weight:800;" oninput="updateSalesNoteStamps()">
             <input type="date" id="stamp-advance-date" class="form-input" style="font-size:0.72rem; padding:0.15rem 0.35rem; width:122px;" onchange="updateSalesNoteStamps()">
@@ -3268,8 +3235,8 @@
           <!-- Columna 3: Cuadro Fiscal de Comprobante / Folio CFDI 4.0 -->
           <div class="quote-meta-box">
             <div class="quote-title-bar" id="doc-main-title-bar">
-              <span id="doc-main-title-text">COTIZACI�N COMERCIAL</span>
-              <span id="doc-sub-title-text" style="font-size:0.65rem; background:rgba(255,255,255,0.2); padding:1px 5px; border-radius:3px;">PROPUESTA ECON�MICA</span>
+              <span id="doc-main-title-text">COTIZACIÓN COMERCIAL</span>
+              <span id="doc-sub-title-text" style="font-size:0.65rem; background:rgba(255,255,255,0.2); padding:1px 5px; border-radius:3px;">PROPUESTA ECONÓMICA</span>
             </div>
             <div class="quote-meta-inner">
               <div class="meta-row">
@@ -3300,18 +3267,18 @@
                 <div style="display:flex; align-items:center; gap:0.25rem; justify-content:flex-end;">
                   <span id="expiry-status-badge" class="expiry-badge expiry-badge-active">Vigente</span>
                   <select id="quote-status" class="editable-field" style="max-width:138px; font-weight:800; color:#0f172a;" onchange="handleStatusChange()">
-                    <option value="draft">1. �x� Borrador (COT)</option>
-                    <option value="sent">2. �x� Enviada (COT)</option>
-                    <option value="rejected">3. �R Rechazada (COT)</option>
-                    <option value="approved">4. �S& Aprobada (COT)</option>
-                    <option value="sales_note">5. �x�� Nota de Venta (NV)</option>
-                    <option value="cancelled">6. �xa� Cancelada</option>
+                    <option value="draft">1. 📝 Borrador (COT)</option>
+                    <option value="sent">2. 📤 Enviada (COT)</option>
+                    <option value="rejected">3. ❌ Rechazada (COT)</option>
+                    <option value="approved">4. ✅ Aprobada (COT)</option>
+                    <option value="sales_note">5. 🧾 Nota de Venta (NV)</option>
+                    <option value="cancelled">6. 🚫 Cancelada</option>
                   </select>
                 </div>
               </div>
               <div class="meta-row no-print" id="row-btn-convert-nv" style="display:none; padding-top:0.25rem;">
                 <button type="button" class="btn btn-success btn-sm" style="width:100%; justify-content:center; font-size:0.72rem; padding:0.28rem;" onclick="convertApprovedQuoteToSalesNote()">
-                  �~�️ Convertir a Nota de Venta (NV)
+                  ➡️ Convertir a Nota de Venta (NV)
                 </button>
               </div>
             </div>
@@ -3335,15 +3302,15 @@
             <div class="client-type-wrapper no-print" style="display:flex; align-items:center; gap:0.35rem;">
               <div class="seg-group">
                 <button type="button" class="seg-btn active" id="btn-type-moral" onclick="setClientType('moral')" style="padding:0.2rem 0.55rem; font-size:0.74rem;">
-                  �x�� Persona Moral (Ret. 1.25% ISR)
+                  🏢 Persona Moral (Ret. 1.25% ISR)
                 </button>
                 <button type="button" class="seg-btn" id="btn-type-fisica" onclick="setClientType('fisica')" style="padding:0.2rem 0.55rem; font-size:0.74rem;">
-                  �x� Persona Física
+                  👤 Persona Física
                 </button>
               </div>
               <button class="btn btn-outline btn-sm" onclick="saveCurrentClientToCRM()" title="Guardar cliente en CRM">+ CRM</button>
-              <button type="button" class="btn btn-outline btn-sm" onclick="applyDefaultPublicClient('fisica')" title="Venta al público en general (Persona Física)">�x� Público Física</button>
-              <button type="button" class="btn btn-outline btn-sm" onclick="applyDefaultPublicClient('moral')" title="Venta al público en general (Persona Moral)">�x�� Público Moral</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="applyDefaultPublicClient('fisica')" title="Venta al público en general (Persona Física)">👥 Público Física</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="applyDefaultPublicClient('moral')" title="Venta al público en general (Persona Moral)">🏢 Público Moral</button>
             </div>
 
             <div class="print-client-type" id="print-client-type-tag">
@@ -3405,21 +3372,21 @@
         <!-- TABLA DE CONCEPTOS CON COLUMNAS OFICIALES FACTURA CFDI 4.0 -->
         <section class="table-container">
           <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; background:#fffbeb; border:1px solid #fde68a; border-radius:5px; padding:0.35rem 0.65rem; margin-bottom:0.35rem; font-size:0.73rem; color:#92400e;">
-            <span>�x <strong>Control Interno (Oculto en PDF):</strong> Las columnas amarillas (<strong>ClaveProdServ</strong>, <strong>No. Identificación</strong> y <strong>% Margen</strong>) son solo para tu control.</span>
-            <button type="button" id="btn-sat-ai-all" onclick="suggestSatWithAI(null)" title="La IA revisa cada partida y sugiere su ClaveProdServ y clave de unidad del SAT" style="background:#fff; border:1px solid #f59e0b; color:#92400e; padding:1px 8px; border-radius:4px; font-weight:800; cursor:pointer;">�S� Sugerir claves SAT con IA</button>
-            <span style="background:#fef3c7; border:1px solid #f59e0b; padding:1px 6px; border-radius:4px; font-weight:800;">�x� Fórmula Fija: Precio = Costo ÷ (1 - %Margen)</span>
+            <span>🔒 <strong>Control Interno (Oculto en PDF):</strong> Las columnas amarillas (<strong>ClaveProdServ</strong>, <strong>No. Identificación</strong> y <strong>% Margen</strong>) son solo para tu control.</span>
+            <button type="button" id="btn-sat-ai-all" onclick="suggestSatWithAI(null)" title="La IA revisa cada partida y sugiere su ClaveProdServ y clave de unidad del SAT" style="background:#fff; border:1px solid #f59e0b; color:#92400e; padding:1px 8px; border-radius:4px; font-weight:800; cursor:pointer;">✨ Sugerir claves SAT con IA</button>
+            <span style="background:#fef3c7; border:1px solid #f59e0b; padding:1px 6px; border-radius:4px; font-weight:800;">📐 Fórmula Fija: Precio = Costo ÷ (1 - %Margen)</span>
             <datalist id="sat-common-codes"></datalist>
           </div>
           <div class="items-table-scroll-wrap">
             <table class="items-table" id="items-table">
               <thead>
                 <tr>
-                  <th class="no-print internal-control-th" style="width: 9%; text-align:center;" title="Solo control interno (No se imprime en PDF)">�x ClaveProdServ<br><span style="font-size:0.54rem; font-weight:400; color:#cbd5e1;">(Interno)</span></th>
-                  <th class="no-print internal-control-th" style="width: 13%;" title="Selecciona el tipo de partida (Equipo, Mano de Obra, Servicio o Material) para agrupar la cotización">�x Identificador / Tipo<br><span style="font-size:0.54rem; font-weight:400; color:#cbd5e1;">(Agrupa en PDF)</span></th>
-                  <th class="no-print internal-control-th" style="width: 7%; text-align:center;" title="Mueve tu porcentaje de ganancia para recalcular el Valor Unitario con la fórmula Costo / (1 - %Margen)">�x % Margen<br><span style="font-size:0.54rem; font-weight:400; color:#cbd5e1;">(Fórmula)</span></th>
+                  <th class="no-print internal-control-th" style="width: 9%; text-align:center;" title="Solo control interno (No se imprime en PDF)">🔒 ClaveProdServ<br><span style="font-size:0.54rem; font-weight:400; color:#cbd5e1;">(Interno)</span></th>
+                  <th class="no-print internal-control-th" style="width: 13%;" title="Selecciona el tipo de partida (Equipo, Mano de Obra, Servicio o Material) para agrupar la cotización">🔒 Identificador / Tipo<br><span style="font-size:0.54rem; font-weight:400; color:#cbd5e1;">(Agrupa en PDF)</span></th>
+                  <th class="no-print internal-control-th" style="width: 7%; text-align:center;" title="Mueve tu porcentaje de ganancia para recalcular el Valor Unitario con la fórmula Costo / (1 - %Margen)">🔒 % Margen<br><span style="font-size:0.54rem; font-weight:400; color:#cbd5e1;">(Fórmula)</span></th>
                   <th class="no-print internal-control-th" style="width: 6%; text-align:center;" title="Marca o desmarca qué productos llevan IVA (por defecto marcado)">
                     <label style="cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:1px; margin:0;">
-                      <span>��️ IVA</span>
+                      <span>☑️ IVA</span>
                       <input type="checkbox" id="master-row-iva-check" checked onchange="toggleAllRowsIva(this.checked)" title="Marcar/Desmarcar IVA en todos los productos">
                     </label>
                   </th>
@@ -3437,35 +3404,35 @@
           </div>
           <div id="visual-stamps-preview" class="visual-stamps-container"></div>
           <div class="no-print" id="section-breakdown-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; background:#eff6ff; border:1px solid #bfdbfe; border-radius:5px; padding:0.32rem 0.75rem; margin-top:0.3rem; font-size:0.74rem; color:#1e3a8a;">
-            <span>�x` <strong>Separación por Identificador en PDF:</strong></span>
+            <span>📊 <strong>Separación por Identificador en PDF:</strong></span>
             <div style="display:flex; gap:0.9rem; flex-wrap:wrap;">
-              <span>�x� Equipos y Materiales: <strong id="sum-cat-equipos">$0.00</strong></span>
-              <span>�x� Mano de Obra y Servicios: <strong id="sum-cat-servicios">$0.00</strong></span>
+              <span>📦 Equipos y Materiales: <strong id="sum-cat-equipos">$0.00</strong></span>
+              <span>👷 Mano de Obra y Servicios: <strong id="sum-cat-servicios">$0.00</strong></span>
             </div>
           </div>
           <div class="no-print" id="internal-profit-summary-bar"  style="display:flex; justify-content:flex-end; align-items:center; gap:1.1rem; flex-wrap:wrap; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:5px; padding:0.35rem 0.75rem; margin-top:0.3rem; font-size:0.75rem; color:#334155;">
-            <span>�x� <strong>Costo Base Total:</strong> <span id="internal-total-cost" style="font-family:monospace; font-weight:700;">$0.00</span></span>
-            <span>�x� <strong>Tu Ganancia Libre ($):</strong> <span id="internal-total-profit" style="font-family:monospace; font-weight:800; color:#15803d;">$0.00</span></span>
-            <span>�x}� <strong>Margen Real Promedio:</strong> <span id="internal-avg-margin" style="font-weight:800; color:#1e40af;">30.0%</span></span>
+            <span>💼 <strong>Costo Base Total:</strong> <span id="internal-total-cost" style="font-family:monospace; font-weight:700;">$0.00</span></span>
+            <span>📈 <strong>Tu Ganancia Libre ($):</strong> <span id="internal-total-profit" style="font-family:monospace; font-weight:800; color:#15803d;">$0.00</span></span>
+            <span>🎯 <strong>Margen Real Promedio:</strong> <span id="internal-avg-margin" style="font-weight:800; color:#1e40af;">30.0%</span></span>
           </div>
 
           <div class="table-toolbar no-print">
             <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
               <button class="btn btn-primary btn-sm" onclick="switchTab('stores')" style="background:#0284c7; border-color:#0284c7; font-weight:700;">
-                �x� Agregar de Catálogo CT / Syscom / Tecnosinergia
+                🔍 Agregar de Catálogo CT / Syscom / Tecnosinergia
               </button>
               <button class="btn btn-outline btn-sm" onclick="addNewRow()">
                 + Agregar Concepto Manual
               </button>
               <button class="btn btn-danger btn-sm" onclick="clearAllQuoteRows()" title="Eliminar todas las partidas y dejar la tabla en blanco">
-                �x️ Eliminar Todo
+                🗑️ Eliminar Todo
               </button>
             </div>
             <span style="font-size: 0.72rem; color: var(--gray-500);">Diseño ejecutivo compacto: 1 a 12 conceptos en 1 sola hoja tamaño Carta.</span>
           </div>
         </section>
 
-        <!-- SECCI�N INFERIOR CFDI 4.0: IZQUIERDA (LETRA, M�0TODO PAGO, BANCOS/CONDICIONES) | DERECHA (IMPUESTOS Y TOTALES) -->
+        <!-- SECCIÓN INFERIOR CFDI 4.0: IZQUIERDA (LETRA, MÉTODO PAGO, BANCOS/CONDICIONES) | DERECHA (IMPUESTOS Y TOTALES) -->
         <section class="doc-bottom">
           <div class="cfdi-left-panel">
             <div class="amount-in-words" id="amount-in-words">
@@ -3510,15 +3477,15 @@ CLABE: 722969010514249300</textarea>
 
               <div class="terms-card">
                 <h4>Condiciones Comerciales y Garantía</h4>
-                <textarea id="commercial-terms" class="editable-field screen-only-field" oninput="syncPrintMirrors()">⬢ Entrega: 3 a 5 días hábiles tras liquidar el equipo.
-⬢ Garantía: conforme a la póliza del fabricante, con el periodo que este indique. Los cambios por defecto de fábrica comprobado se tramitan con GASO dentro de los primeros 30 días; después, directamente con la marca, con nuestro apoyo.
-⬢ No cubre mal uso, descargas o variaciones eléctricas, humedad, manipulación por terceros ni desgaste.
-⬢ Precios en MXN sujetos a vigencia indicada.</textarea>
+                <textarea id="commercial-terms" class="editable-field screen-only-field" oninput="syncPrintMirrors()">• Entrega: 3 a 5 días hábiles tras liquidar el equipo.
+• Garantía: conforme a la póliza del fabricante, con el periodo que este indique. Los cambios por defecto de fábrica comprobado se tramitan con GASO dentro de los primeros 30 días; después, directamente con la marca, con nuestro apoyo.
+• No cubre mal uso, descargas o variaciones eléctricas, humedad, manipulación por terceros ni desgaste.
+• Precios en MXN sujetos a vigencia indicada.</textarea>
           <div class="no-print" style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-top:0.5rem; font-size:0.78rem;">
             <label style="display:flex; align-items:center; gap:0.35rem; cursor:pointer;"><input type="checkbox" id="labor-warranty-chk" onchange="applyLaborWarranty()"> Incluir garantía de mano de obra</label>
             <span id="labor-warranty-days-wrap" style="display:none;"><input type="number" id="labor-warranty-days" value="90" min="1" max="3650" oninput="applyLaborWarranty()" style="width:72px;"> días</span>
-            <button type="button" class="btn btn-outline btn-sm" onclick="saveTermsAsDefault()">�x� Guardar como predeterminadas</button>
-            <button type="button" class="btn btn-outline btn-sm" onclick="restoreSuggestedTerms()">� � Texto sugerido</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="saveTermsAsDefault()">💾 Guardar como predeterminadas</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="restoreSuggestedTerms()">↺ Texto sugerido</button>
           </div>
                 <textarea id="additional-notes" style="display:none;">Incluido en condiciones comerciales</textarea>
                 <div id="print-terms-mirror" class="print-mirror"></div>
@@ -3590,13 +3557,13 @@ CLABE: 722969010514249300</textarea>
             <div class="qr-box">
               <canvas id="qr-code-canvas"></canvas>
             </div>
-            <div class="qr-label">QR VALIDACI�N</div>
+            <div class="qr-label">QR VALIDACIÓN</div>
           </div>
 
           <div class="digital-seal-info">
             <div class="seal-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px; height:13px; color:var(--success);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Código de Verificación de Cotización (informativo, no es CFDI) � Emisor: GASO INGENIERÍA (Folio: <span id="seal-folio">COT-2026-001</span> | Vence: <span id="seal-expiry-text">-</span>)
+              Código de Verificación de Cotización (informativo, no es CFDI) — Emisor: GASO INGENIERÍA (Folio: <span id="seal-folio">COT-2026-001</span> | Vence: <span id="seal-expiry-text">-</span>)
             </div>
             <div class="seal-hash" id="seal-hash-string">
               ||GASO|COT-2026-001|2026-10-13|GATM851209T92|RESICO-626|TOTAL|$0.00||
@@ -3619,8 +3586,8 @@ CLABE: 722969010514249300</textarea>
         </section>
 
         <div class="doc-footer">
-          GASO INGENIERÍA ⬢ RFC: GATM851209T92 ⬢ Régimen Simplificado de Confianza (626) ⬢ Cuautlancingo, Puebla, C.P. 72730
-          <br><span id="footer-professional">Ing. José Miguel Gamboa Torres ⬢ Cédula Profesional 14285574</span>
+          GASO INGENIERÍA • RFC: GATM851209T92 • Régimen Simplificado de Confianza (626) • Cuautlancingo, Puebla, C.P. 72730
+          <br><span id="footer-professional">Ing. José Miguel Gamboa Torres • Cédula Profesional 14285574</span>
         </div>
 
       </div>
@@ -3650,7 +3617,7 @@ CLABE: 722969010514249300</textarea>
                 <th>Tipo</th>
                 <th>RFC</th>
                 <th>Contacto & Teléfono</th>
-                <th>�altima Cotización / Trabajo</th>
+                <th>Última Cotización / Trabajo</th>
                 <th style="text-align:right;">Total Cotizado</th>
                 <th style="text-align:right;">Total Ganado ($)</th>
                 <th style="text-align:center;">Acciones</th>
@@ -3683,26 +3650,26 @@ CLABE: 722969010514249300</textarea>
           </div>
         </div>
 
-        <!-- BOTONES DE SELECCI�N ENTRE TIENDAS (Solicitado expresamente por el usuario) -->
+        <!-- BOTONES DE SELECCIÓN ENTRE TIENDAS (Solicitado expresamente por el usuario) -->
         <div style="background:var(--white); border:1px solid var(--gray-200); border-radius:10px; padding:0.85rem 1rem; margin-bottom:1.25rem; box-shadow:var(--shadow-sm);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem; flex-wrap:wrap; gap:0.5rem;">
             <span style="font-size:0.8rem; font-weight:800; color:var(--gray-700); text-transform:uppercase; letter-spacing:0.5px;">
-              �x�� Seleccionar Tienda / Proveedor:
+              🏪 Seleccionar Tienda / Proveedor:
             </span>
             <span style="font-size:0.75rem; color:var(--gray-500);">Haz clic en una tienda para ver exclusivamente sus productos:</span>
           </div>
           <div class="store-filter-pills" id="store-selector-pills">
             <button type="button" class="store-pill-btn active" id="pill-store-all" onclick="setStoreFilter('ALL')">
-              �xR� Todas las Tiendas (<span id="count-all">0</span>)
+              🌐 Todas las Tiendas (<span id="count-all">0</span>)
             </button>
             <button type="button" class="store-pill-btn" id="pill-store-ct" onclick="setStoreFilter('CT Internacional')">
-              �x�� CT Internacional (<span id="count-ct">0</span>)
+              🏢 CT Internacional (<span id="count-ct">0</span>)
             </button>
             <button type="button" class="store-pill-btn" id="pill-store-syscom" onclick="setStoreFilter('Syscom')">
-              �x� Syscom (<span id="count-syscom">0</span>)
+              📡 Syscom (<span id="count-syscom">0</span>)
             </button>
             <button type="button" class="store-pill-btn" id="pill-store-tecno" onclick="setStoreFilter('Tecnosinergia')">
-              �x:�️ Tecnosinergia (<span id="count-tecno">0</span>)
+              🛡️ Tecnosinergia (<span id="count-tecno">0</span>)
             </button>
             
           </div>
@@ -3724,7 +3691,7 @@ CLABE: 722969010514249300</textarea>
 
           <div class="setting-group">
             <span style="background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe; padding:0.38rem 0.75rem; border-radius:6px; font-size:0.78rem; font-weight:800;">
-              �x� Fórmula de Ganancia Fija: Precio Venta = Costo Base ÷ (1 - %Margen)
+              📐 Fórmula de Ganancia Fija: Precio Venta = Costo Base ÷ (1 - %Margen)
             </span>
           </div>
         </div>
@@ -3733,23 +3700,23 @@ CLABE: 722969010514249300</textarea>
         <div style="background:var(--white); border:1px solid var(--gray-200); border-radius:8px; padding:0.85rem; margin-bottom:1rem; display:flex; gap:0.65rem; flex-wrap:wrap; align-items:center;">
           <div style="min-width:210px;">
             <select id="store-category-filter" class="form-select" style="font-weight:700;" onchange="resetStoreLimitAndRender()">
-              <option value="ALL">�x Todas las Categorías</option>
+              <option value="ALL">📂 Todas las Categorías</option>
             </select>
           </div>
 
           <div style="flex:1; position:relative; min-width:260px;">
-            <input type="text" id="store-search-query" class="form-input" placeholder="�x� Busca sin acentos por clave, producto, marca o especificación (ej. laptop i5 16gb, impresora epson, camara 4mp, ssd 1tb)..." style="width:100%; padding-left:2.4rem; font-size:0.92rem; font-weight:600; border:2px solid #93c5fd;" oninput="debouncedSearchStore()">
-            <span style="position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); color:var(--gray-400); pointer-events:none;">�x�</span>
+            <input type="text" id="store-search-query" class="form-input" placeholder="🔍 Busca sin acentos por clave, producto, marca o especificación (ej. laptop i5 16gb, impresora epson, camara 4mp, ssd 1tb)..." style="width:100%; padding-left:2.4rem; font-size:0.92rem; font-weight:600; border:2px solid #93c5fd;" oninput="debouncedSearchStore()">
+            <span style="position:absolute; left:0.85rem; top:50%; transform:translateY(-50%); color:var(--gray-400); pointer-events:none;">🔍</span>
           </div>
 
           <select id="store-sort-order" class="form-select" style="width:auto; font-size:0.82rem; font-weight:700;" onchange="resetStoreLimitAndRender()" title="Ordenar resultados">
-            <option value="relevance" selected>�x}� Mayor Relevancia</option>
-            <option value="price_asc">�x� Menor a Mayor Precio</option>
-            <option value="price_desc">�x� Mayor a Menor Precio</option>
-            <option value="sku_asc">�x� Clave / Modelo (A-Z)</option>
+            <option value="relevance" selected>🎯 Mayor Relevancia</option>
+            <option value="price_asc">💲 Menor a Mayor Precio</option>
+            <option value="price_desc">💲 Mayor a Menor Precio</option>
+            <option value="sku_asc">🔤 Clave / Modelo (A-Z)</option>
           </select>
 
-          <button class="btn btn-outline btn-sm" onclick="clearStoreSearch()" title="Limpiar búsqueda y filtros">�S" Limpiar</button>
+          <button class="btn btn-outline btn-sm" onclick="clearStoreSearch()" title="Limpiar búsqueda y filtros">✕ Limpiar</button>
           <span id="store-count-badge" style="align-self:center; font-size:0.82rem; color:var(--primary-dark); font-weight:800; white-space:nowrap; background:var(--primary-light); padding:0.35rem 0.7rem; border-radius:999px;">0 productos</span>
         </div>
 
@@ -3777,18 +3744,18 @@ CLABE: 722969010514249300</textarea>
     </div>
 
     <!-- =================================================================== -->
-    <!-- TAB 5: ADMINISTRACI�N DE USUARIOS Y SEGURIDAD (SOLO SUPERUSUARIO)   -->
+    <!-- TAB 5: ADMINISTRACIÓN DE USUARIOS Y SEGURIDAD (SOLO SUPERUSUARIO)   -->
     <!-- =================================================================== -->
     <div id="pane-users" class="tab-pane no-print">
       <div class="crm-container">
         <div class="crm-header">
           <div>
-            <h2>�x� Administración de Usuarios y Seguridad de Acceso</h2>
+            <h2>🔐 Administración de Usuarios y Seguridad de Acceso</h2>
             <p style="font-size:0.85rem; color:var(--gray-500);">Panel exclusivo de <strong>Superusuario</strong> para dar de alta, suspender, cambiar contraseñas y auditar quién entra al sistema.</p>
           </div>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
             <button class="btn btn-outline" onclick="exportUsersBackupJSON()">
-              �x� Exportar Respaldo Usuarios
+              📤 Exportar Respaldo Usuarios
             </button>
             <button class="btn btn-primary" onclick="openNewUserModal()" style="background:#0f172a; border-color:#0f172a;">
               + Nuevo Usuario de Acceso
@@ -3823,15 +3790,15 @@ CLABE: 722969010514249300</textarea>
         <!-- Permissions Guide Box -->
         <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:0.9rem 1.15rem; margin-bottom:1.25rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:0.85rem; font-size:0.78rem;">
           <div>
-            <span class="role-badge role-superadmin">�x Superusuario (Control Total)</span>
+            <span class="role-badge role-superadmin">👑 Superusuario (Control Total)</span>
             <p style="margin-top:0.3rem; color:#475569;">Acceso a todas las pestañas, modifica datos fiscales/bancarios, administra usuarios y consulta el Dashboard financiero.</p>
           </div>
           <div>
-            <span class="role-badge role-ventas">�x� Ventas / Ejecutivo Comercial</span>
+            <span class="role-badge role-ventas">💼 Ventas / Ejecutivo Comercial</span>
             <p style="margin-top:0.3rem; color:#475569;">Puede cotizar, usar Catálogo CT/Syscom, Asistente IA y Cartera CRM. <strong>No puede</strong> modificar tu CLABE/RFC ni ver Usuarios o Dashboard financiero.</p>
           </div>
           <div>
-            <span class="role-badge role-cotizador">�x�️ Solo Cotizador (Restringido)</span>
+            <span class="role-badge role-cotizador">👁️ Solo Cotizador (Restringido)</span>
             <p style="margin-top:0.3rem; color:#475569;">Solo puede elaborar e imprimir cotizaciones usando el catálogo. Oculta CRM, Dashboard financiero y configuración de usuarios.</p>
           </div>
         </div>
@@ -3846,7 +3813,7 @@ CLABE: 722969010514249300</textarea>
                 <th>Correo</th>
                 <th>Rol / Nivel de Acceso</th>
                 <th>Estado</th>
-                <th>�altimo Acceso</th>
+                <th>Último Acceso</th>
                 <th style="text-align:center;">Acciones de Superusuario</th>
               </tr>
             </thead>
@@ -3859,7 +3826,7 @@ CLABE: 722969010514249300</textarea>
         <!-- Audit Log Section -->
         <div style="border-top:1px solid var(--gray-200); padding-top:1.25rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-            <h3 style="font-size:1rem; font-weight:800; color:var(--gray-800);">�x9 Bitácora de Accesos y Seguridad (�altimos movimientos)</h3>
+            <h3 style="font-size:1rem; font-weight:800; color:var(--gray-800);">📋 Bitácora de Accesos y Seguridad (Últimos movimientos)</h3>
             <button class="btn btn-outline btn-sm" onclick="clearSecurityLogs()">Limpiar Bitácora</button>
           </div>
           <div style="max-height:220px; overflow-y:auto; border:1px solid var(--gray-200); border-radius:8px; background:#ffffff;">
@@ -3879,24 +3846,24 @@ CLABE: 722969010514249300</textarea>
           </div>
         </div>
 
-        <!-- (La configuración de IA y APIs vive ahora en �a"️ Configuración) -->
+        <!-- (La configuración de IA y APIs vive ahora en ⚙️ Configuración) -->
       </div>
     </div>
 
-    <!-- �a"️ CONFIGURACI�N: APIs y conexiones (solo Superusuario). Las llaves se guardan cifradas en el servidor. -->
+    <!-- ⚙️ CONFIGURACIÓN: APIs y conexiones (solo Superusuario). Las llaves se guardan cifradas en el servidor. -->
     <div id="pane-config" class="tab-pane no-print">
       <div style="max-width:880px; margin:0 auto; padding:1.25rem 1rem 3rem;">
-        <h2 style="font-size:1.3rem; margin:0 0 0.25rem;">�a"️ Configuración de conexiones</h2>
+        <h2 style="font-size:1.3rem; margin:0 0 0.25rem;">⚙️ Configuración de conexiones</h2>
         <p style="font-size:0.82rem; color:var(--gray-500); margin:0 0 1rem;">Prueba tus APIs. Las llaves viven <strong>solo en las variables de entorno de Netlify</strong>; aquí nunca se capturan ni se muestran.</p>
 
         <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
-          <button type="button" class="btn btn-primary btn-sm" onclick="cfgTest('all')" style="font-weight:700;">�x� Probar todo</button>
-          <button type="button" class="btn btn-outline btn-sm" onclick="cfgLoad()">� � Recargar estado</button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="cfgTest('all')" style="font-weight:700;">🔍 Probar todo</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="cfgLoad()">↻ Recargar estado</button>
         </div>
         <div id="cfg-result-all" style="font-size:0.8rem; line-height:1.5; margin-bottom:1rem;"></div>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">�x�� Inteligencia Artificial (Google Gemini, gratis)</h3>
+          <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">🧠 Inteligencia Artificial (Google Gemini, gratis)</h3>
           <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0.7rem;">
             <div style="font-size:0.78rem;">Llave de Gemini <strong id="cfg-st-GEMINI_API_KEY"></strong><br><span style="color:#64748b;">Variable <code>GEMINI_API_KEY</code> en Netlify</span></div>
             <label style="font-size:0.78rem; font-weight:700;">Modelo Gemini (opcional)
@@ -3904,7 +3871,7 @@ CLABE: 722969010514249300</textarea>
             </label>
             </div>
           <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap;">
-            <button type="button" class="btn btn-primary btn-sm" onclick="cfgSave(['GEMINI_MODEL'],'ai')" style="font-weight:700;">�x� Guardar</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="cfgSave(['GEMINI_MODEL'],'ai')" style="font-weight:700;">💾 Guardar</button>
             <button type="button" class="btn btn-outline btn-sm" onclick="cfgTest('gemini')">Probar Gemini</button>
             
           </div>
@@ -3912,24 +3879,24 @@ CLABE: 722969010514249300</textarea>
         </div>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">�xR Tecnosinergia</h3>
+          <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">🔌 Tecnosinergia</h3>
           <div style="font-size:0.78rem;">Token de la API <strong id="cfg-st-TECNO_API_TOKEN"></strong><br><span style="color:#64748b;">Variable <code>TECNO_API_TOKEN</code> en Netlify</span></div>
           <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap; align-items:center;">
             
             <button type="button" class="btn btn-outline btn-sm" onclick="cfgTest('tecno')">Probar</button>
-            <button type="button" class="btn btn-outline btn-sm" onclick="cfgSyncTecno()">�x Sincronizar catálogo ahora</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="cfgSyncTecno()">🔄 Sincronizar catálogo ahora</button>
             <span id="cfg-counts" style="font-size:0.75rem; color:#475569;"></span>
           </div>
           <div id="cfg-result-tecno" style="font-size:0.8rem; line-height:1.5; margin-top:0.5rem;"></div>
         </div>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
-          <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">�x� Catálogos y nube</h3>
+          <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">📦 Catálogos y nube</h3>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
             <button type="button" class="btn btn-outline btn-sm" onclick="cfgTest('catalogs')">Probar catálogos Syscom/CT</button>
-            <button type="button" class="btn btn-outline btn-sm" onclick="openImportCTModal()">�x9 Importar lista CT</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="openImportCTModal()">📋 Importar lista CT</button>
             <button type="button" class="btn btn-outline btn-sm" onclick="cfgTest('db')">Probar base de datos</button>
-            <button type="button" class="btn btn-outline btn-sm" onclick="cfgCloudNow()">�܁️ Sincronizar clientes ahora</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="cfgCloudNow()">☁️ Sincronizar clientes ahora</button>
           </div>
           <div id="cfg-result-misc" style="font-size:0.8rem; line-height:1.5; margin-top:0.5rem;"></div>
           <div style="font-size:0.78rem; color:#64748b; margin:0.75rem 0 0.4rem;">Los catálogos se guardan en tu base de datos, nunca en GitHub. Elige tus archivos <code>syscom.json</code> y <code>ct.json</code> (carpeta <code>catalogos-privados</code> de tu escritorio) para cargarlos:</div>
@@ -3947,13 +3914,13 @@ CLABE: 722969010514249300</textarea>
       <div class="modal-box" style="max-width:540px; background:#ffffff;">
         <div class="modal-header" style="background:#0f172a; color:#ffffff;">
           <h3 id="modal-user-title" style="color:#ffffff;">Crear Nuevo Usuario de Acceso</h3>
-          <button class="modal-close" onclick="closeModal('modal-user-admin')" style="color:#ffffff;">�S"</button>
+          <button class="modal-close" onclick="closeModal('modal-user-admin')" style="color:#ffffff;">✕</button>
         </div>
         <div class="modal-body">
           <input type="hidden" id="edit-user-id">
           <div>
             <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Nombre Completo / Puesto:</label>
-            <input type="text" id="user-modal-fullname" class="form-input" style="width:100%;" placeholder="Ej. Ing. Carlos Ramírez � Ventas">
+            <input type="text" id="user-modal-fullname" class="form-input" style="width:100%;" placeholder="Ej. Ing. Carlos Ramírez — Ventas">
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
             <div>
@@ -3975,23 +3942,23 @@ CLABE: 722969010514249300</textarea>
             <div>
               <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Estado de la Cuenta:</label>
               <select id="user-modal-status" class="form-select" style="width:100%;">
-                <option value="active">�xx� Activo (Puede entrar)</option>
-                <option value="suspended">�x� Suspendido (Acceso bloqueado)</option>
+                <option value="active">🟢 Activo (Puede entrar)</option>
+                <option value="suspended">🔴 Suspendido (Acceso bloqueado)</option>
               </select>
             </div>
           </div>
           <div>
             <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Rol y Permisos en el Sistema:</label>
             <select id="user-modal-role" class="form-select" style="width:100%; font-weight:700;">
-              <option value="SUPERADMIN">�x Superusuario (Control Total y Administración de Usuarios)</option>
-              <option value="VENTAS" selected>�x� Ventas / Ejecutivo Comercial (Cotizador + Catálogo + CRM)</option>
-              <option value="COTIZADOR">�x�️ Solo Cotizador (Solo Cotizador y Catálogo)</option>
+              <option value="SUPERADMIN">👑 Superusuario (Control Total y Administración de Usuarios)</option>
+              <option value="VENTAS" selected>💼 Ventas / Ejecutivo Comercial (Cotizador + Catálogo + CRM)</option>
+              <option value="COTIZADOR">👁️ Solo Cotizador (Solo Cotizador y Catálogo)</option>
             </select>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline" onclick="closeModal('modal-user-admin')">Cancelar</button>
-          <button class="btn btn-primary" onclick="saveUserFromModal()" style="background:#0f172a; border-color:#0f172a; font-weight:700;">�x� Guardar Usuario</button>
+          <button class="btn btn-primary" onclick="saveUserFromModal()" style="background:#0f172a; border-color:#0f172a; font-weight:700;">💾 Guardar Usuario</button>
         </div>
       </div>
     </div>
@@ -4000,8 +3967,8 @@ CLABE: 722969010514249300</textarea>
     <div class="modal-backdrop no-print" id="modal-import-ct">
       <div class="modal-box" style="max-width:750px; background:#ffffff;">
         <div class="modal-header">
-          <h3>�x9 Importar Lista de Precios de CT Internacional</h3>
-          <button class="modal-close" onclick="closeModal('modal-import-ct')">�S"</button>
+          <h3>📋 Importar Lista de Precios de CT Internacional</h3>
+          <button class="modal-close" onclick="closeModal('modal-import-ct')">✕</button>
         </div>
         <div style="padding:1.25rem;">
           <p style="font-size:0.85rem; color:var(--gray-600); margin-bottom:0.75rem;">
@@ -4045,11 +4012,11 @@ CLABE: 722969010514249300</textarea>
         <div style="background:linear-gradient(135deg, #0f172a, #1e3a8a); color:white; padding:1rem 1.35rem; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
           <div style="display:flex; align-items:center; gap:0.7rem;">
             <div style="background:rgba(56, 189, 248, 0.2); border:1px solid rgba(56, 189, 248, 0.4); border-radius:10px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
-              �S�
+              ✨
             </div>
             <div>
               <div style="display:flex; align-items:center; gap:0.5rem;">
-                <h3 style="margin:0; font-size:1.08rem; font-weight:800; color:white;">Asistente IA � GASO INGENIERÍA</h3>
+                <h3 style="margin:0; font-size:1.08rem; font-weight:800; color:white;">Asistente IA — GASO INGENIERÍA</h3>
                 <span style="background:#10b981; color:#ffffff; font-size:0.65rem; font-weight:800; padding:2px 7px; border-radius:999px;">EN LÍNEA</span>
               </div>
               <p style="margin:0; font-size:0.76rem; color:#cbd5e1;">Tu asistente para todo el negocio: cotiza, compara, revisa compatibilidad, sugiere precios y resuelve dudas</p>
@@ -4057,16 +4024,16 @@ CLABE: 722969010514249300</textarea>
           </div>
           <div style="display:flex; align-items:center; gap:0.4rem;">
             <button type="button" onclick="clearAIChatHistory()" title="Limpiar conversación" style="background:rgba(255,255,255,0.12); border:none; color:#cbd5e1; border-radius:6px; padding:0.35rem 0.6rem; font-size:0.74rem; cursor:pointer; font-weight:600;">
-              �x�� Nueva charla
+              🧹 Nueva charla
             </button>
-            <button class="modal-close" onclick="closeModal('modal-ai-assistant')" style="color:white; opacity:0.9; background:rgba(255,255,255,0.15); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center;">�S"</button>
+            <button class="modal-close" onclick="closeModal('modal-ai-assistant')" style="color:white; opacity:0.9; background:rgba(255,255,255,0.15); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center;">✕</button>
           </div>
         </div>
 
         <!-- Subtle 1-Line Commercial Preferences Bar -->
         <div style="background:#f8fafc; border-bottom:1px solid #e2e8f0; padding:0.55rem 1.25rem; display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap; flex-shrink:0; font-size:0.78rem;">
           <div style="display:flex; align-items:center; gap:0.45rem;">
-            <span style="font-weight:700; color:#475569;">�x�� Catálogo:</span>
+            <span style="font-weight:700; color:#475569;">🏪 Catálogo:</span>
             <select id="ai-store-preference" class="form-select" style="padding:0.22rem 0.55rem; font-size:0.76rem; background:#ffffff; font-weight:600;">
               <option value="AUTO" selected>Todas las tiendas (CT + Syscom + Tecnosinergia)</option>
               <option value="CT Internacional">Solo CT Internacional (Cómputo / Impresión)</option>
@@ -4075,7 +4042,7 @@ CLABE: 722969010514249300</textarea>
             </select>
           </div>
           <div style="display:flex; align-items:center; gap:0.45rem;">
-            <span style="font-weight:700; color:#475569;">�x� Margen de ganancia:</span>
+            <span style="font-weight:700; color:#475569;">📈 Margen de ganancia:</span>
             <div style="display:flex; align-items:center; gap:0.25rem;">
               <input type="number" id="ai-margin-pct" class="form-input" value="30" min="0" max="200" style="width:62px; padding:0.2rem 0.45rem; font-size:0.78rem; font-weight:700; text-align:center; background:#ffffff;">
               <span style="font-weight:700; color:#1e40af;">%</span>
@@ -4087,22 +4054,22 @@ CLABE: 722969010514249300</textarea>
         <div id="ai-chat-stream" style="flex:1; overflow-y:auto; padding:1.25rem; background:#f1f5f9; display:flex; flex-direction:column; gap:0.9rem;">
           <!-- Welcome Message Bubble -->
           <div style="display:flex; gap:0.65rem; align-items:flex-start;">
-            <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">�S�</div>
+            <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">✨</div>
             <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:0 12px 12px 12px; padding:0.85rem 1rem; max-width:88%; box-shadow:0 1px 2px rgba(0,0,0,0.04); font-size:0.85rem; color:#1e293b; line-height:1.5;">
               <strong>¡Hola! ¿En qué te ayudo hoy?</strong><br>
               Pídeme una cotización, pega el mensaje de WhatsApp de tu cliente, o pregúntame lo que necesites del negocio: compatibilidad de componentes, comparar equipos, qué precio poner, cuánto cobrar de mano de obra, claves SAT, redactar un mensaje de venta, etc. Recuerdo lo que vamos hablando en la charla.<br>
               <div style="margin-top:0.55rem; display:flex; gap:0.4rem; flex-wrap:wrap;">
                 <button type="button" onclick="fillQuickAIPrompt('Cotízame 4 cámaras bala IP 4MP para exterior, 1 NVR de 8 canales PoE, 1 disco duro WD Purple de 4TB y 1 bobina de cable Cat6')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
-                  �x� Ej: Kit 4 Cámaras IP + NVR + Disco 4TB
+                  📹 Ej: Kit 4 Cámaras IP + NVR + Disco 4TB
                 </button>
                 <button type="button" onclick="fillQuickAIPrompt('Cotízame 2 laptops Core i5 con 16GB RAM y 512GB SSD, 2 monitores de 24 pulgadas y 1 multifuncional Epson EcoTank')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
-                  �x� Ej: 2 Laptops i5 + Monitores + Impresora
+                  💻 Ej: 2 Laptops i5 + Monitores + Impresora
                 </button>
                 <button type="button" onclick="fillQuickAIPrompt('Quiero armar una PC para diseño con un Ryzen 7. ¿Qué tarjeta madre, memoria RAM, fuente y gabinete son compatibles? Recomiéndame opciones del catálogo')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
-                  �x�️ Ej: Armar PC compatible
+                  🖥️ Ej: Armar PC compatible
                 </button>
                 <button type="button" onclick="fillQuickAIPrompt('Ayúdame a determinar un precio de venta para la instalación de 8 cámaras con cableado de 30 m por cámara. ¿Cuánto cobro de mano de obra y qué margen me conviene?')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
-                  �x� Ej: ¿Qué precio pongo?
+                  💲 Ej: ¿Qué precio pongo?
                 </button>
               </div>
             </div>
@@ -4113,7 +4080,7 @@ CLABE: 722969010514249300</textarea>
         <div style="padding:0.9rem 1.15rem; background:#ffffff; border-top:1px solid #e2e8f0; display:flex; gap:0.6rem; align-items:flex-end; flex-shrink:0;">
           <textarea id="ai-prompt-input" class="form-input" rows="2" style="flex:1; resize:none; font-size:0.88rem; padding:0.6rem 0.85rem; border-radius:10px; background:#f8fafc; color:#0f172a; line-height:1.4;" placeholder="Escribe tu cotización, pregunta o lo que necesites... (Enter para enviar)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); runGeminiQuotation(); }"></textarea>
           <button type="button" class="btn btn-primary" onclick="runGeminiQuotation()" id="btn-run-ai" style="background:linear-gradient(135deg, #2563eb, #0284c7); border:none; padding:0.75rem 1.25rem; border-radius:10px; font-weight:800; font-size:0.88rem; color:white; height:52px; display:flex; align-items:center; gap:0.4rem;">
-            <span>Enviar</span> �S�
+            <span>Enviar</span> ✨
           </button>
         </div>
 
@@ -4125,32 +4092,32 @@ CLABE: 722969010514249300</textarea>
       <div class="modal-box" style="max-width:640px; background:#ffffff;">
         <div class="modal-header" style="background:linear-gradient(135deg, #0f172a, #1e3a8a); color:#ffffff;">
           <div>
-            <h3 style="color:#ffffff; margin:0;">�xR Conector Oficial API v3 � Tecnosinergia</h3>
+            <h3 style="color:#ffffff; margin:0;">🔌 Conector Oficial API v3 — Tecnosinergia</h3>
             <p style="font-size:0.76rem; color:#cbd5e1; margin:0;">Endpoint oficial: <code>https://api.tecnosinergia.info/v3/...</code> con encabezado <code>api-token</code></p>
           </div>
-          <button class="modal-close" onclick="closeModal('modal-tecno-api')" style="color:#ffffff;">�S"</button>
+          <button class="modal-close" onclick="closeModal('modal-tecno-api')" style="color:#ffffff;">✕</button>
         </div>
         <div class="modal-body" style="color:#1e293b;">
           <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:1rem;">
             <label style="font-size:0.82rem; font-weight:700; display:block; margin-bottom:0.35rem; color:#0f172a;">
-              �x Token de Acceso Tecnosinergia (<code>api-token</code>):
+              🔑 Token de Acceso Tecnosinergia (<code>api-token</code>):
             </label>
             <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
               <input type="password" id="tecno-api-token-input" class="form-input" value="" style="flex:1; min-width:220px; font-family:monospace; font-size:0.85rem; background:#ffffff;" placeholder="Vacío = usar el token del servidor (TECNO_API_TOKEN)">
-              <button type="button" class="btn btn-outline btn-sm" onclick="toggleTecnoTokenVisibility()" id="btn-show-tecno-token">�x�️</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="toggleTecnoTokenVisibility()" id="btn-show-tecno-token">👁️</button>
               <button type="button" class="btn btn-dark btn-sm" onclick="saveTecnoApiToken()">Guardar Token</button>
               <button type="button" class="btn btn-primary btn-sm" onclick="checkTecnoApiStatus()" id="btn-check-tecno-status" style="background:#0284c7; border-color:#0284c7; font-weight:700;">
-                �x� Probar /v3/status
+                🔍 Probar /v3/status
               </button>
             </div>
             <div id="tecno-api-status-box" style="margin-top:0.55rem; font-size:0.78rem; color:#475569;">
-              �x Si dejas el campo vacío se usa el token del servidor (variable <code>TECNO_API_TOKEN</code> en Netlify). Si capturas uno y pulsas <strong>Guardar Token</strong>, ese tiene prioridad. Pulsa <strong>Probar /v3/status</strong> o <strong>Sincronizar Productos Ahora</strong>.
+              🔒 Si dejas el campo vacío se usa el token del servidor (variable <code>TECNO_API_TOKEN</code> en Netlify). Si capturas uno y pulsas <strong>Guardar Token</strong>, ese tiene prioridad. Pulsa <strong>Probar /v3/status</strong> o <strong>Sincronizar Productos Ahora</strong>.
             </div>
           </div>
 
           <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:1rem;">
             <label style="font-size:0.82rem; font-weight:700; display:block; margin-bottom:0.35rem; color:#0369a1;">
-              �x� Ruta de Sincronización de Productos Tecnosinergia API v3:
+              📡 Ruta de Sincronización de Productos Tecnosinergia API v3:
             </label>
             <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
               <select id="tecno-endpoint-select" class="form-select" style="flex:1; min-width:240px; font-family:monospace; font-size:0.82rem; background:#ffffff;" onchange="document.getElementById('tecno-custom-url').value=this.value">
@@ -4158,11 +4125,11 @@ CLABE: 722969010514249300</textarea>
               </select>
               <input type="text" id="tecno-custom-url" class="form-input" value="https://api.tecnosinergia.info/v3/item/list" style="flex:1; min-width:240px; font-family:monospace; font-size:0.8rem; background:#ffffff;">
               <button type="button" class="btn btn-success btn-sm" onclick="syncTecnoCatalogFromAPI()" id="btn-sync-tecno" style="font-weight:700;">
-                �x Sincronizar Productos Ahora
+                🔄 Sincronizar Productos Ahora
               </button>
             </div>
             <p style="font-size:0.74rem; color:#0369a1; margin-top:0.4rem;">
-              �x� Los productos de Tecnosinergia se obtienen únicamente desde su API v3 al pulsar Sincronizar; no hay productos precargados.</p>
+              💡 Los productos de Tecnosinergia se obtienen únicamente desde su API v3 al pulsar Sincronizar; no hay productos precargados.</p>
           </div>
         </div>
         <div class="modal-footer">
@@ -4176,7 +4143,7 @@ CLABE: 722969010514249300</textarea>
       <div class="modal-box" style="max-width:560px;">
         <div class="modal-header">
           <h3 id="modal-client-title">Dar de Alta Cliente en Cartera CRM</h3>
-          <button class="modal-close" onclick="closeModal('modal-client')">�S"</button>
+          <button class="modal-close" onclick="closeModal('modal-client')">✕</button>
         </div>
         <div class="modal-body">
           <input type="hidden" id="crm-client-id">
@@ -4192,14 +4159,14 @@ CLABE: 722969010514249300</textarea>
             <div>
               <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Tipo de Contribuyente:</label>
               <select id="crm-modal-type" class="form-select" style="width:100%;">
-                <option value="moral">�x�� Persona Moral (Retención 1.25% ISR)</option>
-                <option value="fisica">�x� Persona Física</option>
+                <option value="moral">🏢 Persona Moral (Retención 1.25% ISR)</option>
+                <option value="fisica">👤 Persona Física</option>
               </select>
             </div>
           </div>
           <div>
             <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Persona de Contacto / Atención:</label>
-            <input type="text" id="crm-modal-contact" class="form-input" style="width:100%;" placeholder="Ej. Ing. Roberto Méndez � Compras">
+            <input type="text" id="crm-modal-contact" class="form-input" style="width:100%;" placeholder="Ej. Ing. Roberto Méndez — Compras">
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
             <div>
@@ -4215,7 +4182,7 @@ CLABE: 722969010514249300</textarea>
             <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Domicilio / Código Postal:</label>
             <input type="text" id="crm-modal-address" class="form-input" style="width:100%;" placeholder="C.P. y Dirección">
           </div>
-          <div style="font-size:0.78rem; font-weight:800; color:#0369a1; margin-top:0.4rem;">�x�� Datos para facturar (de su Constancia de Situación Fiscal)</div>
+          <div style="font-size:0.78rem; font-weight:800; color:#0369a1; margin-top:0.4rem;">🧾 Datos para facturar (de su Constancia de Situación Fiscal)</div>
           <div>
             <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Código postal fiscal:</label>
             <input type="text" id="crm-modal-cp" class="form-input" inputmode="numeric" maxlength="5" style="width:100%;" placeholder="72730">
@@ -4240,13 +4207,13 @@ CLABE: 722969010514249300</textarea>
     <div class="modal-backdrop no-print" id="modal-invoice">
       <div class="modal-box" style="max-width:720px;">
         <div class="modal-header">
-          <h3>�x�� Datos para facturar</h3>
-          <button class="modal-close" onclick="closeModal('modal-invoice')">�S"</button>
+          <h3>🧾 Datos para facturar</h3>
+          <button class="modal-close" onclick="closeModal('modal-invoice')">✕</button>
         </div>
         <div class="modal-body" id="invoice-sheet-body" style="max-height:68vh; overflow:auto;"></div>
         <div class="modal-footer">
           <button class="btn btn-outline" onclick="closeModal('modal-invoice')">Cerrar</button>
-          <button class="btn btn-primary" onclick="copyInvoiceAll()">�x9 Copiar todo</button>
+          <button class="btn btn-primary" onclick="copyInvoiceAll()">📋 Copiar todo</button>
         </div>
       </div>
     </div>
@@ -4301,7 +4268,7 @@ CLABE: 722969010514249300</textarea>
       const bad = kind === 'error';
       el.style.cssText = 'margin:0.5rem 0; padding:0.55rem 0.8rem; border-radius:8px; font-size:0.82rem; font-weight:700; ' +
         (bad ? 'background:#fef2f2; color:#b91c1c; border:1px solid #fecaca;' : 'background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;');
-      el.innerHTML = escapeHtml(msg) + (bad ? ' <button type="button" class="btn btn-outline btn-sm" onclick="retryCatalogs()" style="margin-left:0.5rem;">�x Reintentar</button>' : '');
+      el.innerHTML = escapeHtml(msg) + (bad ? ' <button type="button" class="btn btn-outline btn-sm" onclick="retryCatalogs()" style="margin-left:0.5rem;">🔄 Reintentar</button>' : '');
     }
     async function _fetchCatalog(name) {
       let rows = [], part = 0, parts = 1;
@@ -4310,14 +4277,14 @@ CLABE: 722969010514249300</textarea>
         if (!r.ok) throw new Error(name + ': HTTP ' + r.status);
         const d = await r.json();
         rows = rows.concat(d.rows || []); parts = d.parts || 1; part++;
-        _setCatalogBanner('info', '⏳ Cargando catálogo ' + (name === 'ct' ? 'CT' : 'Syscom') + '⬦ ' + rows.length.toLocaleString('es-MX') + ' / ' + (d.total || 0).toLocaleString('es-MX'));
+        _setCatalogBanner('info', '⏳ Cargando catálogo ' + (name === 'ct' ? 'CT' : 'Syscom') + '… ' + rows.length.toLocaleString('es-MX') + ' / ' + (d.total || 0).toLocaleString('es-MX'));
       }
       return rows;
     }
     async function loadProtectedCatalogs() {
       if (_catalogsLoaded) return true;
       try {
-        _setCatalogBanner('info', '⏳ Cargando catálogos CT y Syscom⬦');
+        _setCatalogBanner('info', '⏳ Cargando catálogos CT y Syscom…');
         const sys = await _fetchCatalog('syscom');
         const ct = await _fetchCatalog('ct');
         sampleSyscomProducts = sys; _ctTuples = ct; sampleCTProducts = _mapCT(ct);
@@ -4327,7 +4294,7 @@ CLABE: 722969010514249300</textarea>
         return true;
       } catch (e) {
         _catalogError = String(e && e.message || e);
-        _setCatalogBanner('error', '�a�️ No se pudieron cargar los catálogos CT/Syscom (' + _catalogError + ').');
+        _setCatalogBanner('error', '⚠️ No se pudieron cargar los catálogos CT/Syscom (' + _catalogError + ').');
         return false;
       }
     }
@@ -4402,7 +4369,7 @@ CLABE: 722969010514249300</textarea>
         else if (v.length === 13 && currentClientType !== 'fisica') { setClientType('fisica'); showToast('Tipo de cliente ajustado a Persona Física por su RFC (13 caracteres): sin retenciones.'); }
       });
 
-      // Refresh CRM first, then set 1 clean empty row at $0.00 and default to VENTA AL P�aBLICO EN GENERAL (Persona Física)
+      // Refresh CRM first, then set 1 clean empty row at $0.00 and default to VENTA AL PÚBLICO EN GENERAL (Persona Física)
       refreshCRMViews();
       document.getElementById('items-body').innerHTML = '';
       addNewRow();
@@ -4723,7 +4690,7 @@ CLABE: 722969010514249300</textarea>
     function ensureDefaultPublicClients() {
       const defaultFisica = {
         id: 'cli_publico_fisica',
-        name: 'VENTA AL P�aBLICO EN GENERAL',
+        name: 'VENTA AL PÚBLICO EN GENERAL',
         type: 'fisica',
         rfc: 'XAXX010101000',
         contact: 'Mostrador / Público en General',
@@ -4738,7 +4705,7 @@ CLABE: 722969010514249300</textarea>
       };
       const defaultMoral = {
         id: 'cli_publico_moral',
-        name: 'VENTA AL P�aBLICO EN GENERAL (PERSONA MORAL)',
+        name: 'VENTA AL PÚBLICO EN GENERAL (PERSONA MORAL)',
         type: 'moral',
         rfc: 'XAXX010101000',
         contact: 'Departamento de Compras / Público General Moral',
@@ -4752,8 +4719,8 @@ CLABE: 722969010514249300</textarea>
         quotesCount: 0
       };
 
-      const hasFisica = crmClients.some(c => c.id === 'cli_publico_fisica' || (c.name.toUpperCase() === 'VENTA AL P�aBLICO EN GENERAL' && c.type === 'fisica'));
-      const hasMoral = crmClients.some(c => c.id === 'cli_publico_moral' || c.name.toUpperCase().includes('P�aBLICO EN GENERAL (PERSONA MORAL)'));
+      const hasFisica = crmClients.some(c => c.id === 'cli_publico_fisica' || (c.name.toUpperCase() === 'VENTA AL PÚBLICO EN GENERAL' && c.type === 'fisica'));
+      const hasMoral = crmClients.some(c => c.id === 'cli_publico_moral' || c.name.toUpperCase().includes('PÚBLICO EN GENERAL (PERSONA MORAL)'));
 
       if (!hasMoral) crmClients.unshift(defaultMoral);
       if (!hasFisica) crmClients.unshift(defaultFisica);
@@ -4764,8 +4731,8 @@ CLABE: 722969010514249300</textarea>
       ensureDefaultPublicClients();
       const targetIdx = crmClients.findIndex(c =>
         type === 'moral'
-          ? (c.id === 'cli_publico_moral' || (c.name.toUpperCase().includes('P�aBLICO EN GENERAL') && c.type === 'moral'))
-          : (c.id === 'cli_publico_fisica' || (c.name.toUpperCase() === 'VENTA AL P�aBLICO EN GENERAL' && c.type === 'fisica'))
+          ? (c.id === 'cli_publico_moral' || (c.name.toUpperCase().includes('PÚBLICO EN GENERAL') && c.type === 'moral'))
+          : (c.id === 'cli_publico_fisica' || (c.name.toUpperCase() === 'VENTA AL PÚBLICO EN GENERAL' && c.type === 'fisica'))
       );
       if (targetIdx >= 0) {
         const cli = crmClients[targetIdx];
@@ -4796,10 +4763,10 @@ CLABE: 722969010514249300</textarea>
       // Si el nombre actual es Venta al Público en General, alternar automáticamente entre Física y Moral
       if (clientNameEl) {
         const curNameUp = clientNameEl.value.trim().toUpperCase();
-        if (!curNameUp || curNameUp.includes('VENTA AL P�aBLICO EN GENERAL')) {
+        if (!curNameUp || curNameUp.includes('VENTA AL PÚBLICO EN GENERAL')) {
           clientNameEl.value = type === 'moral'
-            ? 'VENTA AL P�aBLICO EN GENERAL (PERSONA MORAL)'
-            : 'VENTA AL P�aBLICO EN GENERAL';
+            ? 'VENTA AL PÚBLICO EN GENERAL (PERSONA MORAL)'
+            : 'VENTA AL PÚBLICO EN GENERAL';
           if (clientRfc && !clientRfc.value.trim()) clientRfc.value = 'XAXX010101000';
         }
       }
@@ -4838,7 +4805,7 @@ CLABE: 722969010514249300</textarea>
     /* Table & Line Item Rows (Estructura CFDI 4.0) */
     function syncPrintMirrors() {
       const proEl = document.getElementById('company-professional'), proMir = document.getElementById('footer-professional');
-      if (proEl && proMir && proEl.value.trim()) proMir.textContent = proEl.value.replace(' · ', ' ⬢ ');
+      if (proEl && proMir && proEl.value.trim()) proMir.textContent = proEl.value.replace(' · ', ' • ');
 
       const bankEl = document.getElementById('banking-details');
       const bankMir = document.getElementById('print-banking-mirror');
@@ -4927,14 +4894,14 @@ CLABE: 722969010514249300</textarea>
     }
 
     const ITEM_CATEGORY_META = {
-      "EQUIPO":   { label: "�x� Equipo / Producto", sectionTitle: "SECCI�N: EQUIPOS Y SUMINISTROS", defaultSku: "EQP-01", defaultSat: "43211500", defaultUnit: "H87 - Pieza" },
-      "MATERIAL": { label: "�xR Material / Insumos", sectionTitle: "SECCI�N: MATERIALES E INSUMOS DE INSTALACI�N", defaultSku: "MAT-01", defaultSat: "39121400", defaultUnit: "H87 - Pieza" },
-      "MANO_OBRA":{ label: "�x� Mano de Obra", sectionTitle: "SECCI�N: MANO DE OBRA E INSTALACI�N", defaultSku: "MO-01", defaultSat: "72151500", defaultUnit: "E48 - Unidad de servicio" },
-      "SERVICIO": { label: "�x:�️ Servicio / Config.", sectionTitle: "SECCI�N: SERVICIOS T�0CNICOS Y CONFIGURACI�N", defaultSku: "SERV-01", defaultSat: "81111800", defaultUnit: "E48 - Unidad de servicio" }
+      "EQUIPO":   { label: "📦 Equipo / Producto", sectionTitle: "SECCIÓN: EQUIPOS Y SUMINISTROS", defaultSku: "EQP-01", defaultSat: "43211500", defaultUnit: "H87 - Pieza" },
+      "MATERIAL": { label: "🔌 Material / Insumos", sectionTitle: "SECCIÓN: MATERIALES E INSUMOS DE INSTALACIÓN", defaultSku: "MAT-01", defaultSat: "39121400", defaultUnit: "H87 - Pieza" },
+      "MANO_OBRA":{ label: "👷 Mano de Obra", sectionTitle: "SECCIÓN: MANO DE OBRA E INSTALACIÓN", defaultSku: "MO-01", defaultSat: "72151500", defaultUnit: "E48 - Unidad de servicio" },
+      "SERVICIO": { label: "🛠️ Servicio / Config.", sectionTitle: "SECCIÓN: SERVICIOS TÉCNICOS Y CONFIGURACIÓN", defaultSku: "SERV-01", defaultSat: "81111800", defaultUnit: "E48 - Unidad de servicio" }
     };
 
     // Claves SAT (ClaveProdServ) frecuentes para mano de obra y servicios. Se elige según el concepto
-    // para no facturar todo con la misma clave; el usuario puede cambiarla o pedirla a la IA (botón �S�).
+    // para no facturar todo con la misma clave; el usuario puede cambiarla o pedirla a la IA (botón ✨).
     const SAT_SERVICE_CODES = [
       { code: "72151700", label: "Instalación de sistemas de seguridad (CCTV, alarmas, control de acceso)", re: /(cctv|camara|cámara|videovigil|dvr|nvr|alarma|control de acceso|cerco|videoportero|interfon|biometr|torniquete|chapa|cerradura|seguridad)/ },
       { code: "72151600", label: "Sistemas de comunicación especializados (cableado, redes, telefonía)", re: /(cablead|cable |utp|cat ?5|cat ?6|nodo|red |redes|fibra|rack|patch|wifi|wi-fi|access point|antena|enlace|telefon|conmutador|voz y datos)/ },
@@ -5079,14 +5046,14 @@ ${JSON.stringify(list)}`;
       tr.innerHTML = `
         <td class="no-print internal-control-td" style="text-align:center;">
           <input type="text" class="item-input row-sat" list="sat-common-codes" style="text-align:center; font-family:monospace; font-weight:700; color:#92400e; background:#fff;" placeholder="Clave SAT" value="${escapeHtml(satCode)}" oninput="this.dataset.manual='1'; calculateTotals()" title="ClaveProdServ SAT (Solo control interno, no se imprime)">
-          <button type="button" class="no-print" onclick="suggestSatWithAI(this)" title="Sugerir con IA la clave SAT y unidad correctas para esta partida" style="margin-top:2px; font-size:0.62rem; padding:1px 5px; border:1px solid #f59e0b; background:#fffbeb; color:#92400e; border-radius:4px; cursor:pointer; font-weight:700;">�S� Sugerir</button>
+          <button type="button" class="no-print" onclick="suggestSatWithAI(this)" title="Sugerir con IA la clave SAT y unidad correctas para esta partida" style="margin-top:2px; font-size:0.62rem; padding:1px 5px; border:1px solid #f59e0b; background:#fffbeb; color:#92400e; border-radius:4px; cursor:pointer; font-weight:700;">✨ Sugerir</button>
         </td>
         <td class="no-print internal-control-td">
           <select class="item-input row-item-category" style="font-size:0.7rem; font-weight:800; color:#0f172a; background:#ffffff; border:1px solid #f59e0b; border-radius:4px; padding:0.15rem 0.25rem; margin-bottom:2px; width:100%;" onchange="onRowCategoryChange(this)" title="Clasifica esta partida para separarla por sección en la Cotización / Nota de Venta">
-            <option value="EQUIPO" ${itemCat === 'EQUIPO' ? 'selected' : ''}>�x� Equipo / Producto</option>
-            <option value="MANO_OBRA" ${itemCat === 'MANO_OBRA' ? 'selected' : ''}>�x� Mano de Obra</option>
-            <option value="SERVICIO" ${itemCat === 'SERVICIO' ? 'selected' : ''}>�x:�️ Servicio / Config.</option>
-            <option value="MATERIAL" ${itemCat === 'MATERIAL' ? 'selected' : ''}>�xR Material / Insumos</option>
+            <option value="EQUIPO" ${itemCat === 'EQUIPO' ? 'selected' : ''}>📦 Equipo / Producto</option>
+            <option value="MANO_OBRA" ${itemCat === 'MANO_OBRA' ? 'selected' : ''}>👷 Mano de Obra</option>
+            <option value="SERVICIO" ${itemCat === 'SERVICIO' ? 'selected' : ''}>🛠️ Servicio / Config.</option>
+            <option value="MATERIAL" ${itemCat === 'MATERIAL' ? 'selected' : ''}>🔌 Material / Insumos</option>
           </select>
           <input type="text" class="item-input row-sku" style="font-family:monospace; font-weight:600; color:#92400e; background:#fff; font-size:0.72rem;" placeholder="SKU / Clave" value="${escapeHtml(sku)}" oninput="calculateTotals()" title="No. Identificación / SKU (Solo control interno)">
                     <input type="hidden" class="row-base-cost" value="${baseCost}">
@@ -5112,7 +5079,7 @@ ${JSON.stringify(list)}`;
           <input type="text" class="item-input row-concept screen-only-field" style="font-weight:700;" placeholder="Concepto / Producto / Mano de Obra / Servicio" value="${escapeHtml(concept)}" oninput="syncPrintMirrors(); calculateTotals()" onchange="autoSatForRow(this.closest('tr'))">
           <textarea class="item-input row-desc screen-only-field" placeholder="Especificación técnica o alcance del servicio" oninput="syncPrintMirrors()" onchange="autoSatForRow(this.closest('tr'))">${escapeHtml(desc)}</textarea>
           <div class="print-mirror"><div class="print-mirror-title">${escapeHtml(concept)}</div><div class="print-mirror-desc">${escapeHtml(desc)}</div></div>
-          <button type="button" class="row-adv-toggle no-print" onclick="this.closest('tr').classList.toggle('row-adv-open')">�a"️ Ajustes de la partida (SAT, margen, IVA)</button>
+          <button type="button" class="row-adv-toggle no-print" onclick="this.closest('tr').classList.toggle('row-adv-open')">⚙️ Ajustes de la partida (SAT, margen, IVA)</button>
         </td>
         <td class="col-unit-price" style="text-align:right;">
           <input type="number" class="item-input item-num row-price screen-only-field" min="0" step="any" inputmode="decimal" value="${price}" oninput="onRowPriceManualInput(this)">
@@ -5126,7 +5093,7 @@ ${JSON.stringify(list)}`;
           $0.00
         </td>
         <td class="td-action no-print" style="text-align:center;">
-          <button class="btn btn-danger btn-sm" onclick="removeRow(this)" style="padding:0.15rem 0.35rem;" title="Eliminar o limpiar partida">�S"</button>
+          <button class="btn btn-danger btn-sm" onclick="removeRow(this)" style="padding:0.15rem 0.35rem;" title="Eliminar o limpiar partida">✕</button>
         </td>
       `;
 
@@ -5176,8 +5143,8 @@ ${JSON.stringify(list)}`;
       const masterCheck = document.getElementById('master-row-iva-check');
       if (label) {
         label.textContent = withInvoice
-          ? '�x�� Con Factura (Aplica IVA)'
-          : '�x Sin Factura (Neto sin IVA)';
+          ? '🧾 Con Factura (Aplica IVA)'
+          : '📄 Sin Factura (Neto sin IVA)';
       }
       if (masterCheck) masterCheck.checked = withInvoice;
       document.querySelectorAll('#items-body .row-apply-iva').forEach(chk => {
@@ -5198,7 +5165,7 @@ ${JSON.stringify(list)}`;
       if (billingToggle) {
         billingToggle.checked = checked;
         if (label) {
-          label.textContent = checked ? '�x�� Con Factura (Aplica IVA)' : '�x Sin Factura (Neto sin IVA)';
+          label.textContent = checked ? '🧾 Con Factura (Aplica IVA)' : '📄 Sin Factura (Neto sin IVA)';
         }
       }
       calculateTotals();
@@ -5215,7 +5182,7 @@ ${JSON.stringify(list)}`;
       if (billingToggle) {
         billingToggle.checked = anyChecked;
         if (label) {
-          label.textContent = anyChecked ? '�x�� Con Factura (Aplica IVA)' : '�x Sin Factura (Neto sin IVA)';
+          label.textContent = anyChecked ? '🧾 Con Factura (Aplica IVA)' : '📄 Sin Factura (Neto sin IVA)';
         }
       }
       calculateTotals();
@@ -5420,13 +5387,13 @@ ${JSON.stringify(list)}`;
       let currencyName = "PESOS";
       let currencySuffix = "M.N.";
       if (currencyCode === 'USD') {
-        currencyName = "D�LARES AMERICANOS";
+        currencyName = "DÓLARES AMERICANOS";
         currencySuffix = "USD";
       }
 
       function convertGroup(n) {
         const units = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
-        const teens = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECIS�0IS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
+        const teens = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
         const tens = ['', '', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
         const hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
 
@@ -5462,7 +5429,7 @@ ${JSON.stringify(list)}`;
       const remainder = integerPart % 1000;
 
       if (millions > 0) {
-        if (millions === 1) words += 'UN MILL�N ';
+        if (millions === 1) words += 'UN MILLÓN ';
         else words += convertGroup(millions) + ' MILLONES ';
       }
 
@@ -5528,8 +5495,8 @@ ${JSON.stringify(list)}`;
             <td style="text-align:center;">
               <div style="display:flex; gap:0.35rem; justify-content:center;">
                 <button class="btn btn-primary btn-sm" onclick="quoteForCRMClient(${idx})" title="Crear nueva cotización para este cliente">Cotizar</button>
-                <button class="btn btn-outline btn-sm" onclick="editCRMClient(${idx})" title="Editar datos">�S�️</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteCRMClient(${idx})" title="Eliminar cliente">�S"</button>
+                <button class="btn btn-outline btn-sm" onclick="editCRMClient(${idx})" title="Editar datos">✏️</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteCRMClient(${idx})" title="Eliminar cliente">✕</button>
               </div>
             </td>
           `;
@@ -5815,19 +5782,19 @@ function updateDashboardKPIs() { renderDashboard(); }
       wrap.innerHTML = (slice.length ? '<div style="overflow-x:auto;"><table class="dash-table" style="width:100%; border-collapse:collapse; font-size:0.78rem;"><thead><tr style="text-align:left; color:#64748b; font-size:0.68rem; text-transform:uppercase;"><th style="padding:0.4rem;">Folio</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th style="text-align:right;">Total</th><th style="text-align:right;">Acciones</th></tr></thead><tbody>' +
         slice.map(({ r, idx }) => {
           const st = DASH_STATUS[r.status] || [r.status, '#475569'];
-          const link = r.status === 'sales_note' && r.refCotFolio ? '<div style="font-size:0.66rem; color:#64748b;">�  ' + escapeHtml(r.refCotFolio) + '</div>' : '';
-          const fbtn = (r.status === 'approved' || r.status === 'sales_note') ? '<button type="button" class="btn btn-primary btn-sm" onclick="openInvoiceSheet(' + idx + ')">�x�� Facturar</button> ' : '';
-          const inv = r.invoice ? '<div style="font-size:0.66rem; color:#15803d;">�x�� Facturada ' + escapeHtml(r.invoice.date || '') + (r.invoice.uuid ? ' · ' + escapeHtml(String(r.invoice.uuid).slice(0, 8)) + '⬦' : '') + '</div>' : '';
-          const acts = '<button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + idx + ')">�x Abrir</button> ' + fbtn +
-            (r.status === 'draft' ? (isAdmin ? '<button type="button" class="btn btn-outline btn-sm" style="color:#b91c1c;" onclick="dashDeleteQuote(' + idx + ')">�x️ Eliminar</button>' : '')
-              : r.status === 'cancelled' ? '<button type="button" class="btn btn-outline btn-sm" onclick="dashRestoreQuote(' + idx + ')">� �️ Restaurar</button>'
-              : '<button type="button" class="btn btn-outline btn-sm" style="color:#b45309;" onclick="dashCancelQuote(' + idx + ')">�xa� Cancelar</button>');
-          return '<tr style="border-top:1px solid #e2e8f0;' + (r.status === 'cancelled' ? ' opacity:0.55; text-decoration:line-through;' : '') + '"><td style="padding:0.5rem 0.4rem; font-weight:800; color:#023e8a;">' + escapeHtml(r.number) + link + inv + '</td><td>' + escapeHtml((r.client && r.client.name) || '�') + '</td><td>' + escapeHtml(r.date || '') + '</td><td><span style="color:' + st[1] + '; font-weight:800;">' + st[0] + '</span></td><td style="text-align:right; font-weight:700;">' + dashFmt(dashMxn(r)) + '</td><td style="text-align:right; white-space:nowrap;">' + acts + '</td></tr>';
+          const link = r.status === 'sales_note' && r.refCotFolio ? '<div style="font-size:0.66rem; color:#64748b;">↔ ' + escapeHtml(r.refCotFolio) + '</div>' : '';
+          const fbtn = (r.status === 'approved' || r.status === 'sales_note') ? '<button type="button" class="btn btn-primary btn-sm" onclick="openInvoiceSheet(' + idx + ')">🧾 Facturar</button> ' : '';
+          const inv = r.invoice ? '<div style="font-size:0.66rem; color:#15803d;">🧾 Facturada ' + escapeHtml(r.invoice.date || '') + (r.invoice.uuid ? ' · ' + escapeHtml(String(r.invoice.uuid).slice(0, 8)) + '…' : '') + '</div>' : '';
+          const acts = '<button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + idx + ')">📂 Abrir</button> ' + fbtn +
+            (r.status === 'draft' ? (isAdmin ? '<button type="button" class="btn btn-outline btn-sm" style="color:#b91c1c;" onclick="dashDeleteQuote(' + idx + ')">🗑️ Eliminar</button>' : '')
+              : r.status === 'cancelled' ? '<button type="button" class="btn btn-outline btn-sm" onclick="dashRestoreQuote(' + idx + ')">↩️ Restaurar</button>'
+              : '<button type="button" class="btn btn-outline btn-sm" style="color:#b45309;" onclick="dashCancelQuote(' + idx + ')">🚫 Cancelar</button>');
+          return '<tr style="border-top:1px solid #e2e8f0;' + (r.status === 'cancelled' ? ' opacity:0.55; text-decoration:line-through;' : '') + '"><td style="padding:0.5rem 0.4rem; font-weight:800; color:#023e8a;">' + escapeHtml(r.number) + link + inv + '</td><td>' + escapeHtml((r.client && r.client.name) || '—') + '</td><td>' + escapeHtml(r.date || '') + '</td><td><span style="color:' + st[1] + '; font-weight:800;">' + st[0] + '</span></td><td style="text-align:right; font-weight:700;">' + dashFmt(dashMxn(r)) + '</td><td style="text-align:right; white-space:nowrap;">' + acts + '</td></tr>';
         }).join('') + '</tbody></table></div>'
         : '<p style="text-align:center; color:#64748b; padding:1.2rem; font-size:0.82rem;">No hay cotizaciones con esos filtros.</p>') +
         '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.6rem; font-size:0.74rem; color:#64748b;"><span>' + rows.length + ' resultado(s)</span><span>' +
-        '<button type="button" class="btn btn-outline btn-sm" ' + (DASH.page <= 1 ? 'disabled' : '') + ' onclick="DASH.page--; dashRenderTable()">��</button> Página ' + DASH.page + ' de ' + pages + ' ' +
-        '<button type="button" class="btn btn-outline btn-sm" ' + (DASH.page >= pages ? 'disabled' : '') + ' onclick="DASH.page++; dashRenderTable()">��</button></span></div>';
+        '<button type="button" class="btn btn-outline btn-sm" ' + (DASH.page <= 1 ? 'disabled' : '') + ' onclick="DASH.page--; dashRenderTable()">◀</button> Página ' + DASH.page + ' de ' + pages + ' ' +
+        '<button type="button" class="btn btn-outline btn-sm" ' + (DASH.page >= pages ? 'disabled' : '') + ' onclick="DASH.page++; dashRenderTable()">▶</button></span></div>';
     }
 
     function dashPersist(msg) {
@@ -5842,20 +5809,20 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (r.status !== 'draft') { showToast('Solo se eliminan borradores. Para las demás usa "Cancelar" (conserva el folio).'); return; }
       if (!confirm('¿Eliminar definitivamente el borrador ' + r.number + '? Esta acción no se puede deshacer.')) return;
       quotesHistory.splice(idx, 1);
-      logSecurityEvent(currentAuthUser.username, currentAuthUser.role, '�x️ Eliminó el borrador ' + r.number);
+      logSecurityEvent(currentAuthUser.username, currentAuthUser.role, '🗑️ Eliminó el borrador ' + r.number);
       dashPersist('Borrador eliminado.');
     }
     function dashCancelQuote(idx) {
       const r = quotesHistory[idx]; if (!r) return;
       if (!confirm('¿Cancelar ' + r.number + '? Se conserva en el historial con su folio, marcada como cancelada, y deja de contar en las métricas.')) return;
       r.statusBeforeCancel = r.status; r.status = 'cancelled'; r.cancelledAt = new Date().toISOString(); r.cancelledBy = currentAuthUser ? currentAuthUser.username : '';
-      logSecurityEvent(currentAuthUser ? currentAuthUser.username : '', currentAuthUser ? currentAuthUser.role : '', '�xa� Canceló ' + r.number);
+      logSecurityEvent(currentAuthUser ? currentAuthUser.username : '', currentAuthUser ? currentAuthUser.role : '', '🚫 Canceló ' + r.number);
       dashPersist(r.number + ' cancelada.');
     }
     function dashRestoreQuote(idx) {
       const r = quotesHistory[idx]; if (!r) return;
       r.status = r.statusBeforeCancel || 'draft'; delete r.cancelledAt; delete r.cancelledBy;
-      logSecurityEvent(currentAuthUser ? currentAuthUser.username : '', currentAuthUser ? currentAuthUser.role : '', '� �️ Restauró ' + r.number);
+      logSecurityEvent(currentAuthUser ? currentAuthUser.username : '', currentAuthUser ? currentAuthUser.role : '', '↩️ Restauró ' + r.number);
       dashPersist(r.number + ' restaurada.');
     }
 
@@ -5867,16 +5834,16 @@ function updateDashboardKPIs() { renderDashboard(); }
       const maxS = Math.max(1, ...m.stages.map(x => x.amt));
       const catTotal = Object.values(m.cat).reduce((a, b) => a + b, 0) || 1;
       const wonTotal = m.moralWon + m.fisicaWon || 1;
-      const wa = (phone, text) => { const u = dashWaLink(phone, text); return u ? ' <a href="' + u + '" target="_blank" rel="noopener" class="btn btn-success btn-sm" style="text-decoration:none; padding:0.2rem 0.5rem; font-size:0.7rem;">�x�</a>' : ''; };
+      const wa = (phone, text) => { const u = dashWaLink(phone, text); return u ? ' <a href="' + u + '" target="_blank" rel="noopener" class="btn btn-success btn-sm" style="text-decoration:none; padding:0.2rem 0.5rem; font-size:0.7rem;">📲</a>' : ''; };
       const tips = [];
-      if (m.follow.length) tips.push('�x~ <b>' + m.follow.length + '</b> cotización(es) enviada(s) llevan 5+ días sin respuesta (' + dashFmt(m.follow.reduce((a, q) => a + dashMxn(q), 0)) + '). Da seguimiento hoy.');
+      if (m.follow.length) tips.push('📞 <b>' + m.follow.length + '</b> cotización(es) enviada(s) llevan 5+ días sin respuesta (' + dashFmt(m.follow.reduce((a, q) => a + dashMxn(q), 0)) + '). Da seguimiento hoy.');
       if (m.soon.length) tips.push('⏰ <b>' + m.soon.length + '</b> vencen en los próximos 7 días: ofrece una extensión o cierra la venta.');
-      if (m.expired.length) tips.push('�a�️ <b>' + m.expired.length + '</b> cotización(es) enviadas ya vencieron sin respuesta.');
-      if (m.idle.length) tips.push('�x� <b>' + m.idle.length + '</b> cliente(s) con compra previa llevan más de 90 días sin cotizar: reactívalos con un mensaje personal.');
-      if (m.toInvoiceN) tips.push('�x�� <b>' + m.toInvoiceN + '</b> operación(es) ganada(s) por ' + dashFmt(m.toInvoiceAmt) + ' aún sin factura: usa el filtro "Pendientes de facturar".');
-      if (m.draftN) tips.push('�x� <b>' + m.draftN + '</b> borrador(es) por ' + dashFmt(m.draftAmt) + ' sin enviar.');
-      if (m.emittedN >= 5 && m.closeRate < 25) tips.push('�x0 Tu tasa de cierre es ' + m.closeRate + '%: revisa tiempos de respuesta, precios y el seguimiento a los 3-5 días.');
-      if (!tips.length) tips.push('�S& Sin pendientes críticos. Buen momento para prospectar: contacta a tus clientes recurrentes y pide referidos.');
+      if (m.expired.length) tips.push('⚠️ <b>' + m.expired.length + '</b> cotización(es) enviadas ya vencieron sin respuesta.');
+      if (m.idle.length) tips.push('🔁 <b>' + m.idle.length + '</b> cliente(s) con compra previa llevan más de 90 días sin cotizar: reactívalos con un mensaje personal.');
+      if (m.toInvoiceN) tips.push('🧾 <b>' + m.toInvoiceN + '</b> operación(es) ganada(s) por ' + dashFmt(m.toInvoiceAmt) + ' aún sin factura: usa el filtro "Pendientes de facturar".');
+      if (m.draftN) tips.push('📝 <b>' + m.draftN + '</b> borrador(es) por ' + dashFmt(m.draftAmt) + ' sin enviar.');
+      if (m.emittedN >= 5 && m.closeRate < 25) tips.push('📉 Tu tasa de cierre es ' + m.closeRate + '%: revisa tiempos de respuesta, precios y el seguimiento a los 3-5 días.');
+      if (!tips.length) tips.push('✅ Sin pendientes críticos. Buen momento para prospectar: contacta a tus clientes recurrentes y pide referidos.');
       root.innerHTML =
         '<div class="dash-kpis" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:0.7rem; margin-bottom:0.9rem;">' +
         kpi('Ganado (aprobadas + notas de venta)', dashFmt(m.wonAmt), m.wonN + ' operación(es) cerradas', '#15803d') +
@@ -5884,29 +5851,29 @@ function updateDashboardKPIs() { renderDashboard(); }
         kpi('Tasa de cierre', m.closeRate + '%', 'Ganadas / emitidas · ' + m.winRate + '% sobre las ya decididas') +
         kpi('Ticket promedio', dashFmt(m.ticket), 'Por operación ganada') +
         kpi('Pipeline abierto', dashFmt(m.openAmt), m.openN + ' enviada(s) esperando respuesta', '#b45309') +
-        kpi('Utilidad estimada', m.marginPct === null ? '�' : dashFmt(m.profit), m.marginPct === null ? 'Sin costos capturados en lo ganado' : 'Margen ' + m.marginPct + '% sobre lo ganado') +
+        kpi('Utilidad estimada', m.marginPct === null ? '—' : dashFmt(m.profit), m.marginPct === null ? 'Sin costos capturados en lo ganado' : 'Margen ' + m.marginPct + '% sobre lo ganado') +
         kpi('Clientes activos', m.activeClientsN, m.newClientsN + ' nuevo(s) en 30 días · ' + m.idle.length + ' inactivo(s) +90 días') +
         kpi('Por vencer / vencidas', m.soon.length + ' / ' + m.expired.length, 'Enviadas en próximos 7 días / ya vencidas') +
         kpi('Por facturar', m.toInvoiceN, dashFmt(m.toInvoiceAmt) + ' ganado sin factura', m.toInvoiceN ? '#b45309' : '') + '</div>' +
 
-        '<div class="dash-card" style="margin-bottom:0.9rem; background:#f0f9ff; border-color:#bae6fd;"><h3>�x}� Qué hacer hoy para crecer</h3>' + tips.map(t => '<div class="dash-row" style="border-color:#e0f2fe;"><span>' + t + '</span></div>').join('') + '</div>' +
+        '<div class="dash-card" style="margin-bottom:0.9rem; background:#f0f9ff; border-color:#bae6fd;"><h3>🎯 Qué hacer hoy para crecer</h3>' + tips.map(t => '<div class="dash-row" style="border-color:#e0f2fe;"><span>' + t + '</span></div>').join('') + '</div>' +
 
         '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:0.9rem; margin-bottom:0.9rem;">' +
-        '<div class="dash-card"><h3>�x� �altimos 6 meses (cotizado vs ganado)</h3>' + m.monthly.map(x => '<div style="margin-bottom:0.5rem;"><div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#475569;"><b>' + x.m + '</b><span>' + dashFmt(x.quoted) + ' / <b style="color:#15803d;">' + dashFmt(x.won) + '</b></span></div><div class="dash-bar"><i style="width:' + Math.round(x.quoted / maxM * 100) + '%; background:#7dd3fc;"></i></div><div class="dash-bar" style="margin-top:2px;"><i style="width:' + Math.round(x.won / maxM * 100) + '%; background:#16a34a;"></i></div></div>').join('') + '</div>' +
-        '<div class="dash-card"><h3>�x�� Embudo por etapa</h3>' + m.stages.map(x => '<div style="margin-bottom:0.5rem;"><div style="display:flex; justify-content:space-between; font-size:0.74rem;"><b style="color:' + DASH_STATUS[x.k][1] + ';">' + DASH_STATUS[x.k][0] + ' (' + x.n + ')</b><span>' + dashFmt(x.amt) + '</span></div><div class="dash-bar"><i style="width:' + Math.round(x.amt / maxS * 100) + '%; background:' + DASH_STATUS[x.k][1] + ';"></i></div></div>').join('') + '</div></div>' +
+        '<div class="dash-card"><h3>📈 Últimos 6 meses (cotizado vs ganado)</h3>' + m.monthly.map(x => '<div style="margin-bottom:0.5rem;"><div style="display:flex; justify-content:space-between; font-size:0.72rem; color:#475569;"><b>' + x.m + '</b><span>' + dashFmt(x.quoted) + ' / <b style="color:#15803d;">' + dashFmt(x.won) + '</b></span></div><div class="dash-bar"><i style="width:' + Math.round(x.quoted / maxM * 100) + '%; background:#7dd3fc;"></i></div><div class="dash-bar" style="margin-top:2px;"><i style="width:' + Math.round(x.won / maxM * 100) + '%; background:#16a34a;"></i></div></div>').join('') + '</div>' +
+        '<div class="dash-card"><h3>🧭 Embudo por etapa</h3>' + m.stages.map(x => '<div style="margin-bottom:0.5rem;"><div style="display:flex; justify-content:space-between; font-size:0.74rem;"><b style="color:' + DASH_STATUS[x.k][1] + ';">' + DASH_STATUS[x.k][0] + ' (' + x.n + ')</b><span>' + dashFmt(x.amt) + '</span></div><div class="dash-bar"><i style="width:' + Math.round(x.amt / maxS * 100) + '%; background:' + DASH_STATUS[x.k][1] + ';"></i></div></div>').join('') + '</div></div>' +
 
         '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:0.9rem; margin-bottom:0.9rem;">' +
-        '<div class="dash-card"><h3>�x~ Dar seguimiento (enviadas 5+ días)</h3>' + (m.follow.length ? m.follow.slice(0, 6).map(q => '<div class="dash-row"><span><b>' + E(q.number) + '</b> · ' + E((q.client && q.client.name) || '') + '<br><span style="color:#64748b;">' + dashFmt(dashMxn(q)) + ' · ' + E(q.date || '') + '</span></span><span style="white-space:nowrap;">' + wa((q.client && q.client.phone) || dashCrmPhone(q.client && q.client.name), 'Hola ' + ((q.client && q.client.name) || '') + ', te escribo de GASO Ingeniería para dar seguimiento a la cotización ' + q.number + '. ¿Pudiste revisarla? Quedo atento a tus comentarios.') + ' <button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + quotesHistory.indexOf(q) + ')">Abrir</button></span></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Nada pendiente de seguimiento.</p>') + '</div>' +
-        '<div class="dash-card"><h3>�x� Reactivar clientes (+90 días)</h3>' + (m.idle.length ? m.idle.slice(0, 6).map(c => '<div class="dash-row"><span><b>' + E(c.name) + '</b><br><span style="color:#64748b;">Compró ' + dashFmt(c.won) + ' · último contacto ' + E(c.last) + '</span></span>' + wa(c.phone, 'Hola ' + c.name + ', soy de GASO Ingeniería. Hace tiempo trabajamos juntos y quería saber si hay algún proyecto (cámaras, redes, mantenimiento) en el que podamos apoyarte. ¡Con gusto te preparo una cotización!') + '</div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Aún no hay clientes inactivos con compra previa.</p>') + '</div></div>' +
+        '<div class="dash-card"><h3>📞 Dar seguimiento (enviadas 5+ días)</h3>' + (m.follow.length ? m.follow.slice(0, 6).map(q => '<div class="dash-row"><span><b>' + E(q.number) + '</b> · ' + E((q.client && q.client.name) || '') + '<br><span style="color:#64748b;">' + dashFmt(dashMxn(q)) + ' · ' + E(q.date || '') + '</span></span><span style="white-space:nowrap;">' + wa((q.client && q.client.phone) || dashCrmPhone(q.client && q.client.name), 'Hola ' + ((q.client && q.client.name) || '') + ', te escribo de GASO Ingeniería para dar seguimiento a la cotización ' + q.number + '. ¿Pudiste revisarla? Quedo atento a tus comentarios.') + ' <button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + quotesHistory.indexOf(q) + ')">Abrir</button></span></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Nada pendiente de seguimiento.</p>') + '</div>' +
+        '<div class="dash-card"><h3>🔁 Reactivar clientes (+90 días)</h3>' + (m.idle.length ? m.idle.slice(0, 6).map(c => '<div class="dash-row"><span><b>' + E(c.name) + '</b><br><span style="color:#64748b;">Compró ' + dashFmt(c.won) + ' · último contacto ' + E(c.last) + '</span></span>' + wa(c.phone, 'Hola ' + c.name + ', soy de GASO Ingeniería. Hace tiempo trabajamos juntos y quería saber si hay algún proyecto (cámaras, redes, mantenimiento) en el que podamos apoyarte. ¡Con gusto te preparo una cotización!') + '</div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Aún no hay clientes inactivos con compra previa.</p>') + '</div></div>' +
 
         '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0.9rem; margin-bottom:0.9rem;">' +
-        '<div class="dash-card"><h3>�x�  Top clientes (ganado)</h3>' + (m.topClients.length ? m.topClients.map((c, i) => '<div class="dash-row"><span>' + (i + 1) + '. ' + E(c.name) + '</span><b style="color:#15803d;">' + dashFmt(c.won) + '</b></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Sin ventas cerradas aún.</p>') + '</div>' +
-        '<div class="dash-card"><h3>�x�� Qué vendes (ganado)</h3>' + (Object.keys(m.cat).length ? Object.entries(m.cat).sort((a, b) => b[1] - a[1]).map(([k, v]) => '<div class="dash-row"><span>' + E(k.replace('_', ' ')) + '</span><b>' + Math.round(v / catTotal * 100) + '% · ' + dashFmt(v) + '</b></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Sin datos.</p>') + '<div class="dash-row"><span>Persona Moral / Física</span><b>' + Math.round(m.moralWon / wonTotal * 100) + '% / ' + Math.round(m.fisicaWon / wonTotal * 100) + '%</b></div></div>' +
-        '<div class="dash-card"><h3>�x� Más cotizados</h3>' + (m.topProducts.length ? m.topProducts.map(x => '<div class="dash-row"><span>' + E(x.name) + '</span><b>' + x.qty + ' pz</b></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Sin datos.</p>') + '</div></div>' +
+        '<div class="dash-card"><h3>🏆 Top clientes (ganado)</h3>' + (m.topClients.length ? m.topClients.map((c, i) => '<div class="dash-row"><span>' + (i + 1) + '. ' + E(c.name) + '</span><b style="color:#15803d;">' + dashFmt(c.won) + '</b></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Sin ventas cerradas aún.</p>') + '</div>' +
+        '<div class="dash-card"><h3>🧩 Qué vendes (ganado)</h3>' + (Object.keys(m.cat).length ? Object.entries(m.cat).sort((a, b) => b[1] - a[1]).map(([k, v]) => '<div class="dash-row"><span>' + E(k.replace('_', ' ')) + '</span><b>' + Math.round(v / catTotal * 100) + '% · ' + dashFmt(v) + '</b></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Sin datos.</p>') + '<div class="dash-row"><span>Persona Moral / Física</span><b>' + Math.round(m.moralWon / wonTotal * 100) + '% / ' + Math.round(m.fisicaWon / wonTotal * 100) + '%</b></div></div>' +
+        '<div class="dash-card"><h3>📦 Más cotizados</h3>' + (m.topProducts.length ? m.topProducts.map(x => '<div class="dash-row"><span>' + E(x.name) + '</span><b>' + x.qty + ' pz</b></div>').join('') : '<p style="font-size:0.78rem; color:#64748b;">Sin datos.</p>') + '</div></div>' +
 
-        '<div class="dash-card"><h3>�x9 Historial de cotizaciones y notas de venta</h3>' +
+        '<div class="dash-card"><h3>📋 Historial de cotizaciones y notas de venta</h3>' +
         '<div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.7rem;">' +
-        '<input type="search" id="dash-search" class="form-input" placeholder="�x} Buscar por cliente, folio o RFC..." value="' + E(DASH.q) + '" oninput="DASH.q=this.value; DASH.page=1; dashRenderTable()" style="flex:1; min-width:220px; font-size:0.8rem;">' +
+        '<input type="search" id="dash-search" class="form-input" placeholder="🔎 Buscar por cliente, folio o RFC..." value="' + E(DASH.q) + '" oninput="DASH.q=this.value; DASH.page=1; dashRenderTable()" style="flex:1; min-width:220px; font-size:0.8rem;">' +
         '<select class="form-select" style="font-size:0.78rem;" onchange="DASH.status=this.value; DASH.page=1; dashRenderTable()">' + [['all', 'Todos los estados']].concat(Object.keys(DASH_STATUS).map(k => [k, DASH_STATUS[k][0]])).map(([k, l]) => '<option value="' + k + '"' + (DASH.status === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select>' +
         '<select class="form-select" style="font-size:0.78rem;" onchange="DASH.type=this.value; DASH.page=1; dashRenderTable()">' + [['all', 'Cotizaciones y NV'], ['COT', 'Solo cotizaciones'], ['NV', 'Solo notas de venta'], ['TOFACTURAR', 'Pendientes de facturar']].map(([k, l]) => '<option value="' + k + '"' + (DASH.type === k ? ' selected' : '') + '>' + l + '</option>').join('') + '</select></div>' +
         '<div id="dash-table-wrap"></div></div>';
@@ -5981,7 +5948,7 @@ function updateDashboardKPIs() { renderDashboard(); }
 
       const sortedCats = Object.keys(catCounts).sort((a, b) => a.localeCompare(b, "es"));
       let totalInStore = Object.values(catCounts).reduce((a, b) => a + b, 0);
-      let htmlOpts = `<option value="ALL">�x Todas las Categorías (${totalInStore.toLocaleString("es-MX")})</option>`;
+      let htmlOpts = `<option value="ALL">📂 Todas las Categorías (${totalInStore.toLocaleString("es-MX")})</option>`;
       sortedCats.forEach(c => {
         const selectedAttr = c === currentVal ? " selected" : "";
         htmlOpts += `<option value="${escapeHtml(c)}"${selectedAttr}>${escapeHtml(c)} (${catCounts[c].toLocaleString("es-MX")})</option>`;
@@ -6201,10 +6168,10 @@ function updateDashboardKPIs() { renderDashboard(); }
             <tr>
               <td colspan="6" style="text-align:center; padding:2.5rem 1.5rem; background:#fffbeb;">
                 <div style="max-width:580px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:0.65rem;">
-                  <span style="font-size:1.6rem;">�x:�️</span>
+                  <span style="font-size:1.6rem;">🛡️</span>
                   <strong style="font-size:0.98rem; color:#92400e;">Catálogo de Tecnosinergia sin productos cargados</strong>
                   <p style="font-size:0.82rem; color:#78350f; line-height:1.45; margin:0;">
-                    Aún no se han descargado los productos. Revisa la conexión en �a"️ Configuración �  Tecnosinergia.
+                    Aún no se han descargado los productos. Revisa la conexión en ⚙️ Configuración → Tecnosinergia.
                   </p>
                 </div>
               </td>
@@ -6255,7 +6222,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         moreTr.innerHTML = `
           <td colspan="6" style="text-align:center; padding:1rem; background:#f8fafc;">
             <button type="button" class="btn btn-primary btn-sm" onclick="loadMoreStoreProducts()" style="padding:0.5rem 1.25rem; font-weight:700;">
-              �~" Mostrar 150 productos más (${remaining.toLocaleString("es-MX")} restantes)
+              ➕ Mostrar 150 productos más (${remaining.toLocaleString("es-MX")} restantes)
             </button>
           </td>
         `;
@@ -6489,7 +6456,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         let defaultCurr = (storeName === 'Tecnosinergia') ? 'MXN' : 'USD';
         let curr = String(item.moneda || item.currency || item.currency_code || defaultCurr).toUpperCase();
         if (curr.includes('MX') || curr.includes('PESO') || curr === 'MN') curr = 'MXN';
-        else if (curr.includes('US') || curr.includes('DOL') || curr.includes('D�L')) curr = 'USD';
+        else if (curr.includes('US') || curr.includes('DOL') || curr.includes('DÓL')) curr = 'USD';
         else curr = defaultCurr;
         if (storeName === 'Tecnosinergia') curr = 'MXN'; // Tecnosinergia entrega sus precios en pesos
 
@@ -6524,7 +6491,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         renderStoreProducts();
         showToast(`${imported.length.toLocaleString('es-MX')} productos de ${targetStore} extraídos y sincronizados con éxito.`);
       } else {
-        showToast("�a�️ No se detectaron productos con precio válido en la respuesta.");
+        showToast("⚠️ No se detectaron productos con precio válido en la respuesta.");
       }
     }
 
@@ -6533,8 +6500,8 @@ function updateDashboardKPIs() { renderDashboard(); }
     /* ========================================================= */
     /* ====== Condiciones de pago y garantía (editables, guardadas con cada cotización) ====== */
     const DEFAULT_COND_PAGO = 'SE TIENE QUE LIQUIDAR EL TOTAL DEL EQUIPO PARA LIBERAR PEDIDO. MANO DE OBRA: CONTRA ENTREGA.';
-    const DEFAULT_TERMS = '⬢ Entrega: 3 a 5 días hábiles tras liquidar el equipo.\n⬢ Garantía: conforme a la póliza del fabricante, con el periodo que este indique. Los cambios por defecto de fábrica comprobado se tramitan con GASO dentro de los primeros 30 días; después, directamente con la marca, con nuestro apoyo.\n⬢ No cubre mal uso, descargas o variaciones eléctricas, humedad, manipulación por terceros ni desgaste.\n⬢ Precios en MXN sujetos a vigencia indicada.';
-    const LABOR_WARRANTY_MARK = '⬢ Mano de obra: garantía de instalación';
+    const DEFAULT_TERMS = '• Entrega: 3 a 5 días hábiles tras liquidar el equipo.\n• Garantía: conforme a la póliza del fabricante, con el periodo que este indique. Los cambios por defecto de fábrica comprobado se tramitan con GASO dentro de los primeros 30 días; después, directamente con la marca, con nuestro apoyo.\n• No cubre mal uso, descargas o variaciones eléctricas, humedad, manipulación por terceros ni desgaste.\n• Precios en MXN sujetos a vigencia indicada.';
+    const LABOR_WARRANTY_MARK = '• Mano de obra: garantía de instalación';
     const _el = id => document.getElementById(id);
     function loadTermsDefaults() { try { return JSON.parse(safeStorage.getItem('gaso_terms_defaults') || 'null'); } catch (e) { return null; } }
     function setLaborUI(on, days) {
@@ -6601,7 +6568,7 @@ function updateDashboardKPIs() { renderDashboard(); }
     function fillFiscalSelects() {
       [['client-regimen', SAT_REGIMENES], ['crm-modal-regimen', SAT_REGIMENES], ['client-uso-cfdi', SAT_USOS], ['crm-modal-uso', SAT_USOS]].forEach(([id, list]) => {
         const sel = document.getElementById(id); if (!sel) return;
-        sel.innerHTML = '<option value="">� Selecciona �</option>' + list.map(([c, n]) => '<option value="' + c + '">' + c + ' - ' + n + '</option>').join('');
+        sel.innerHTML = '<option value="">— Selecciona —</option>' + list.map(([c, n]) => '<option value="' + c + '">' + c + ' - ' + n + '</option>').join('');
       });
     }
     function setClientFiscal(cli) {
@@ -6671,14 +6638,14 @@ function updateDashboardKPIs() { renderDashboard(); }
       const row = (label, shown, copy) => {
         const v = String(shown === undefined || shown === null ? '' : shown), c = copy === undefined ? v : String(copy);
         txt.push(label + ': ' + c);
-        return '<div class="inv-row"><span class="inv-l">' + E(label) + '</span><span class="inv-v">' + (v ? E(v) : '<em style="color:#b91c1c;">� falta �</em>') + '</span>' + (c ? '<button type="button" class="inv-copy" data-v="' + E(c) + '" onclick="copyInvoiceField(this)">Copiar</button>' : '<span></span>') + '</div>';
+        return '<div class="inv-row"><span class="inv-l">' + E(label) + '</span><span class="inv-v">' + (v ? E(v) : '<em style="color:#b91c1c;">— falta —</em>') + '</span>' + (c ? '<button type="button" class="inv-copy" data-v="' + E(c) + '" onclick="copyInvoiceField(this)">Copiar</button>' : '<span></span>') + '</div>';
       };
       const sec = (title, html) => { txt.push(''); txt.push('== ' + title + ' =='); return html; };
       const t = d.totales;
       let html = d.warnings.length
-        ? '<div class="inv-warn"><b>�a�️ Revisa antes de facturar:</b><ul style="margin:0.3rem 0 0 1.1rem; padding:0;">' + d.warnings.map(w => '<li>' + E(w) + '</li>').join('') + '</ul></div>'
-        : '<div class="inv-ok">�S& La cotización trae todos los datos necesarios para facturar.</div>';
-      txt.push('FACTURA � ' + (q.number || '') + (q.refCotFolio && q.status === 'sales_note' ? ' (ref. ' + q.refCotFolio + ')' : ''));
+        ? '<div class="inv-warn"><b>⚠️ Revisa antes de facturar:</b><ul style="margin:0.3rem 0 0 1.1rem; padding:0;">' + d.warnings.map(w => '<li>' + E(w) + '</li>').join('') + '</ul></div>'
+        : '<div class="inv-ok">✅ La cotización trae todos los datos necesarios para facturar.</div>';
+      txt.push('FACTURA — ' + (q.number || '') + (q.refCotFolio && q.status === 'sales_note' ? ' (ref. ' + q.refCotFolio + ')' : ''));
       html += '<div class="inv-sec"><h4>Receptor</h4>' + sec('RECEPTOR', '') +
         row('RFC', d.receptor.rfc) + row('Nombre / razón social', d.receptor.nombre) + row('Código postal fiscal', d.receptor.cp) + row('Régimen fiscal', d.receptor.regimen) + row('Uso del CFDI', d.receptor.uso) +
         '<div style="font-size:0.72rem; color:#64748b; margin-top:0.3rem;">El nombre debe escribirse como aparece en su Constancia de Situación Fiscal (en CFDI 4.0, sin el régimen de capital: S.A. de C.V., etc.).</div></div>';
@@ -6698,8 +6665,8 @@ function updateDashboardKPIs() { renderDashboard(); }
         row('IVA trasladado', f(t.iva), n2(t.iva)) + (t.retIsr > 0 ? row('Retención ISR ' + t.resicoPct + '% (RESICO)', f(t.retIsr), n2(t.retIsr)) : '') + (t.retIva > 0 ? row('Retención IVA ' + t.retIvaPct + '%', f(t.retIva), n2(t.retIva)) : '') +
         row('Total', f(t.total), n2(t.total)) + '</div>';
       html += '<div class="inv-sec" style="text-align:center;">' + (q.invoice
-        ? '<div class="inv-ok">�x�� Facturada el ' + E(q.invoice.date || '') + (q.invoice.uuid ? ' · Folio fiscal: ' + E(q.invoice.uuid) : '') + '</div><button type="button" class="btn btn-outline btn-sm" onclick="unmarkInvoiced(' + idx + ')">Quitar marca de facturada</button>'
-        : '<button type="button" class="btn btn-success" onclick="markInvoiced(' + idx + ')">�S& Ya la facturé: marcar como facturada</button>') + '</div>';
+        ? '<div class="inv-ok">🧾 Facturada el ' + E(q.invoice.date || '') + (q.invoice.uuid ? ' · Folio fiscal: ' + E(q.invoice.uuid) : '') + '</div><button type="button" class="btn btn-outline btn-sm" onclick="unmarkInvoiced(' + idx + ')">Quitar marca de facturada</button>'
+        : '<button type="button" class="btn btn-success" onclick="markInvoiced(' + idx + ')">✅ Ya la facturé: marcar como facturada</button>') + '</div>';
       _invoiceText = txt.join('\n');
       document.getElementById('invoice-sheet-body').innerHTML = html;
       openModal('modal-invoice');
@@ -6802,7 +6769,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       CLOUD.dirty = true;
       clearTimeout(CLOUD.timer);
       CLOUD.timer = setTimeout(cloudSync, 1200);
-      cloudStatus('Guardando⬦', 'wait');
+      cloudStatus('Guardando…', 'wait');
     }
     async function cloudSync() {
       if (!document.body.classList.contains('app-authenticated')) return false;
@@ -6836,10 +6803,10 @@ function updateDashboardKPIs() { renderDashboard(); }
         safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients));
         safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
         if (before !== JSON.stringify([crmClients, quotesHistory])) { try { refreshCRMViews(); } catch (e) {} }
-        cloudStatus('�܁ Guardado en la nube', 'ok');
+        cloudStatus('☁ Guardado en la nube', 'ok');
         return true;
       } catch (e) {
-        cloudStatus('Sin sincronizar (' + (e.message || 'error') + ') � clic para reintentar', 'err');
+        cloudStatus('Sin sincronizar (' + (e.message || 'error') + ') — clic para reintentar', 'err');
         clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudSync, 30000);
         return false;
       } finally { CLOUD.busy = false; }
@@ -6871,7 +6838,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       handleStatusChange();
       document.getElementById('discount-pct').value = 0;
 
-      // Reiniciar partidas en blanco ($0.00) y cliente por defecto VENTA AL P�aBLICO EN GENERAL (Persona Física)
+      // Reiniciar partidas en blanco ($0.00) y cliente por defecto VENTA AL PÚBLICO EN GENERAL (Persona Física)
       document.getElementById('items-body').innerHTML = '';
       addNewRow();
       applyDefaultPublicClient('fisica');
@@ -6892,7 +6859,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       // Protección: no pisar en silencio un folio que ya existe y que no es el documento que estás editando
       if (existingIdx >= 0 && quotesHistory[existingIdx].number === data.number && data.number !== currentLoadedQuoteNumber) {
         const prev = quotesHistory[existingIdx];
-        if (!confirm('El folio ' + data.number + ' ya existe (cliente: ' + ((prev.client && prev.client.name) || '�') + '). ¿Reemplazarlo con esta cotización?\n\nSi no, cancela y usa "Nueva" para tomar el siguiente folio.')) return;
+        if (!confirm('El folio ' + data.number + ' ya existe (cliente: ' + ((prev.client && prev.client.name) || '—') + '). ¿Reemplazarlo con esta cotización?\n\nSi no, cancela y usa "Nueva" para tomar el siguiente folio.')) return;
       }
       currentLoadedQuoteNumber = data.number;
       bumpFolioSeq(data.number);
@@ -6941,7 +6908,7 @@ function updateDashboardKPIs() { renderDashboard(); }
 
       if (st === 'sales_note') {
         if (titleText) titleText.textContent = 'NOTA DE VENTA';
-        if (subTitleText) subTitleText.textContent = 'COMPROBANTE DE OPERACI�N';
+        if (subTitleText) subTitleText.textContent = 'COMPROBANTE DE OPERACIÓN';
         if (rowConvertBtn) rowConvertBtn.style.display = 'none';
         if (stampsBar) stampsBar.classList.add('active-note');
         if (badge) {
@@ -6960,8 +6927,8 @@ function updateDashboardKPIs() { renderDashboard(); }
         updateSalesNoteStamps(false);
         showToast("Documento convertido a NOTA DE VENTA. Ya puedes activar los sellos de Pago/Entrega/Anticipo.");
       } else {
-        if (titleText) titleText.textContent = 'COTIZACI�N COMERCIAL';
-        if (subTitleText) subTitleText.textContent = st === 'rejected' ? 'NO APROBADA' : 'PROPUESTA ECON�MICA';
+        if (titleText) titleText.textContent = 'COTIZACIÓN COMERCIAL';
+        if (subTitleText) subTitleText.textContent = st === 'rejected' ? 'NO APROBADA' : 'PROPUESTA ECONÓMICA';
         if (rowRefCot) rowRefCot.style.display = 'none';
         if (rowConvertBtn) rowConvertBtn.style.display = st === 'approved' ? 'block' : 'none';
         // En Cotización los sellos SIEMPRE están ocultos y desactivados
@@ -7030,7 +6997,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (isPaid) {
         htmlBadges += `
           <div class="rubber-stamp-badge rubber-stamp-paid">
-            <div style="font-size:1.05rem;">�S& PAGADO ⬢ LIQUIDADO</div>
+            <div style="font-size:1.05rem;">✅ PAGADO • LIQUIDADO</div>
             <div style="font-size:0.7rem;">FECHA: ${escapeHtml(paidDate)}</div>
           </div>
         `;
@@ -7038,16 +7005,16 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (isDelivered) {
         htmlBadges += `
           <div class="rubber-stamp-badge rubber-stamp-delivered">
-            <div style="font-size:1.05rem;">�x� ENTREGADO</div>
-            <div style="font-size:0.7rem;">FECHA: ${escapeHtml(delivDate)} ⬢ RECIBIDO DE CONFORMIDAD</div>
+            <div style="font-size:1.05rem;">📦 ENTREGADO</div>
+            <div style="font-size:0.7rem;">FECHA: ${escapeHtml(delivDate)} • RECIBIDO DE CONFORMIDAD</div>
           </div>
         `;
       }
       if (isAdvance && advAmt > 0) {
         htmlBadges += `
           <div class="rubber-stamp-badge rubber-stamp-advance">
-            <div style="font-size:0.95rem;">�x� ANTICIPO: ${formatCurrency(advAmt)}</div>
-            <div style="font-size:0.7rem;">FECHA: ${escapeHtml(advDate)} ⬢ RESTA: ${formatCurrency(remainingBalance)}</div>
+            <div style="font-size:0.95rem;">💰 ANTICIPO: ${formatCurrency(advAmt)}</div>
+            <div style="font-size:0.7rem;">FECHA: ${escapeHtml(advDate)} • RESTA: ${formatCurrency(remainingBalance)}</div>
           </div>
         `;
       }
@@ -7313,7 +7280,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (!stream) return;
       stream.innerHTML = `
         <div style="display:flex; gap:0.65rem; align-items:flex-start;">
-          <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">�S�</div>
+          <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">✨</div>
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:0 12px 12px 12px; padding:0.85rem 1rem; max-width:88%; box-shadow:0 1px 2px rgba(0,0,0,0.04); font-size:0.85rem; color:#1e293b; line-height:1.5;">
             Conversación reiniciada. ¿En qué te ayudo ahora? Puedo cotizar, comparar, revisar compatibilidad, sugerir precios o resolver dudas del negocio.
           </div>
@@ -7346,10 +7313,10 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (!input) return;
       if (input.type === 'password') {
         input.type = 'text';
-        if (btn) btn.textContent = '�x';
+        if (btn) btn.textContent = '🔒';
       } else {
         input.type = 'password';
-        if (btn) btn.textContent = '�x�️';
+        if (btn) btn.textContent = '👁️';
       }
     }
 
@@ -7374,7 +7341,7 @@ function updateDashboardKPIs() { renderDashboard(); }
           if (info.secret) { el.value = ''; }
           else if (info.value) el.value = info.value;
         }
-        if (st) st.textContent = '� ' + CFG_SRC[info.source];
+        if (st) st.textContent = '— ' + CFG_SRC[info.source];
       });
     }
     async function cfgLoad() {
@@ -7388,9 +7355,9 @@ function updateDashboardKPIs() { renderDashboard(); }
     function cfgShow(boxId, d) {
       const box = document.getElementById(boxId);
       if (!box) return;
-      if (!d.checks) { box.innerHTML = '�R ' + escapeHtml(d.message || 'Error'); return; }
-      box.innerHTML = d.checks.map(c => '<div style="margin-top:0.3rem;">' + (c.ok ? '�S&' : '�R') + ' <strong>' + escapeHtml(c.name) + ':</strong> ' + escapeHtml(c.detail) +
-        (c.fix ? '<br><span style="color:#0369a1;">�x0 ' + escapeHtml(c.fix) + '</span>' : '') + '</div>').join('');
+      if (!d.checks) { box.innerHTML = '❌ ' + escapeHtml(d.message || 'Error'); return; }
+      box.innerHTML = d.checks.map(c => '<div style="margin-top:0.3rem;">' + (c.ok ? '✅' : '❌') + ' <strong>' + escapeHtml(c.name) + ':</strong> ' + escapeHtml(c.detail) +
+        (c.fix ? '<br><span style="color:#0369a1;">👉 ' + escapeHtml(c.fix) + '</span>' : '') + '</div>').join('');
     }
     const CFG_BOX = { all: 'all', gemini: 'ai', anthropic: 'ai', tecno: 'tecno', db: 'misc', catalogs: 'misc' };
     function cfgBusy(btn, on, label) {
@@ -7416,9 +7383,9 @@ function updateDashboardKPIs() { renderDashboard(); }
           const d = await r.json().catch(() => ({}));
           if (!r.ok) throw new Error(d.message || ('HTTP ' + r.status));
         }
-        box.innerHTML = '�S& ' + name.toUpperCase() + ' cargado: ' + rows.length.toLocaleString('es-MX') + ' productos. Recarga la página (Ctrl+F5) para usarlo.';
+        box.innerHTML = '✅ ' + name.toUpperCase() + ' cargado: ' + rows.length.toLocaleString('es-MX') + ' productos. Recarga la página (Ctrl+F5) para usarlo.';
       } catch (e) {
-        box.innerHTML = '�R No se pudo importar: ' + escapeHtml(e.message);
+        box.innerHTML = '❌ No se pudo importar: ' + escapeHtml(e.message);
       }
       input.value = '';
     }
@@ -7433,7 +7400,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         const d = await cfgApi({ op: 'test', target });
         cfgShow(id, d);
         if (box) box.insertAdjacentHTML('beforeend', '<div style="margin-top:0.3rem; color:#94a3b8; font-size:0.72rem;">Probado a las ' + new Date().toLocaleTimeString('es-MX') + ' (' + ((Date.now() - t0) / 1000).toFixed(1) + ' s)</div>');
-      } catch (e) { if (box) box.textContent = '�R ' + e.message; }
+      } catch (e) { if (box) box.textContent = '❌ ' + e.message; }
       cfgBusy(btn, false);
     }
     // La API de Tecnosinergia entrega todo el catálogo de una vez y tarda: el servidor lo descarga en segundo plano,
@@ -7480,10 +7447,10 @@ function updateDashboardKPIs() { renderDashboard(); }
       cfgBusy(btn, true, 'Sincronizando...');
       try {
         const n = await tecnoSyncViaCloud(m => { if (box) box.innerHTML = '<span style="color:#0369a1;">⏳ ' + escapeHtml(m) + '</span>'; });
-        if (box) box.innerHTML = '�S& <strong>Catálogo sincronizado:</strong> ' + n.toLocaleString('es-MX') + ' productos de Tecnosinergia (' + ((Date.now() - t0) / 1000).toFixed(0) + ' s).';
+        if (box) box.innerHTML = '✅ <strong>Catálogo sincronizado:</strong> ' + n.toLocaleString('es-MX') + ' productos de Tecnosinergia (' + ((Date.now() - t0) / 1000).toFixed(0) + ' s).';
         cfgLoad();
       } catch (e) {
-        if (box) box.innerHTML = '�R <strong>No se pudo sincronizar:</strong> ' + escapeHtml(e.message);
+        if (box) box.innerHTML = '❌ <strong>No se pudo sincronizar:</strong> ' + escapeHtml(e.message);
       }
       cfgBusy(btn, false);
     }
@@ -7492,14 +7459,14 @@ function updateDashboardKPIs() { renderDashboard(); }
       names.forEach(n => { const el = document.getElementById('cfg-' + n); if (el && el.value.trim()) values[n] = el.value.trim(); });
       if (!Object.keys(values).length) { showToast('No hay cambios que guardar.'); return; }
       const d = await cfgApi({ op: 'save', values });
-      if (d.settings) { cfgPaint(d.settings); showToast('�S& Guardado. Pulsa Probar para verificar.'); } else showToast('�R ' + (d.message || 'No se pudo guardar'));
+      if (d.settings) { cfgPaint(d.settings); showToast('✅ Guardado. Pulsa Probar para verificar.'); } else showToast('❌ ' + (d.message || 'No se pudo guardar'));
     }
     async function cfgCloudNow() {
       const box = document.getElementById('cfg-result-misc');
       const btn = document.activeElement;
       if (box) box.innerHTML = '<span style="color:#0369a1;">⏳ Sincronizando...</span>';
       cfgBusy(btn, true, 'Sincronizando...');
-      try { await cloudSync(); if (box) box.textContent = '�S& Clientes y notas sincronizados con la nube (' + new Date().toLocaleTimeString('es-MX') + ').'; } catch (e) { if (box) box.textContent = '�R ' + e.message; }
+      try { await cloudSync(); if (box) box.textContent = '✅ Clientes y notas sincronizados con la nube (' + new Date().toLocaleTimeString('es-MX') + ').'; } catch (e) { if (box) box.textContent = '❌ ' + e.message; }
       cfgBusy(btn, false);
     }
 
@@ -7670,7 +7637,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       const div = document.createElement('div');
       div.style.cssText = "display:flex; gap:0.65rem; align-items:flex-start;";
       div.innerHTML = `
-        <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">�S�</div>
+        <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">✨</div>
         <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:0 12px 12px 12px; padding:0.8rem 1rem; font-size:0.84rem; color:#475569;">
           ⏳ Pensando y consultando tus catálogos (CT, Syscom y Tecnosinergia)...
         </div>
@@ -7707,7 +7674,7 @@ function updateDashboardKPIs() { renderDashboard(); }
               <td style="padding:0.4rem 0.5rem; text-align:center; font-weight:700;">${it.quantity || 1}</td>
               <td style="padding:0.4rem 0.5rem;">
                 <div style="font-weight:700; color:#0f172a; font-size:0.8rem;">${escapeHtml(it.concept)}</div>
-                <div style="font-size:0.7rem; color:#64748b;">SKU: <code>${escapeHtml(it.sku || 'SERV-01')}</code> ⬢ SAT: <code>${escapeHtml(it.satCode)}</code></div>
+                <div style="font-size:0.7rem; color:#64748b;">SKU: <code>${escapeHtml(it.sku || 'SERV-01')}</code> • SAT: <code>${escapeHtml(it.satCode)}</code></div>
               </td>
               <td style="padding:0.4rem 0.5rem; text-align:right; font-size:0.78rem;">$${(it.price || 0).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
               <td style="padding:0.4rem 0.5rem; text-align:right; font-weight:700; color:#1e3a8a; font-size:0.8rem;">$${lineTotal.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
@@ -7733,7 +7700,7 @@ function updateDashboardKPIs() { renderDashboard(); }
             <div style="padding:0.6rem 0.75rem; background:#f0fdf4; border-top:1px solid #bbf7d0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
               <span style="font-size:0.8rem; font-weight:800; color:#166534;">Subtotal sugerido: $${sumSubtotal.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2})} MXN</span>
               <button type="button" class="btn btn-success btn-sm" onclick="insertProposalById('${propId}')" style="font-weight:800; padding:0.4rem 0.85rem;">
-                �x� Agregar Partidas a la Cotización
+                📥 Agregar Partidas a la Cotización
               </button>
             </div>
           </div>
@@ -7741,7 +7708,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       }
 
       loadingEl.innerHTML = `
-        <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">�S�</div>
+        <div style="width:32px; height:32px; border-radius:50%; background:#1e3a8a; color:white; display:flex; align-items:center; justify-content:center; font-size:0.9rem; flex-shrink:0;">✨</div>
         <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:0 12px 12px 12px; padding:0.85rem 1rem; width:100%; max-width:90%; box-shadow:0 1px 3px rgba(0,0,0,0.05); font-size:0.85rem; color:#1e293b; line-height:1.5;">
           <div style="white-space:pre-wrap;">${formatAIText(explanation)}</div>
           ${itemsHtml}
@@ -7760,15 +7727,15 @@ function updateDashboardKPIs() { renderDashboard(); }
     function generateEngineeringAdvisoryReply(promptText, storePref, marginPct) {
       const q = normText(promptText);
       if (q.includes("hola") || q.includes("buenos") || q.includes("buenas") || q.includes("ayuda") || q.includes("como funciona")) {
-        return "¡Hola! Estoy trabajando al 100% y conectado a tus catálogos de CT Internacional, Syscom y API Tecnosinergia.\n\nPuedes escribirme solicitudes como:\n⬢ «Cotízame 4 cámaras bala IP 4MP, 1 NVR de 8 canales PoE, 1 disco duro de 4TB y 1 bobina Cat6»\n⬢ «Cotízame 2 laptops Core i5 con 16GB RAM y 2 monitores de 24 pulgadas»\n⬢ O hacerme consultas sobre diferencias técnicas, cálculo de almacenamiento o impuestos RESICO.";
+        return "¡Hola! Estoy trabajando al 100% y conectado a tus catálogos de CT Internacional, Syscom y API Tecnosinergia.\n\nPuedes escribirme solicitudes como:\n• «Cotízame 4 cámaras bala IP 4MP, 1 NVR de 8 canales PoE, 1 disco duro de 4TB y 1 bobina Cat6»\n• «Cotízame 2 laptops Core i5 con 16GB RAM y 2 monitores de 24 pulgadas»\n• O hacerme consultas sobre diferencias técnicas, cálculo de almacenamiento o impuestos RESICO.";
       }
       if (q.includes("cat6") || q.includes("cable")) {
-        return "�x� Recomendación de Cableado Estructurado:\n⬢ Cat5e (hasta 1 Gbps / 100 MHz): recomendado para instalaciones residenciales básicas o CCTV analógico/IP estándar hasta 100 m.\n⬢ Cat6 (1 Gbps a 100 m / 10 Gbps hasta 55 m / 250 MHz): estándar ideal para CCTV IP PoE, redes empresariales y puntos de acceso Wi-Fi 6.\n⬢ Cat6A (10 Gbps hasta 100 m / 500 MHz): recomendado para enlaces troncales (backbone), servidores NAS y alta densidad.\n\nSi deseas cotizar bobinas o conectores, escríbeme por ejemplo: «Cotízame 2 bobinas de cable Cat6 100% cobre».";
+        return "📐 Recomendación de Cableado Estructurado:\n• Cat5e (hasta 1 Gbps / 100 MHz): recomendado para instalaciones residenciales básicas o CCTV analógico/IP estándar hasta 100 m.\n• Cat6 (1 Gbps a 100 m / 10 Gbps hasta 55 m / 250 MHz): estándar ideal para CCTV IP PoE, redes empresariales y puntos de acceso Wi-Fi 6.\n• Cat6A (10 Gbps hasta 100 m / 500 MHz): recomendado para enlaces troncales (backbone), servidores NAS y alta densidad.\n\nSi deseas cotizar bobinas o conectores, escríbeme por ejemplo: «Cotízame 2 bobinas de cable Cat6 100% cobre».";
       }
       if (q.includes("resico") || q.includes("iva") || q.includes("retencion") || q.includes("factura")) {
-        return "�x�� Regla Fiscal RESICO en tu Cotizador:\n⬢ Persona Física: Se desglosa el 16% de IVA sin retención de ISR.\n⬢ Persona Moral: Cuando emites con factura bajo Régimen Simplificado de Confianza (626), aplica automáticamente la retención del 1.25% de ISR sobre el subtotal antes de IVA (Art. 113-J LISR).\n⬢ Modo Sin Factura: Desmarca la casilla «Con Factura» en la barra superior para generar una cotización o nota de venta neta.";
+        return "🧾 Regla Fiscal RESICO en tu Cotizador:\n• Persona Física: Se desglosa el 16% de IVA sin retención de ISR.\n• Persona Moral: Cuando emites con factura bajo Régimen Simplificado de Confianza (626), aplica automáticamente la retención del 1.25% de ISR sobre el subtotal antes de IVA (Art. 113-J LISR).\n• Modo Sin Factura: Desmarca la casilla «Con Factura» en la barra superior para generar una cotización o nota de venta neta.";
       }
-      return "�x� Para armar tu cotización con precios exactos del catálogo, indícame la cantidad y el equipo que buscas (por ejemplo: «4 cámaras IP 4MP, 1 NVR 8 canales, 1 disco 4TB» o «1 laptop Core i5, 1 monitor 24 pulgadas, 1 UPS»).";
+      return "💡 Para armar tu cotización con precios exactos del catálogo, indícame la cantidad y el equipo que buscas (por ejemplo: «4 cámaras IP 4MP, 1 NVR 8 canales, 1 disco 4TB» o «1 laptop Core i5, 1 monitor 24 pulgadas, 1 UPS»).";
     }
 
     // Historial de la charla (para que el asistente recuerde el contexto entre mensajes)
@@ -7781,7 +7748,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         .replace(/^#{1,4}\s*(.+)$/gm, '<strong style="color:#1e3a8a;">$1</strong>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/`([^`\n]+)`/g, '<code>$1</code>')
-        .replace(/^\s*[-*]\s+/gm, '⬢ ');
+        .replace(/^\s*[-*]\s+/gm, '• ');
     }
 
     function parseAIJson(text) {
@@ -7803,10 +7770,10 @@ Da de 0 a 8 búsquedas cortas (2 a 5 palabras) usando sinónimos y términos té
 Si el mensaje no necesita el catálogo (saludo, pregunta fiscal, redacción de un mensaje, cálculo), responde "searches": [].
 RESPONDE SOLO JSON: {"searches": ["..."]}
 
-CONVERSACI�N PREVIA:
+CONVERSACIÓN PREVIA:
 ${aiHistoryText() || '(sin mensajes previos)'}
 
-�aLTIMO MENSAJE:
+ÚLTIMO MENSAJE:
 ${promptText}`;
       try {
         const r = await callGeminiWithFallback(plan, preferredModel, apiKey, { json: true, maxTokens: 512, temperature: 0.2 });
@@ -7861,7 +7828,7 @@ ${promptText}`;
         const searches = await planCatalogSearches(promptText, preferredModel, apiKey);
         const relevantCatalog = gatherCatalogContext(promptText, searches, storePref);
 
-        const systemInstruction = `Eres el colega y mano derecha técnico del dueño de 'GASO INGENIERÍA' (México). �0l es ingeniero en mecatrónica: háblale de tú a tú, como un compañero experimentado, directo y sin rodeos ni sermones. Opina con criterio propio, haz preguntas cuando falte un dato clave (distancia, uso, presupuesto, tipo de instalación) y avisa de riesgos o errores comunes. Ayudas con TODO el negocio, no solo con el catálogo:
+        const systemInstruction = `Eres el colega y mano derecha técnico del dueño de 'GASO INGENIERÍA' (México). Él es ingeniero en mecatrónica: háblale de tú a tú, como un compañero experimentado, directo y sin rodeos ni sermones. Opina con criterio propio, haz preguntas cuando falte un dato clave (distancia, uso, presupuesto, tipo de instalación) y avisa de riesgos o errores comunes. Ayudas con TODO el negocio, no solo con el catálogo:
 - Cotizar: productos del catálogo Y trabajos de campo (mano de obra, instalación, programación, materiales menores).
 - Electricidad: bajadas y contactos (por ejemplo una bajada de contacto duplex: cable, canalización, caja, placa, pastilla, mano de obra), cargas, calibres de cable, protecciones, tierra física, UPS y respaldo.
 - Radiocomunicación: radios DMR/analógicos, programación (codeplug, canales, contactos, zonas, repetidores), antenas, alcance y costo de programar equipos.
@@ -7880,7 +7847,7 @@ Reglas:
 5) En "description" pon solo especificaciones para el cliente final (sin mencionar mayorista ni clave SAT).
 6) Si es una pregunta o charla sin productos concretos, deja "items": [].
 7) Toma en cuenta la conversación previa (el usuario puede referirse a algo anterior).
-8) "price" es SIEMPRE el precio UNITARIO y el total de cada partida es quantity � price. No repitas la misma partida en varias líneas. Si cobras una instalación o servicio como paquete o kit (por ejemplo "instalación de kit de 4 cámaras"), pon UNA sola partida con "quantity": 1 y en "price" el precio total del paquete. Solo usa quantity mayor a 1 si el precio es por pieza o por punto, y entonces "price" es el precio de cada una (por ejemplo 4 cámaras a $550 = $2,200). El total de "items" debe coincidir con las cantidades que das en la explicación.
+8) "price" es SIEMPRE el precio UNITARIO y el total de cada partida es quantity × price. No repitas la misma partida en varias líneas. Si cobras una instalación o servicio como paquete o kit (por ejemplo "instalación de kit de 4 cámaras"), pon UNA sola partida con "quantity": 1 y en "price" el precio total del paquete. Solo usa quantity mayor a 1 si el precio es por pieza o por punto, y entonces "price" es el precio de cada una (por ejemplo 4 cámaras a $550 = $2,200). El total de "items" debe coincidir con las cantidades que das en la explicación.
 
 RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 {
@@ -7890,7 +7857,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
   ]
 }`;
 
-        const buildPrompt = () => `${systemInstruction}\n\nCATÁLOGO RELEVANTE (${relevantCatalog.length} productos; precio = costo del mayorista):\n${JSON.stringify(relevantCatalog)}\n\nCONVERSACI�N PREVIA:\n${aiHistoryText() || '(sin mensajes previos)'}\n\nMENSAJE DEL USUARIO:\n${promptText}\nFiltro de tienda: ${storePref}`;
+        const buildPrompt = () => `${systemInstruction}\n\nCATÁLOGO RELEVANTE (${relevantCatalog.length} productos; precio = costo del mayorista):\n${JSON.stringify(relevantCatalog)}\n\nCONVERSACIÓN PREVIA:\n${aiHistoryText() || '(sin mensajes previos)'}\n\nMENSAJE DEL USUARIO:\n${promptText}\nFiltro de tienda: ${storePref}`;
         let fullPrompt = buildPrompt();
         while (fullPrompt.length > 58000 && relevantCatalog.length) { relevantCatalog.splice(-10); fullPrompt = buildPrompt(); } // límite del servidor
         const result = await callGeminiWithFallback(fullPrompt, preferredModel, apiKey, { json: true, temperature: 0.55 });
@@ -7902,8 +7869,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         aiChatHistory.push({ role: 'assistant', text: explanation + (items.length ? '\n[Partidas propuestas: ' + items.map(it => (it.quantity || 1) + 'x ' + (it.sku || '') + ' ' + (it.concept || '') + ' $' + (it.price || 0)).join('; ') + ']' : '') });
       } catch(err) {
         // Sin conexión no se inventa una respuesta: se avisa claramente qué falló.
-        const replyExplanation = "�a�️ **No hay conexión con la IA (" + aiProviderLabel() + ").** No respondí tu mensaje para no darte información sin sentido.\n\nDetalle: " + (err && err.message ? err.message : 'error desconocido') +
-          "\n\n- Entra a **�a"️ Configuración** (superusuario) para revisar la llave de la IA y pulsa **Probar**.";
+        const replyExplanation = "⚠️ **No hay conexión con la IA (" + aiProviderLabel() + ").** No respondí tu mensaje para no darte información sin sentido.\n\nDetalle: " + (err && err.message ? err.message : 'error desconocido') +
+          "\n\n- Entra a **⚙️ Configuración** (superusuario) para revisar la llave de la IA y pulsa **Probar**.";
         const fallbackItems = [];
         renderAssistantBubble(loadingBubble, replyExplanation, fallbackItems);
       } finally {
@@ -8028,10 +7995,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const btn = document.getElementById("btn-toggle-login-pass");
       if (input.type === "password") {
         input.type = "text";
-        btn.textContent = "�x";
+        btn.textContent = "🔒";
       } else {
         input.type = "password";
-        btn.textContent = "�x�️";
+        btn.textContent = "👁️";
       }
     }
 
@@ -8058,11 +8025,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           body: JSON.stringify({ action: "login", username: userRaw, password: passRaw, remember })
         });
         status = res.status; data = await res.json();
-      } catch (err) { showErr("�R No se pudo contactar al servidor de acceso. Verifica tu conexión."); return; }
+      } catch (err) { showErr("❌ No se pudo contactar al servidor de acceso. Verifica tu conexión."); return; }
 
       if (!data || !data.ok) {
-        showErr((status === 429 ? "�: " : "�R ") + ((data && data.message) || "No se pudo iniciar sesión."));
-        logSecurityEvent(userRaw.toLowerCase(), "N/A", "�R Intento fallido de inicio de sesión");
+        showErr((status === 429 ? "⛔ " : "❌ ") + ((data && data.message) || "No se pudo iniciar sesión."));
+        logSecurityEvent(userRaw.toLowerCase(), "N/A", "❌ Intento fallido de inicio de sesión");
         return;
       }
       errBox.style.display = "none";
@@ -8071,7 +8038,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         email: data.user.email || "", role: data.user.role, status: "active", lastLogin: nowStr };
       document.getElementById("login-password").value = "";
       _sessRemember = !!data.remember;
-      logSecurityEvent(currentAuthUser.username, currentAuthUser.role, "�S& Inicio de sesión exitoso");
+      logSecurityEvent(currentAuthUser.username, currentAuthUser.role, "✅ Inicio de sesión exitoso");
       unlockAppForUser(currentAuthUser, true);
     }
 
@@ -8090,11 +8057,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         "COTIZADOR": "Cotizador"
       };
       const roleIcons = {
-        "SUPERADMIN": "�x",
-        "VENTAS": "�x�",
-        "COTIZADOR": "�x�️"
+        "SUPERADMIN": "👑",
+        "VENTAS": "💼",
+        "COTIZADOR": "👁️"
       };
-      if (iconEl) iconEl.textContent = roleIcons[user.role] || "�x�";
+      if (iconEl) iconEl.textContent = roleIcons[user.role] || "👤";
       if (nameEl) nameEl.textContent = user.username;
 
       applyRolePermissions(user);
@@ -8141,7 +8108,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
     function logoutSession() {
       if (currentAuthUser) {
-        logSecurityEvent(currentAuthUser.username, currentAuthUser.role, "�x Cierre de sesión / Regreso a Página Ejecutiva");
+        logSecurityEvent(currentAuthUser.username, currentAuthUser.role, "🔒 Cierre de sesión / Regreso a Página Ejecutiva");
       }
       currentAuthUser = null;
       safeStorage.setItem("gaso_active_session", "");
@@ -8179,14 +8146,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         systemUsers.forEach((u, idx) => {
           const tr = document.createElement("tr");
           const roleBadge = u.role === "SUPERADMIN"
-            ? `<span class="role-badge role-superadmin">�x Superusuario</span>`
+            ? `<span class="role-badge role-superadmin">👑 Superusuario</span>`
             : (u.role === "VENTAS"
-              ? `<span class="role-badge role-ventas">�x� Ventas y CRM</span>`
-              : `<span class="role-badge role-cotizador">�x�️ Solo Cotizador</span>`);
+              ? `<span class="role-badge role-ventas">💼 Ventas y CRM</span>`
+              : `<span class="role-badge role-cotizador">👁️ Solo Cotizador</span>`);
 
           const statusBadge = u.status === "active"
-            ? `<span class="status-pill status-approved">�xx� Activo</span>`
-            : `<span class="status-pill status-rejected">�x� Suspendido</span>`;
+            ? `<span class="status-pill status-approved">🟢 Activo</span>`
+            : `<span class="status-pill status-rejected">🔴 Suspendido</span>`;
 
           tr.innerHTML = `
             <td><strong>${escapeHtml(u.fullName)}</strong></td>
@@ -8197,9 +8164,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             <td style="font-size:0.78rem; color:var(--gray-500);">${escapeHtml(u.lastLogin || "Sin ingresos")}</td>
             <td style="text-align:center;">
               <div style="display:flex; gap:0.35rem; justify-content:center; flex-wrap:wrap;">
-                <button class="btn btn-outline btn-sm" onclick="editSystemUser(${idx})" title="Editar usuario o cambiar contraseña">�S�️ Editar / Clave</button>
-                <button class="btn btn-outline btn-sm" onclick="toggleUserStatus(${idx})" title="Suspender o Reactivar acceso">${u.status === "active" ? "⏸️ Suspender" : "��️ Activar"}</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteSystemUser(${idx})" title="Eliminar usuario">�x️</button>
+                <button class="btn btn-outline btn-sm" onclick="editSystemUser(${idx})" title="Editar usuario o cambiar contraseña">✏️ Editar / Clave</button>
+                <button class="btn btn-outline btn-sm" onclick="toggleUserStatus(${idx})" title="Suspender o Reactivar acceso">${u.status === "active" ? "⏸️ Suspender" : "▶️ Activar"}</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteSystemUser(${idx})" title="Eliminar usuario">🗑️</button>
               </div>
             </td>
           `;
@@ -8306,7 +8273,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           currentAuthUser = systemUsers[idx];
           unlockAppForUser(currentAuthUser, false);
         }
-        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `�S�️ Usuario actualizado: ${username} (${role})`);
+        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `✏️ Usuario actualizado: ${username} (${role})`);
         showToast(`Usuario ${username} actualizado.`);
       } else {
         const newUser = {
@@ -8320,7 +8287,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           lastLogin: "Sin ingresos previos"
         };
         systemUsers.push(newUser);
-        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `�~" Nuevo usuario creado: ${username} (${role})`);
+        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `➕ Nuevo usuario creado: ${username} (${role})`);
         showToast(`Usuario ${username} dado de alta.`);
       }
 
@@ -8345,7 +8312,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         showToast(`Acceso suspendido a ${target.username}.`);
       } else {
         target.status = "active";
-        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `��️ Acceso reactivado al usuario: ${target.username}`);
+        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `▶️ Acceso reactivado al usuario: ${target.username}`);
         showToast(`Acceso reactivado a ${target.username}.`);
       }
 
@@ -8367,7 +8334,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       if (true) {
         systemUsers.splice(idx, 1);
         safeStorage.setItem("gaso_system_users", JSON.stringify(systemUsers));
-        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `�x️ Usuario eliminado: ${target.username}`);
+        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", `🗑️ Usuario eliminado: ${target.username}`);
         renderUsersAndLogs();
         showToast(`Usuario ${target.username} eliminado.`);
       }
@@ -8378,7 +8345,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       if (true) {
         securityLogs = [];
         safeStorage.setItem("gaso_security_logs", JSON.stringify(securityLogs));
-        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", "�x�� Bitácora de seguridad reiniciada");
+        logSecurityEvent(currentAuthUser.username, "SUPERADMIN", "🧹 Bitácora de seguridad reiniciada");
         renderUsersAndLogs();
       }
     }
@@ -8421,10 +8388,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       if (!inp) return;
       if (inp.type === "password") {
         inp.type = "text";
-        if (btn) btn.textContent = "�x";
+        if (btn) btn.textContent = "🔒";
       } else {
         inp.type = "password";
-        if (btn) btn.textContent = "�x�️";
+        if (btn) btn.textContent = "👁️";
       }
     }
 
@@ -8541,25 +8508,25 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         if (data && (data.status === true || data.code === 0 || String(data.message).toLowerCase().includes("success") || data.ok)) {
           if (statusBox) {
             statusBox.style.color = "#15803d";
-            statusBox.innerHTML = `�S& <strong>¡Conexión exitosa con API Tecnosinergia!</strong> Respuesta: <code>${escapeHtml(JSON.stringify(data))}</code>`;
+            statusBox.innerHTML = `✅ <strong>¡Conexión exitosa con API Tecnosinergia!</strong> Respuesta: <code>${escapeHtml(JSON.stringify(data))}</code>`;
           }
           showToast("Token de Tecnosinergia validado con éxito.");
         } else {
           if (statusBox) {
             statusBox.style.color = "#b45309";
-            statusBox.innerHTML = `�a�️ Respuesta del servidor: <code>${escapeHtml(JSON.stringify(data))}</code>`;
+            statusBox.innerHTML = `⚠️ Respuesta del servidor: <code>${escapeHtml(JSON.stringify(data))}</code>`;
           }
         }
       } catch (err) {
         if (statusBox) {
           statusBox.style.color = "#dc2626";
-          statusBox.innerHTML = `�R ${escapeHtml(err.message)}`;
+          statusBox.innerHTML = `❌ ${escapeHtml(err.message)}`;
         }
         showToast("Aviso API Tecnosinergia: " + err.message);
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "�x� Probar /v3/status";
+          btn.textContent = "🔍 Probar /v3/status";
         }
       }
     }
@@ -8602,9 +8569,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
               usedRoute = rUrl;
               break;
             }
-            routeProblems.push(rUrl + " �  " + (tecnoErrorMessage(candidate) || "respondió JSON sin lista de productos"));
+            routeProblems.push(rUrl + " → " + (tecnoErrorMessage(candidate) || "respondió JSON sin lista de productos"));
           } catch (e) {
-            routeProblems.push(rUrl + " �  " + e.message);
+            routeProblems.push(rUrl + " → " + e.message);
           }
         }
 
@@ -8618,24 +8585,24 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         if (indicator) {
           indicator.style.background = "#dcfce7";
           indicator.style.color = "#166534";
-          indicator.textContent = `�S& API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
+          indicator.textContent = `✅ API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
         }
         if (statusBox) {
           statusBox.style.color = "#15803d";
-          statusBox.innerHTML = `�S& <strong>${countTec.toLocaleString("es-MX")} productos extraídos</strong> desde <code>${escapeHtml(usedRoute)}</code>.`;
+          statusBox.innerHTML = `✅ <strong>${countTec.toLocaleString("es-MX")} productos extraídos</strong> desde <code>${escapeHtml(usedRoute)}</code>.`;
         }
         closeModal("modal-tecno-api");
         setStoreFilter("Tecnosinergia");
       } catch (err) {
         if (statusBox) {
           statusBox.style.color = "#dc2626";
-          statusBox.innerHTML = `�R Error al extraer desde <code>${escapeHtml(endpointUrl)}</code>: ${escapeHtml(err.message)}`;
+          statusBox.innerHTML = `❌ Error al extraer desde <code>${escapeHtml(endpointUrl)}</code>: ${escapeHtml(err.message)}`;
         }
         showToast("Error al sincronizar API Tecnosinergia: " + err.message);
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "�x Sincronizar Productos Ahora";
+          btn.textContent = "🔄 Sincronizar Productos Ahora";
         }
       }
     }
@@ -8671,11 +8638,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           if (all.length) { parseAndImportStoreJSON({ status: true, items: all }, 'Tecnosinergia'); }
         }
         const countTec = storeProducts.filter(p => p.store === "Tecnosinergia").length;
-        if (!countTec) throw new Error('Aún no hay catálogo de Tecnosinergia. Pulsa "Sincronizar catálogo" en �a"️ Configuración.');
+        if (!countTec) throw new Error('Aún no hay catálogo de Tecnosinergia. Pulsa "Sincronizar catálogo" en ⚙️ Configuración.');
         if (indicator) {
           indicator.style.background = "#dcfce7";
           indicator.style.color = "#166534";
-          indicator.textContent = `�S& API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
+          indicator.textContent = `✅ API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
         }
         if (isManualClick) {
           setStoreFilter("Tecnosinergia");
@@ -8686,11 +8653,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           if (countTec > 0) {
             indicator.style.background = "#dcfce7";
             indicator.style.color = "#166534";
-            indicator.textContent = `�S& API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
+            indicator.textContent = `✅ API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
           } else {
             indicator.style.background = "#fef3c7";
             indicator.style.color = "#92400e";
-            indicator.textContent = `�xR API Tecnosinergia (0 prod. ⬢ Lista para extraer en Netlify)`;
+            indicator.textContent = `🔌 API Tecnosinergia (0 prod. • Lista para extraer en Netlify)`;
           }
         }
         if (isManualClick) {
@@ -8702,7 +8669,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "�x Actualizar Tecnosinergia";
+          btn.textContent = "🔄 Actualizar Tecnosinergia";
         }
       }
     }
@@ -8956,7 +8923,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         ctx.fillText(compPro, midX + 128, midY);
       }
 
-      // Right Column: Meta Box (COTIZACI�N COMERCIAL vs NOTA DE VENTA)
+      // Right Column: Meta Box (COTIZACIÓN COMERCIAL vs NOTA DE VENTA)
       roundRect(metaX, curY, metaBoxW, headerH, 12, "#f8fafc", "#cbd5e1", 2);
       const bannerColor = isSalesNote ? "#0f172a" : "#023e8a";
       ctx.save();
@@ -8967,13 +8934,13 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       ctx.font = "800 18.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
       ctx.fillStyle = "#ffffff";
-      ctx.fillText(isSalesNote ? "NOTA DE VENTA" : "COTIZACI�N COMERCIAL", metaX + 16, curY + 35);
+      ctx.fillText(isSalesNote ? "NOTA DE VENTA" : "COTIZACIÓN COMERCIAL", metaX + 16, curY + 35);
 
       roundRect(metaX + metaBoxW - 184, curY + 13, 170, 30, 6, "rgba(255,255,255,0.18)", null);
       ctx.font = "700 11.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
       ctx.fillStyle = "#e0f2fe";
       ctx.textAlign = "center";
-      ctx.fillText(isSalesNote ? "COMPROBANTE COMERCIAL" : "PROPUESTA ECON�MICA", metaX + metaBoxW - 99, curY + 32);
+      ctx.fillText(isSalesNote ? "COMPROBANTE COMERCIAL" : "PROPUESTA ECONÓMICA", metaX + metaBoxW - 99, curY + 32);
       ctx.textAlign = "left";
 
       const qFolio = (document.getElementById("quote-number").value || "COT-2026-001").trim();
@@ -8995,7 +8962,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         { label: isSalesNote ? "Folio Nota Venta:" : "Serie y Folio:", val: qFolio, color: "#dc2626", font: "800 20px monospace" },
         { label: "Fecha Emisión:", val: qDate, color: "#0f172a", font: "700 18px -apple-system, sans-serif" },
         { label: isSalesNote ? "Origen / Ref.:" : "Vigencia Hasta:", val: isSalesNote ? (refCot || qDate) : qExp, color: "#023e8a", font: "700 17.5px -apple-system, sans-serif" },
-        { label: "Estado / Etapa:", val: `${badgeText} ⬢ ${statusText}`, color: "#047857", font: "800 16.5px -apple-system, sans-serif" }
+        { label: "Estado / Etapa:", val: `${badgeText} • ${statusText}`, color: "#047857", font: "800 16.5px -apple-system, sans-serif" }
       ];
       let mRowY = curY + 86;
       metaRows.forEach((r, idx) => {
@@ -9056,7 +9023,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         ctx.textAlign = "left";
       }
 
-      const cName = (document.getElementById("client-name").value || "VENTA AL P�aBLICO EN GENERAL").trim();
+      const cName = (document.getElementById("client-name").value || "VENTA AL PÚBLICO EN GENERAL").trim();
       const cRfc = (document.getElementById("client-rfc").value || "XAXX010101000").trim();
       const cAddr = (document.getElementById("client-address").value || "-").trim();
       const cContact = (document.getElementById("client-contact").value || "Mostrador / Público en General").trim();
@@ -9146,7 +9113,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       ctx.textAlign = "center";
       ctx.fillText("CANT.", xCant + wCant / 2, curY + 30);
       ctx.textAlign = "left";
-      ctx.fillText("DESCRIPCI�N / CONCEPTO", xDesc + 16, curY + 30);
+      ctx.fillText("DESCRIPCIÓN / CONCEPTO", xDesc + 16, curY + 30);
       ctx.textAlign = "right";
       ctx.fillText("VALOR UNITARIO", xUnit + wUnit - 16, curY + 30);
       ctx.fillText("IMPORTE", xTot + wTot - 16, curY + 30);
@@ -9515,7 +9482,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       ctx.textAlign = "center";
       ctx.font = "800 13px -apple-system, sans-serif";
       ctx.fillStyle = "#023e8a";
-      ctx.fillText("QR VALIDACI�N", qrX + qrBoxSize / 2, qrY + qrBoxSize + 19);
+      ctx.fillText("QR VALIDACIÓN", qrX + qrBoxSize / 2, qrY + qrBoxSize + 19);
       ctx.textAlign = "left";
 
       const sigBoxW = 350;
@@ -9524,7 +9491,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       ctx.font = "800 16.5px -apple-system, sans-serif";
       ctx.fillStyle = "#0f172a";
-      ctx.fillText(`Código de Verificación de ${isSalesNote ? "Nota de Venta" : "Cotización"} � Emisor: GASO INGENIERÍA`, sealX, curY + 36);
+      ctx.fillText(`Código de Verificación de ${isSalesNote ? "Nota de Venta" : "Cotización"} — Emisor: GASO INGENIERÍA`, sealX, curY + 36);
       ctx.font = "700 15.5px -apple-system, sans-serif";
       ctx.fillStyle = "#023e8a";
       ctx.fillText(`Folio: ${qFolio}   |   Fecha: ${qDate}`, sealX, curY + 60);
@@ -9578,9 +9545,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       ctx.textAlign = "center";
       ctx.font = "600 15px -apple-system, sans-serif";
       ctx.fillStyle = "#64748b";
-      const footProTxt = (document.getElementById("company-professional") ? document.getElementById("company-professional").value : "").trim().replace(" · ", " ⬢ ");
+      const footProTxt = (document.getElementById("company-professional") ? document.getElementById("company-professional").value : "").trim().replace(" · ", " • ");
       const footY = Math.min(H - (footProTxt ? 46 : 24), curY);
-      ctx.fillText("GASO INGENIERÍA ⬢ RFC: GATM851209T92 ⬢ Cuautlancingo, Puebla, C.P. 72730 ⬢ Tel: (222) 376-3195", W / 2, footY);
+      ctx.fillText("GASO INGENIERÍA • RFC: GATM851209T92 • Cuautlancingo, Puebla, C.P. 72730 • Tel: (222) 376-3195", W / 2, footY);
       if (footProTxt) {
         ctx.font = "700 15px -apple-system, sans-serif";
         ctx.fillStyle = "#334155";
@@ -9614,9 +9581,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           a.click();
           a.remove();
           setTimeout(() => URL.revokeObjectURL(url), 6000);
-          showToast(`�S& Archivo PDF descargado directamente: ${res.filename}`);
+          showToast(`✅ Archivo PDF descargado directamente: ${res.filename}`);
         } else {
-          showToast("�a�️ Generando vista PDF directa...");
+          showToast("⚠️ Generando vista PDF directa...");
           window.print();
         }
       } catch (err) {
@@ -9625,7 +9592,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "�x� PDF Directo";
+          btn.textContent = "📥 PDF Directo";
         }
       }
     }
@@ -9655,20 +9622,20 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           const concept = tr.querySelector(".row-concept") ? tr.querySelector(".row-concept").value.trim() : "";
           const rowTot = tr.querySelector(".row-total") ? tr.querySelector(".row-total").textContent.trim() : "";
           if (concept) {
-            itemsSummary += `⬢ (${qty}) ${concept} � ${rowTot}\n`;
+            itemsSummary += `• (${qty}) ${concept} — ${rowTot}\n`;
           }
         }
       });
       if (rows.length > 6) {
-        itemsSummary += `⬢ ...y ${rows.length - 6} partida(s) adicional(es).\n`;
+        itemsSummary += `• ...y ${rows.length - 6} partida(s) adicional(es).\n`;
       }
 
       return `Hola *${recipient}*, te comparto la cotización *#${folio}* de *GASO INGENIERÍA*:\n\n` +
         (itemsSummary ? `*Resumen de partidas:*\n${itemsSummary}\n` : "") +
-        `�x� *Total Neto:* ${totalStr}\n` +
-        `�x& *Vigencia hasta:* ${expiryDate || "15 días"}\n` +
-        `�x�� *Datos para pago (Mercado Pago):*\nBeneficiario: GASO INGENIERÍA\nCLABE: 722969010514249300\n\n` +
-        `�x} *Te adjunto el archivo PDF (${filename})* con el desglose completo. Quedo atento a tus comentarios.`;
+        `💰 *Total Neto:* ${totalStr}\n` +
+        `📅 *Vigencia hasta:* ${expiryDate || "15 días"}\n` +
+        `🏦 *Datos para pago (Mercado Pago):*\nBeneficiario: GASO INGENIERÍA\nCLABE: 722969010514249300\n\n` +
+        `📎 *Te adjunto el archivo PDF (${filename})* con el desglose completo. Quedo atento a tus comentarios.`;
     }
 
     function showWhatsAppDirectLinkModal(waUrl, messageText, filename) {
@@ -9682,12 +9649,12 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       modal.innerHTML = `
         <div class="modal-box" style="max-width:500px; background:#ffffff;">
           <div class="modal-header" style="background:#16a34a; color:#ffffff;">
-            <h3 style="margin:0; font-size:1rem;">�x� Enviar Cotización por WhatsApp</h3>
-            <button class="modal-close" onclick="closeModal('modal-wa-direct-link')" style="color:#ffffff;">�S"</button>
+            <h3 style="margin:0; font-size:1rem;">📲 Enviar Cotización por WhatsApp</h3>
+            <button class="modal-close" onclick="closeModal('modal-wa-direct-link')" style="color:#ffffff;">✕</button>
           </div>
           <div class="modal-body" style="padding:1.15rem;">
             <div style="background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; padding:0.65rem 0.85rem; border-radius:8px; font-size:0.8rem; font-weight:600; margin-bottom:0.85rem;">
-              �S& El archivo PDF <strong>${escapeHtml(filename)}</strong> se está descargando automáticamente en tu equipo.
+              ✅ El archivo PDF <strong>${escapeHtml(filename)}</strong> se está descargando automáticamente en tu equipo.
             </div>
             <label style="font-size:0.78rem; font-weight:700; color:#334155; display:block; margin-bottom:0.35rem;">
               Leyenda comercial lista para enviar:
@@ -9695,10 +9662,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             <textarea id="wa-preview-msg-box" class="form-input" style="width:100%; height:135px; font-size:0.78rem; margin-bottom:0.85rem;">${escapeHtml(messageText)}</textarea>
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
               <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-success" style="flex:1; justify-content:center; background:#16a34a; color:#fff; font-weight:800; padding:0.65rem; text-decoration:none;">
-                �x� Abrir Liga de WhatsApp Ahora
+                📲 Abrir Liga de WhatsApp Ahora
               </a>
               <button type="button" class="btn btn-outline" onclick="navigator.clipboard.writeText(document.getElementById('wa-preview-msg-box').value); showToast('Leyenda copiada al portapapeles.');">
-                �x9 Copiar Leyenda
+                📋 Copiar Leyenda
               </button>
             </div>
           </div>
@@ -9778,7 +9745,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "�x� WhatsApp";
+          btn.textContent = "📲 WhatsApp";
         }
       }
     }
@@ -9787,25 +9754,25 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     /* PUBLIC AI AUTO-QUOTER WITH HUMAN VERIFICATION & CRM LEAD  */
     /* ========================================================= */
     // RFC: persona moral = 12 caracteres, persona física = 13. El tipo debe coincidir con el RFC.
-    const PUB_RFC_MORAL = /^[A-Z�&]{3}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[A-Z0-9]{3}$/;
-    const PUB_RFC_FISICA = /^[A-Z�&]{4}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[A-Z0-9]{3}$/;
+    const PUB_RFC_MORAL = /^[A-ZÑ&]{3}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[A-Z0-9]{3}$/;
+    const PUB_RFC_FISICA = /^[A-ZÑ&]{4}\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])[A-Z0-9]{3}$/;
     const PUB_RFC_GENERICO = /^(XAXX|XEXX)010101000$/;
     function validatePublicRfc(rfc, type) {
-      if (!rfc) return "�a�️ Ingresa tu RFC: lo necesitamos para calcular tu cotización correctamente (con o sin retenciones).";
+      if (!rfc) return "⚠️ Ingresa tu RFC: lo necesitamos para calcular tu cotización correctamente (con o sin retenciones).";
       if (type === "moral") {
-        if (PUB_RFC_GENERICO.test(rfc)) return "�a�️ Una Persona Moral necesita su RFC de 12 caracteres; no aplica el RFC genérico.";
-        if (rfc.length === 13) return "�a�️ El RFC de 13 caracteres es de Persona Física. Cambia el tipo de cliente o revisa tu RFC.";
-        if (!PUB_RFC_MORAL.test(rfc)) return "�a�️ El RFC de Persona Moral debe tener 12 caracteres con el formato correcto (3 letras, fecha de 6 dígitos y 3 de homoclave).";
+        if (PUB_RFC_GENERICO.test(rfc)) return "⚠️ Una Persona Moral necesita su RFC de 12 caracteres; no aplica el RFC genérico.";
+        if (rfc.length === 13) return "⚠️ El RFC de 13 caracteres es de Persona Física. Cambia el tipo de cliente o revisa tu RFC.";
+        if (!PUB_RFC_MORAL.test(rfc)) return "⚠️ El RFC de Persona Moral debe tener 12 caracteres con el formato correcto (3 letras, fecha de 6 dígitos y 3 de homoclave).";
       } else {
-        if (rfc.length === 12) return "�a�️ El RFC de 12 caracteres es de Persona Moral. Cambia el tipo de cliente o revisa tu RFC.";
-        if (!PUB_RFC_FISICA.test(rfc)) return "�a�️ El RFC de Persona Física debe tener 13 caracteres con el formato correcto (4 letras, fecha de 6 dígitos y 3 de homoclave).";
+        if (rfc.length === 12) return "⚠️ El RFC de 12 caracteres es de Persona Moral. Cambia el tipo de cliente o revisa tu RFC.";
+        if (!PUB_RFC_FISICA.test(rfc)) return "⚠️ El RFC de Persona Física debe tener 13 caracteres con el formato correcto (4 letras, fecha de 6 dígitos y 3 de homoclave).";
       }
       return "";
     }
     function onPublicRfcInput() {
       const el = document.getElementById("pub-lead-rfc"), sel = document.getElementById("pub-lead-type"), hint = document.getElementById("pub-rfc-hint");
       if (!el || !sel) return;
-      el.value = el.value.toUpperCase().replace(/[^A-Z�&0-9]/g, "");
+      el.value = el.value.toUpperCase().replace(/[^A-ZÑ&0-9]/g, "");
       if (el.value.length === 12) sel.value = "moral";
       else if (el.value.length === 13) sel.value = "fisica";
       if (hint) hint.textContent = sel.value === "moral"
@@ -9825,12 +9792,12 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const email = g("pub-lead-email").value.trim();
       const zone = g("pub-lead-address").value.trim();
       const need = g("pub-lead-need").value.trim();
-      if (name.length < 3) return fail("�a�️ Ingresa tu nombre completo o razón social.");
-      if (phoneDigits.length < 10 || phoneDigits.length > 13) return fail("�a�️ Ingresa un teléfono válido de 10 dígitos.");
+      if (name.length < 3) return fail("⚠️ Ingresa tu nombre completo o razón social.");
+      if (phoneDigits.length < 10 || phoneDigits.length > 13) return fail("⚠️ Ingresa un teléfono válido de 10 dígitos.");
       const rfcErr = validatePublicRfc(rfc, clientType);
       if (rfcErr) return fail(rfcErr);
-      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return fail("�a�️ El correo electrónico no es válido.");
-      if (!g("pub-lead-privacy").checked) return fail("�a�️ Debes aceptar el Aviso de Privacidad para registrarte.");
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return fail("⚠️ El correo electrónico no es válido.");
+      if (!g("pub-lead-privacy").checked) return fail("⚠️ Debes aceptar el Aviso de Privacidad para registrarte.");
 
       const typeLabel = clientType === "moral" ? "Persona Moral" : "Persona Física";
       const payload = {
@@ -9852,7 +9819,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         g("pub-reg-success").style.display = "block";
         g("pub-ai-subtitle").textContent = "Registro recibido";
       } catch (e) {
-        fail("�R No pudimos enviar tu registro. Escríbenos por WhatsApp y te atendemos de inmediato.");
+        fail("❌ No pudimos enviar tu registro. Escríbenos por WhatsApp y te atendemos de inmediato.");
       } finally { btn.disabled = false; btn.textContent = oldTxt; }
     }
 
