@@ -8911,19 +8911,47 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       canvas.height = H;
       const ctx = canvas.getContext("2d");
       const pdfPages = [];
+      const pageBuffers = []; // canvases intermedios; al final se numera "1 de N"
 
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, W, H);
 
       const M = 56;
       const contentW = W - M * 2; // 1588px
+      const PAGE_FOOT_H = 44; // franja inferior para "Página X de N"
       let curY = M;
       function pushPdfPage() {
-        pdfPages.push({ jpegDataUrl: canvas.toDataURL("image/jpeg", 0.95), width: W, height: H });
+        const snap = document.createElement("canvas");
+        snap.width = W;
+        snap.height = H;
+        snap.getContext("2d").drawImage(canvas, 0, 0);
+        pageBuffers.push(snap);
       }
       function clearCanvasWhite() {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, W, H);
+      }
+      function finalizePdfPages() {
+        const total = Math.max(1, pageBuffers.length);
+        pageBuffers.forEach((snap, i) => {
+          const sctx = snap.getContext("2d");
+          sctx.fillStyle = "#ffffff";
+          sctx.fillRect(0, H - PAGE_FOOT_H, W, PAGE_FOOT_H);
+          sctx.textAlign = "center";
+          sctx.font = "700 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+          sctx.fillStyle = "#475569";
+          sctx.fillText("Página " + (i + 1) + " de " + total, W / 2, H - 16);
+          if (i < total - 1) {
+            sctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+            sctx.fillStyle = "#94a3b8";
+            sctx.textAlign = "right";
+            sctx.fillText("Continúa →", W - M - 10, H - 16);
+            sctx.textAlign = "left";
+            sctx.fillText("← Continúa", M + 10, H - 16);
+          }
+          sctx.textAlign = "left";
+          pdfPages.push({ jpegDataUrl: snap.toDataURL("image/jpeg", 0.95), width: W, height: H });
+        });
       }
 
       function roundRect(x, y, w, h, r, fill, stroke, lineW = 1.5) {
@@ -9267,9 +9295,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       ctx.textAlign = "left";
 
       curY += thH;
-      const tableStartY = curY;
-      // Reserva pie (totales/firma). Con multipágina las descripciones ya no se cortan a 2 líneas.
-      const maxTableBottomY = H - 620;
+      // Páginas intermedias: usan casi toda la hoja (sin totales/términos).
+      // Totales + IVA + condiciones solo van fijos abajo en la ÚLTIMA página.
+      const maxTableBottomY = H - PAGE_FOOT_H - 16;
       const totalVisualRows = rawItems.length + (showSectionHeaders ? distinctCats.length : 0);
       const compactScale = totalVisualRows > 10 ? 0.78 : (totalVisualRows > 7 ? 0.86 : (totalVisualRows > 4 ? 0.93 : 1.0));
       const titleFont = `700 ${Math.round(18.5 * compactScale)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
@@ -9295,7 +9323,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         curY += thH;
       }
 
-      function startContinuationPage(note) {
+      function startContinuationPage(note, withTableHeader) {
         pushPdfPage();
         clearCanvasWhite();
         curY = M;
@@ -9304,7 +9332,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         ctx.fillStyle = "#ffffff";
         ctx.fillText(note || ("GASO INGENIERÍA — continuación · " + qFolio), M + 16, curY + 28);
         curY += 56;
-        drawItemsTableHeader();
+        if (withTableHeader !== false) drawItemsTableHeader();
       }
 
       let globalRowIndex = 0;
@@ -9412,36 +9440,91 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         });
       });
 
-      const openSpaceStartY = curY;
-      // En la última página de partidas, si sobra poco espacio no rellenamos forzado:
-      // el pie se dibuja abajo; si no cabe, se abre página de cierre.
-      if (curY > maxTableBottomY - 40) {
-        startContinuationPage("GASO INGENIERÍA — totales y condiciones · " + qFolio);
-      }
-
       // =========================================================================
-      // 3B. DRAW OFFICIAL RUBBER STAMPS ON PDF (ONLY WHEN STATUS === 'sales_note')
+      // CIERRE: totales / IVA / términos SOLO en la última hoja, anclados abajo.
+      // Hojas intermedias quedan solo con partidas (+ "Página X de N").
       // =========================================================================
       const isPaid = isSalesNote && document.getElementById("stamp-paid-chk") && document.getElementById("stamp-paid-chk").checked;
       const paidDate = (document.getElementById("stamp-paid-date") && document.getElementById("stamp-paid-date").value) || qDate;
-
       const isDelivered = isSalesNote && document.getElementById("stamp-delivered-chk") && document.getElementById("stamp-delivered-chk").checked;
       const delivDate = (document.getElementById("stamp-delivered-date") && document.getElementById("stamp-delivered-date").value) || qDate;
-
       const isAdvance = isSalesNote && document.getElementById("stamp-advance-chk") && document.getElementById("stamp-advance-chk").checked;
       const advAmt = parseFloat(document.getElementById("stamp-advance-amount") ? document.getElementById("stamp-advance-amount").value : 0) || 0;
       const advDate = (document.getElementById("stamp-advance-date") && document.getElementById("stamp-advance-date").value) || qDate;
-
       const grandTotalStrClean = (document.getElementById("grand-total-val").textContent || "0").replace(/[^0-9.-]+/g, "");
       const grandTotalNum = parseFloat(grandTotalStrClean) || 0;
       const remainingBalance = isPaid ? 0 : Math.max(0, grandTotalNum - (isAdvance ? advAmt : 0));
+
+      const leftPanelW = Math.floor(contentW * 0.635);
+      const rightPanelW = contentW - leftPanelW - 24;
+      const rightPanelX = M + leftPanelW + 24;
+
+      const wordsStr = (document.getElementById("amount-in-words").textContent || "").trim();
+      const wordsLines = wrapTextLines(wordsStr, leftPanelW - 32, "800 16.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif");
+      const wordsBoxH = Math.max(46, 18 + wordsLines.length * 22);
+
+      const formaSel = document.getElementById("cfdi-forma-pago");
+      const metodoSel = document.getElementById("cfdi-metodo-pago");
+      const formaText = formaSel && formaSel.options[formaSel.selectedIndex] ? formaSel.options[formaSel.selectedIndex].text : "Transferencia electrónica (SPEI / CLABE)";
+      const metodoText = metodoSel && metodoSel.options[metodoSel.selectedIndex] ? metodoSel.options[metodoSel.selectedIndex].text : "Pago en una sola exhibición";
+      const condPagoText = (document.getElementById("cfdi-condiciones-pago").value || DEFAULT_COND_PAGO).trim();
+      const payColW = Math.floor((leftPanelW - 32) / 3);
+      const payFont = "700 14px -apple-system, sans-serif";
+      const payCols = [
+        { title: "FORMA DE PAGO", val: formaText },
+        { title: "MODALIDAD DE PAGO", val: metodoText },
+        { title: "CONDICIONES DE PAGO", val: condPagoText }
+      ];
+      const payLinesN = Math.min(4, Math.max(2, ...payCols.map(pc => wrapTextLines(pc.val, payColW - 14, payFont).length)));
+      const payBarH = 38 + payLinesN * 18;
+
+      const cardW = Math.floor((leftPanelW - 16) / 2);
+      const bankText = (document.getElementById("banking-details").value || "").trim();
+      const termsText = (document.getElementById("commercial-terms").value || "").trim();
+      const termsFont = "500 14px -apple-system, sans-serif";
+      const termsLinesAll = termsText.split("\n").filter(t => t.trim()).flatMap(par => wrapTextLines(par, cardW - 32, termsFont)).slice(0, 10);
+      const cardH = Math.max(140, 62 + termsLinesAll.length * 20 + 12);
+
+      const subtotalTxt = (document.getElementById("subtotal-val").textContent || "$0.00").trim();
+      const discountPct = parseFloat(document.getElementById("discount-pct").value) || 0;
+      const discountTxt = (document.getElementById("discount-val").textContent || "-$0.00").trim();
+      const taxLabelTxt = (document.getElementById("tax-label").textContent || "(+) IVA (16%):").trim();
+      const taxTxt = (document.getElementById("tax-val").textContent || "$0.00").trim();
+      const retIsrTxt = (document.getElementById("ret-isr-resico-val").textContent || "-$0.00").trim();
+      const grandTotalTxt = (document.getElementById("grand-total-val").textContent || "$0.00").trim();
+      const isResico = document.getElementById("resico-mode-toggle").checked;
+      const totRows = [];
+      if (!isSinFactura) totRows.push({ label: "Subtotal:", val: subtotalTxt, color: "#0f172a", bold: true });
+      else totRows.push({ label: "Importe de Partidas:", val: subtotalTxt, color: "#0f172a", bold: true });
+      if (discountPct > 0) totRows.push({ label: `Descuento (${discountPct}%):`, val: discountTxt, color: "#b45309", bold: false });
+      if (!isSinFactura) {
+        totRows.push({ label: taxLabelTxt, val: taxTxt, color: "#1e293b", bold: true });
+        if (currentClientType === "moral" && isResico) {
+          totRows.push({ label: "(-) Ret. ISR RESICO (1.25%):", val: retIsrTxt, color: "#047857", bold: true });
+        }
+      }
+      const hasExtraBalanceRows = isSalesNote && ((isAdvance && advAmt > 0) || isPaid);
+      const extraH = hasExtraBalanceRows ? (isAdvance && advAmt > 0 ? 92 : 52) : 0;
+      const totBoxH = 88 + totRows.length * 38 + extraH;
+      const midBlockH = Math.max(wordsBoxH + 12 + payBarH + 12 + cardH, totBoxH);
+      const stampH = 195;
+      const companyLineH = 48;
+      const FOOTER_H = midBlockH + 22 + stampH + companyLineH + 8;
+
+      // Si en la hoja actual no cabe el bloque fijo de totales, abrir hoja de cierre
+      // (sin tabla de partidas: solo totales / condiciones).
+      if (curY > H - PAGE_FOOT_H - FOOTER_H - 24) {
+        startContinuationPage("GASO INGENIERÍA — totales y condiciones · " + qFolio, false);
+      }
+
+      const itemsEndY = curY;
+      const footerTop = H - PAGE_FOOT_H - FOOTER_H;
 
       function drawRubberStamp(cx, cy, angleDeg, borderColor, line1, line2, line3) {
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate((angleDeg * Math.PI) / 180);
-        const sw = 380;
-        const sh = 128;
+        const sw = 380, sh = 128;
         roundRect(-sw / 2, -sh / 2, sw, sh, 12, "rgba(255, 255, 255, 0.92)", borderColor, 5);
         roundRect(-sw / 2 + 8, -sh / 2 + 8, sw - 16, sh - 16, 8, null, borderColor, 2);
         ctx.textAlign = "center";
@@ -9458,17 +9541,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
 
       if (isSalesNote) {
-        const stampCenterY = Math.min(curY - 95, Math.max(openSpaceStartY + 85, 1180));
+        const stampCenterY = Math.min(footerTop - 70, Math.max(itemsEndY + 70, footerTop - 160));
         const activeStamps = [];
-        if (isPaid) {
-          activeStamps.push({ color: "#15803d", angle: -8, l1: "PAGADO", l2: `FECHA: ${paidDate}`, l3: "LIQUIDADO AL 100%" });
-        }
-        if (isAdvance && advAmt > 0) {
-          activeStamps.push({ color: "#b45309", angle: -6, l1: "ANTICIPO RECIBIDO", l2: `${formatCurrency(advAmt)} (${advDate})`, l3: `RESTA: ${formatCurrency(remainingBalance)}` });
-        }
-        if (isDelivered) {
-          activeStamps.push({ color: "#1d4ed8", angle: -5, l1: "ENTREGADO", l2: `FECHA: ${delivDate}`, l3: "RECIBIDO DE CONFORMIDAD" });
-        }
+        if (isPaid) activeStamps.push({ color: "#15803d", angle: -8, l1: "PAGADO", l2: `FECHA: ${paidDate}`, l3: "LIQUIDADO AL 100%" });
+        if (isAdvance && advAmt > 0) activeStamps.push({ color: "#b45309", angle: -6, l1: "ANTICIPO RECIBIDO", l2: `${formatCurrency(advAmt)} (${advDate})`, l3: `RESTA: ${formatCurrency(remainingBalance)}` });
+        if (isDelivered) activeStamps.push({ color: "#1d4ed8", angle: -5, l1: "ENTREGADO", l2: `FECHA: ${delivDate}`, l3: "RECIBIDO DE CONFORMIDAD" });
         if (activeStamps.length === 1) {
           drawRubberStamp(W / 2, stampCenterY, activeStamps[0].angle, activeStamps[0].color, activeStamps[0].l1, activeStamps[0].l2, activeStamps[0].l3);
         } else if (activeStamps.length === 2) {
@@ -9481,42 +9558,16 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         }
       }
 
-      curY += 24;
+      // Bloque fijo inferior (última página)
+      let leftY = footerTop;
+      const footerAnchorY = footerTop;
 
-      // =========================================================================
-      // 4. BOTTOM SECTION: LEFT (LETRA, PAGO, BANCOS/CONDICIONES) | RIGHT (TOTALES)
-      // =========================================================================
-      const leftPanelW = Math.floor(contentW * 0.635);
-      const rightPanelW = contentW - leftPanelW - 24;
-      const rightPanelX = M + leftPanelW + 24;
-      let leftY = curY;
-
-      const wordsStr = (document.getElementById("amount-in-words").textContent || "").trim();
-      const wordsLines = wrapTextLines(wordsStr, leftPanelW - 32, "800 16.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif");
-      const wordsBoxH = Math.max(46, 18 + wordsLines.length * 22);
       roundRect(M, leftY, leftPanelW, wordsBoxH, 8, "#e0f2fe", "#bae6fd", 1.5);
       ctx.font = "800 16.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
       ctx.fillStyle = "#023e8a";
-      wordsLines.forEach((ln, i) => {
-        ctx.fillText(ln, M + 16, leftY + 28 + i * 22);
-      });
+      wordsLines.forEach((ln, i) => { ctx.fillText(ln, M + 16, leftY + 28 + i * 22); });
       leftY += wordsBoxH + 12;
 
-      const formaSel = document.getElementById("cfdi-forma-pago");
-      const metodoSel = document.getElementById("cfdi-metodo-pago");
-      const formaText = formaSel && formaSel.options[formaSel.selectedIndex] ? formaSel.options[formaSel.selectedIndex].text : "Transferencia electrónica (SPEI / CLABE)";
-      const metodoText = metodoSel && metodoSel.options[metodoSel.selectedIndex] ? metodoSel.options[metodoSel.selectedIndex].text : "Pago en una sola exhibición";
-      const condPagoText = (document.getElementById("cfdi-condiciones-pago").value || DEFAULT_COND_PAGO).trim();
-
-      const payColW = Math.floor((leftPanelW - 32) / 3);
-      const payFont = "700 14px -apple-system, sans-serif";
-      const payCols = [
-        { title: "FORMA DE PAGO", val: formaText },
-        { title: "MODALIDAD DE PAGO", val: metodoText },
-        { title: "CONDICIONES DE PAGO", val: condPagoText }
-      ];
-      const payLinesN = Math.min(4, Math.max(2, ...payCols.map(pc => wrapTextLines(pc.val, payColW - 14, payFont).length)));
-      const payBarH = 38 + payLinesN * 18;
       roundRect(M, leftY, leftPanelW, payBarH, 8, "#f8fafc", "#cbd5e1", 1.5);
       payCols.forEach((pc, idx) => {
         const px = M + 16 + idx * payColW;
@@ -9531,21 +9582,12 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       });
       leftY += payBarH + 12;
 
-      const cardW = Math.floor((leftPanelW - 16) / 2);
-      const bankText = (document.getElementById("banking-details").value || "").trim();
-      const termsText = (document.getElementById("commercial-terms").value || "").trim();
-      const termsFont = "500 14px -apple-system, sans-serif";
-      // Cada viñeta se ajusta por separado; la tarjeta crece según el texto (ya no se corta a 4 líneas)
-      const termsLinesAll = termsText.split("\n").filter(t => t.trim()).flatMap(par => wrapTextLines(par, cardW - 32, termsFont)).slice(0, 14);
-      const cardH = Math.max(160, 62 + termsLinesAll.length * 20 + 16);
-
       roundRect(M, leftY, cardW, cardH, 8, "#ffffff", "#cbd5e1", 1.5);
       ctx.font = "800 16px -apple-system, sans-serif";
       ctx.fillStyle = "#023e8a";
       ctx.fillText("DATOS BANCARIOS PARA PAGO", M + 16, leftY + 28);
       ctx.strokeStyle = "#e2e8f0";
       ctx.beginPath(); ctx.moveTo(M + 16, leftY + 36); ctx.lineTo(M + cardW - 16, leftY + 36); ctx.stroke();
-
       wrapTextLines(bankText, cardW - 32, "600 16px -apple-system, sans-serif").slice(0, 4).forEach((ln, i) => {
         ctx.fillStyle = "#1e293b";
         ctx.fillText(ln, M + 16, leftY + 62 + i * 24);
@@ -9557,65 +9599,31 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       ctx.fillStyle = "#023e8a";
       ctx.fillText("CONDICIONES COMERCIALES Y GARANTÍA", card2X + 16, leftY + 28);
       ctx.beginPath(); ctx.moveTo(card2X + 16, leftY + 36); ctx.lineTo(card2X + cardW - 16, leftY + 36); ctx.stroke();
-
       ctx.font = termsFont;
       termsLinesAll.forEach((ln, i) => {
         ctx.fillStyle = "#1e293b";
         ctx.fillText(ln, card2X + 16, leftY + 62 + i * 20);
       });
 
-      // 4D. Right Panel: Totals Box (with Advance & Remaining Balance when in Nota de Venta)
-      const subtotalTxt = (document.getElementById("subtotal-val").textContent || "$0.00").trim();
-      const discountPct = parseFloat(document.getElementById("discount-pct").value) || 0;
-      const discountTxt = (document.getElementById("discount-val").textContent || "-$0.00").trim();
-      const taxLabelTxt = (document.getElementById("tax-label").textContent || "(+) IVA (16%):").trim();
-      const taxTxt = (document.getElementById("tax-val").textContent || "$0.00").trim();
-      const retIsrTxt = (document.getElementById("ret-isr-resico-val").textContent || "-$0.00").trim();
-      const grandTotalTxt = (document.getElementById("grand-total-val").textContent || "$0.00").trim();
-      const isResico = document.getElementById("resico-mode-toggle").checked;
-
-      const totRows = [];
-      if (!isSinFactura) {
-        totRows.push({ label: "Subtotal:", val: subtotalTxt, color: "#0f172a", bold: true });
-      } else {
-        totRows.push({ label: "Importe de Partidas:", val: subtotalTxt, color: "#0f172a", bold: true });
-      }
-      if (discountPct > 0) {
-        totRows.push({ label: `Descuento (${discountPct}%):`, val: discountTxt, color: "#b45309", bold: false });
-      }
-      if (!isSinFactura) {
-        totRows.push({ label: taxLabelTxt, val: taxTxt, color: "#1e293b", bold: true });
-        if (currentClientType === "moral" && isResico) {
-          totRows.push({ label: "(-) Ret. ISR RESICO (1.25%):", val: retIsrTxt, color: "#047857", bold: true });
-        }
-      }
-
-      const hasExtraBalanceRows = isSalesNote && ((isAdvance && advAmt > 0) || isPaid);
-      const extraH = hasExtraBalanceRows ? (isAdvance && advAmt > 0 ? 92 : 52) : 0;
-      const totBoxH = 88 + totRows.length * 38 + extraH;
-      roundRect(rightPanelX, curY, rightPanelW, totBoxH, 10, "#f8fafc", "#cbd5e1", 2);
-
-      let tY = curY + 34;
+      roundRect(rightPanelX, footerAnchorY, rightPanelW, totBoxH, 10, "#f8fafc", "#cbd5e1", 2);
+      let tY = footerAnchorY + 34;
       totRows.forEach(tr => {
         ctx.textAlign = "left";
         ctx.font = tr.bold ? "700 17.5px -apple-system, sans-serif" : "600 17px -apple-system, sans-serif";
         ctx.fillStyle = tr.color;
         ctx.fillText(tr.label, rightPanelX + 20, tY);
-
         ctx.textAlign = "right";
         ctx.font = "800 18px -apple-system, sans-serif";
         ctx.fillStyle = tr.color;
         ctx.fillText(tr.val, rightPanelX + rightPanelW - 20, tY);
         tY += 38;
       });
-
       const gtY = tY - 12;
       roundRect(rightPanelX + 14, gtY, rightPanelW - 28, 48, 8, "#023e8a", null);
       ctx.textAlign = "left";
       ctx.font = "800 19px -apple-system, sans-serif";
       ctx.fillStyle = "#ffffff";
       ctx.fillText("TOTAL NETO:", rightPanelX + 28, gtY + 31);
-
       ctx.textAlign = "right";
       ctx.font = "800 22px -apple-system, sans-serif";
       ctx.fillStyle = "#ffffff";
@@ -9648,14 +9656,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         ctx.textAlign = "left";
       }
 
-      curY = Math.max(leftY + cardH, curY + totBoxH) + 22;
+      curY = footerTop + midBlockH + 22;
 
-      // =========================================================================
-      // 5. QR CODE, DIGITAL STAMP & CLIENT SIGNATURE SECTION
-      // =========================================================================
-      const stampH = 195;
       roundRect(M, curY, contentW, stampH, 10, "#f8fafc", "#cbd5e1", 2);
-
       const qrBoxSize = 140;
       const qrX = M + 20;
       const qrY = curY + 18;
@@ -9673,21 +9676,18 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const sigBoxW = 350;
       const sealX = qrX + qrBoxSize + 24;
       const sealW = contentW - (qrBoxSize + 44) - sigBoxW - 36;
-
       ctx.font = "800 16.5px -apple-system, sans-serif";
       ctx.fillStyle = "#0f172a";
       ctx.fillText(`Código de Verificación de ${isSalesNote ? "Nota de Venta" : "Cotización"} — Emisor: GASO INGENIERÍA`, sealX, curY + 36);
       ctx.font = "700 15.5px -apple-system, sans-serif";
       ctx.fillStyle = "#023e8a";
       ctx.fillText(`Folio: ${qFolio}   |   Fecha: ${qDate}`, sealX, curY + 60);
-
       const rawHash = (document.getElementById("seal-hash-string").textContent || "").trim();
       roundRect(sealX, curY + 74, sealW, 56, 6, "#ffffff", "#cbd5e1", 1.2);
       ctx.font = "600 13.5px monospace";
       ctx.fillStyle = "#334155";
       ctx.fillText(rawHash.substring(0, 68), sealX + 12, curY + 98);
       if (rawHash.length > 68) ctx.fillText(rawHash.substring(68, 136), sealX + 12, curY + 118);
-
       ctx.font = "500 14px -apple-system, sans-serif";
       ctx.fillStyle = "#64748b";
       const legalTxt = isSalesNote
@@ -9707,40 +9707,36 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       if (sigCanvas && sigCanvas.width > 0) {
         ctx.drawImage(sigCanvas, sigX + 6, sigY + 6, sigBoxW - 12, sigCanvasH - 12);
       }
-
       ctx.strokeStyle = "#334155";
       ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.moveTo(sigX + 16, sigY + sigCanvasH + 14);
       ctx.lineTo(sigX + sigBoxW - 16, sigY + sigCanvasH + 14);
       ctx.stroke();
-
       ctx.textAlign = "center";
       ctx.font = "800 15.5px -apple-system, sans-serif";
       ctx.fillStyle = "#0f172a";
       ctx.fillText("Aceptación y Conformidad del Cliente", sigX + sigBoxW / 2, sigY + sigCanvasH + 34);
-
       ctx.font = "500 13.5px -apple-system, sans-serif";
       ctx.fillStyle = "#64748b";
       ctx.fillText("Nombre, Fecha y Firma de Autorización", sigX + sigBoxW / 2, sigY + sigCanvasH + 54);
       ctx.textAlign = "left";
 
-      curY += stampH + 26;
-
-      ctx.textAlign = "center";
-      ctx.font = "600 15px -apple-system, sans-serif";
-      ctx.fillStyle = "#64748b";
       const footProTxt = (document.getElementById("company-professional") ? document.getElementById("company-professional").value : "").trim().replace(" · ", " • ");
-      const footY = Math.min(H - (footProTxt ? 46 : 24), curY);
+      const footY = H - PAGE_FOOT_H - (footProTxt ? 38 : 18);
+      ctx.textAlign = "center";
+      ctx.font = "600 14px -apple-system, sans-serif";
+      ctx.fillStyle = "#64748b";
       ctx.fillText("GASO INGENIERÍA • RFC: GATM851209T92 • Cuautlancingo, Puebla, C.P. 72730 • Tel: (222) 376-3195", W / 2, footY);
       if (footProTxt) {
-        ctx.font = "700 15px -apple-system, sans-serif";
+        ctx.font = "700 14px -apple-system, sans-serif";
         ctx.fillStyle = "#334155";
-        ctx.fillText(footProTxt, W / 2, footY + 22);
+        ctx.fillText(footProTxt, W / 2, footY + 18);
       }
       ctx.textAlign = "left";
 
       pushPdfPage();
+      finalizePdfPages();
       const pdfBlob = buildPDFBytesFromJpegPages(pdfPages);
       return { blob: pdfBlob, filename };
     }
