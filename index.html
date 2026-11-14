@@ -142,6 +142,32 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      flex-wrap: nowrap;
+      flex: 0 0 auto;
+    }
+    /* Estado de auto-guardado: no participa del flex del menú (no mueve la retícula) */
+    .quote-autosave-chip {
+      position: fixed;
+      top: 58px;
+      right: 12px;
+      z-index: 45;
+      max-width: min(260px, 46vw);
+      padding: 0.22rem 0.55rem;
+      border-radius: 999px;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      font-size: 0.66rem;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+      pointer-events: none;
+    }
+    @media (max-width: 900px) {
+      .quote-autosave-chip { top: auto; bottom: 78px; right: 12px; max-width: 55vw; }
     }
 
     .btn {
@@ -3097,10 +3123,6 @@
             <button type="button" role="menuitem" id="btn-share-wa" onclick="closeActionsMenu(); shareQuoteViaWhatsApp()">📲 WhatsApp</button>
           </div>
         </div>
-        <div id="quote-autosave-chip" title="La cotización se guarda sola y puedes reabrirla desde el Dashboard" style="display:none; max-width:min(280px,42vw); padding:0.28rem 0.55rem; border-radius:999px; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:0.68rem; font-weight:700; line-height:1.25; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-          ● Auto-guardado
-        </div>
-
         <div class="user-chip-top" id="active-user-chip" title="Usuario con sesión activa" style="padding:0.25rem 0.55rem; font-size:0.74rem;">
           <span id="active-user-role-icon">👑</span>
           <span id="active-user-display">Admin</span>
@@ -3110,6 +3132,8 @@
         </button>
       </div>
     </div>
+    <!-- Chip fuera de la toolbar para no romper la retícula del top-bar -->
+    <div id="quote-autosave-chip" class="quote-autosave-chip no-print" title="La cotización se guarda sola; reábrela desde Dashboard → Editar" hidden>● Auto-guardado</div>
   </header>
 
   <!-- Botón de Chat Flotante del Asistente IA -->
@@ -5007,7 +5031,8 @@ CLABE: 722969010514249300</textarea>
       "EQUIPO":   { label: "📦 Equipo / Producto", sectionTitle: "SECCIÓN: EQUIPOS Y SUMINISTROS", defaultSku: "EQP-01", defaultSat: "43211500", defaultUnit: "H87 - Pieza" },
       "MATERIAL": { label: "🔌 Material / Insumos", sectionTitle: "SECCIÓN: MATERIALES E INSUMOS DE INSTALACIÓN", defaultSku: "MAT-01", defaultSat: "39121400", defaultUnit: "H87 - Pieza" },
       "MANO_OBRA":{ label: "👷 Mano de Obra", sectionTitle: "SECCIÓN: MANO DE OBRA E INSTALACIÓN", defaultSku: "MO-01", defaultSat: "72151500", defaultUnit: "E48 - Unidad de servicio" },
-      "SERVICIO": { label: "🛠️ Servicio / Config.", sectionTitle: "SECCIÓN: SERVICIOS TÉCNICOS Y CONFIGURACIÓN", defaultSku: "SERV-01", defaultSat: "81111800", defaultUnit: "E48 - Unidad de servicio" }
+      "SERVICIO": { label: "🛠️ Servicio / Config.", sectionTitle: "SECCIÓN: SERVICIOS TÉCNICOS Y CONFIGURACIÓN", defaultSku: "SERV-01", defaultSat: "81111800", defaultUnit: "E48 - Unidad de servicio" },
+      "ANEXO":    { label: "📄 Anexo / Leyenda", sectionTitle: "ANEXO TÉCNICO / LEYENDAS", defaultSku: "ANX-01", defaultSat: "80141600", defaultUnit: "E48 - Unidad de servicio", annex: true }
     };
 
     // Claves SAT (ClaveProdServ) frecuentes para mano de obra y servicios. Se elige según el concepto
@@ -5102,6 +5127,7 @@ ${JSON.stringify(list)}`;
     function detectItemCategory(data) {
       if (data && data.itemCategory && ITEM_CATEGORY_META[data.itemCategory]) return data.itemCategory;
       const text = `${(data && data.sku) || ""} ${(data && data.concept) || ""} ${(data && data.unit) || ""}`.toLowerCase();
+      if (text.includes("anexo") || text.includes("leyenda") || text.startsWith("anx-")) return "ANEXO";
       if (text.includes("mano de obra") || text.startsWith("mo-")) return "MANO_OBRA";
       if (text.includes("instalaci") || text.includes("configuraci") || text.includes("mantenimiento") || text.includes("administraci") || text.includes("serv-")) return "SERVICIO";
       if (text.includes("tuber") || text.includes("canaleta") || text.includes("miscel") || text.startsWith("mat-")) return "MATERIAL";
@@ -5116,9 +5142,10 @@ ${JSON.stringify(list)}`;
       const skuInput = tr.querySelector(".row-sku");
       const satInput = tr.querySelector(".row-sat");
       const unitInput = tr.querySelector(".row-unit");
+      const priceInput = tr.querySelector(".row-price");
       if (skuInput) {
         const curSku = skuInput.value.trim();
-        if (!curSku || ["EQP-01", "MAT-01", "MO-01", "SERV-01"].includes(curSku)) {
+        if (!curSku || ["EQP-01", "MAT-01", "MO-01", "SERV-01", "ANX-01"].includes(curSku)) {
           skuInput.value = meta.defaultSku;
         }
       }
@@ -5127,7 +5154,14 @@ ${JSON.stringify(list)}`;
         satInput.value = (cat === "MANO_OBRA" || cat === "SERVICIO") ? suggestServiceSat(text, cat) : meta.defaultSat;
       }
       if (unitInput) unitInput.value = meta.defaultUnit;
+      // Anexo: leyenda técnica sin precio (no afecta totales)
+      if (cat === "ANEXO" && priceInput) {
+        priceInput.value = 0;
+        const costEl = tr.querySelector(".row-base-cost");
+        if (costEl) costEl.value = 0;
+      }
       calculateTotals();
+      try { markQuoteDirty(); } catch (e) {}
     }
 
     function addNewRow(data = null) {
@@ -5159,11 +5193,12 @@ ${JSON.stringify(list)}`;
           <button type="button" class="no-print" onclick="suggestSatWithAI(this)" title="Sugerir con IA la clave SAT y unidad correctas para esta partida" style="margin-top:2px; font-size:0.62rem; padding:1px 5px; border:1px solid #f59e0b; background:#fffbeb; color:#92400e; border-radius:4px; cursor:pointer; font-weight:700;">✨ Sugerir</button>
         </td>
         <td class="no-print internal-control-td">
-          <select class="item-input row-item-category" style="font-size:0.7rem; font-weight:800; color:#0f172a; background:#ffffff; border:1px solid #f59e0b; border-radius:4px; padding:0.15rem 0.25rem; margin-bottom:2px; width:100%;" onchange="onRowCategoryChange(this)" title="Clasifica esta partida para separarla por sección en la Cotización / Nota de Venta">
+          <select class="item-input row-item-category" style="font-size:0.7rem; font-weight:800; color:#0f172a; background:#ffffff; border:1px solid #f59e0b; border-radius:4px; padding:0.15rem 0.25rem; margin-bottom:2px; width:100%;" onchange="onRowCategoryChange(this)" title="Clasifica esta partida: Equipo/Material/MO/Servicio van con precio; Anexo sale en hoja aparte sin cotizar">
             <option value="EQUIPO" ${itemCat === 'EQUIPO' ? 'selected' : ''}>📦 Equipo / Producto</option>
             <option value="MANO_OBRA" ${itemCat === 'MANO_OBRA' ? 'selected' : ''}>👷 Mano de Obra</option>
             <option value="SERVICIO" ${itemCat === 'SERVICIO' ? 'selected' : ''}>🛠️ Servicio / Config.</option>
             <option value="MATERIAL" ${itemCat === 'MATERIAL' ? 'selected' : ''}>🔌 Material / Insumos</option>
+            <option value="ANEXO" ${itemCat === 'ANEXO' ? 'selected' : ''}>📄 Anexo / Leyenda</option>
           </select>
           <input type="text" class="item-input row-sku" style="font-family:monospace; font-weight:600; color:#92400e; background:#fff; font-size:0.72rem;" placeholder="SKU / Clave" value="${escapeHtml(sku)}" oninput="calculateTotals()" title="No. Identificación / SKU (Solo control interno)">
                     <input type="hidden" class="row-base-cost" value="${baseCost}">
@@ -5395,17 +5430,17 @@ ${JSON.stringify(list)}`;
         rowsData.push({ qty, price, ivaOn: rowHasIva });
         const _uh = tr.querySelector('.row-unit-hint'), _us = tr.querySelector('.row-unit');
         if (_uh && _us) _uh.textContent = _us.value.indexOf(' - ') > -1 ? _us.value.split(' - ').slice(1).join(' - ') : _us.value;
-        subtotal += total;
-        if (itemCat === 'MANO_OBRA' || itemCat === 'SERVICIO') {
-          sumManoObraServ += total;
-        } else {
-          sumEquiposMat += total;
+        // Anexo / leyenda: no entra a totales comerciales
+        if (itemCat !== 'ANEXO') {
+          subtotal += total;
+          if (itemCat === 'MANO_OBRA' || itemCat === 'SERVICIO') sumManoObraServ += total;
+          else sumEquiposMat += total;
+          if (rowHasIva) taxableSubtotal += total;
+          totalBaseCost += (qty * unitCost);
         }
-        if (rowHasIva) {
-          taxableSubtotal += total;
-        }
-        totalBaseCost += (qty * unitCost);
-        tr.querySelector('.row-total').textContent = currentCurrency.symbol + total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        tr.querySelector('.row-total').textContent = itemCat === 'ANEXO'
+          ? 'Anexo'
+          : (currentCurrency.symbol + total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
       });
 
       const elSumEq = document.getElementById('sum-cat-equipos');
@@ -7057,7 +7092,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       const el = document.getElementById('quote-autosave-chip');
       if (!el) return;
       const folio = (document.getElementById('quote-number') || {}).value || currentLoadedQuoteNumber || '';
-      el.style.display = 'block';
+      el.hidden = false;
       el.textContent = msg || (folio ? ('● Editando ' + folio) : '● Auto-guardado');
     }
     function markQuoteDirty() {
@@ -9240,24 +9275,47 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       function wrapTextLines(text, maxW, fontSpec) {
         ctx.font = fontSpec;
+        const limit = Math.max(40, Number(maxW) || 0);
         const paragraphs = String(text || "").split(/\r?\n/);
         const lines = [];
+        function breakLongWord(word) {
+          if (ctx.measureText(word).width <= limit) return [word];
+          const parts = [];
+          let cur = "";
+          for (const ch of Array.from(word)) {
+            const test = cur + ch;
+            if (!cur || ctx.measureText(test).width <= limit) cur = test;
+            else { parts.push(cur); cur = ch; }
+          }
+          if (cur) parts.push(cur);
+          return parts.length ? parts : [word];
+        }
         paragraphs.forEach(p => {
-          const words = p.trim().split(/\s+/).filter(Boolean);
-          if (words.length === 0) return;
+          const rawWords = p.trim().split(/\s+/).filter(Boolean);
+          if (rawWords.length === 0) return;
+          const words = [];
+          rawWords.forEach(w => breakLongWord(w).forEach(x => words.push(x)));
           let line = words[0];
           for (let i = 1; i < words.length; i++) {
             const test = line + " " + words[i];
-            if (ctx.measureText(test).width <= maxW) {
-              line = test;
-            } else {
-              lines.push(line);
-              line = words[i];
-            }
+            if (ctx.measureText(test).width <= limit) line = test;
+            else { lines.push(line); line = words[i]; }
           }
           lines.push(line);
         });
         return lines.length > 0 ? lines : [""];
+      }
+      function fillTextClipped(str, x, y, maxW) {
+        const s = String(str || "");
+        if (!s) return;
+        if (ctx.measureText(s).width <= maxW) { ctx.fillText(s, x, y); return; }
+        // Seguridad: nunca pintar fuera del margen derecho de la celda
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x - 1, y - 28, maxW + 2, 40);
+        ctx.clip();
+        ctx.fillText(s, x, y);
+        ctx.restore();
       }
 
       const billingToggle = document.getElementById("billing-mode-toggle");
@@ -9531,15 +9589,18 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         };
       });
 
-      // Group items by category in logical order: EQUIPO -> MATERIAL -> MANO_OBRA -> SERVICIO
+      // Cotizados: EQUIPO / MATERIAL / MANO_OBRA / SERVICIO. ANEXO → hojas aparte sin precio.
+      const annexItems = rawItems.filter(i => i.itemCat === "ANEXO");
+      const pricedItems = rawItems.filter(i => i.itemCat !== "ANEXO");
       const catOrder = ["EQUIPO", "MATERIAL", "MANO_OBRA", "SERVICIO"];
-      const distinctCats = Array.from(new Set(rawItems.map(i => i.itemCat)));
+      const distinctCats = Array.from(new Set(pricedItems.map(i => i.itemCat)));
       const showSectionHeaders = distinctCats.length > 1 || (distinctCats.length === 1 && distinctCats[0] !== "EQUIPO");
 
       const wCant = 120;
       const wUnit = 240;
       const wTot = 240;
       const wDesc = contentW - wCant - wUnit - wTot;
+      const descTextMaxW = Math.max(80, wDesc - 36);
 
       const xCant = M;
       const xDesc = xCant + wCant;
@@ -9564,9 +9625,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       curY += thH;
       // Páginas intermedias: usan casi toda la hoja (sin totales/términos).
-      // Totales + IVA + condiciones solo van fijos abajo en la ÚLTIMA página.
+      // Totales + IVA + condiciones solo van fijos abajo en la ÚLTIMA página comercial.
       const maxTableBottomY = H - PAGE_FOOT_H - 16;
-      const totalVisualRows = rawItems.length + (showSectionHeaders ? distinctCats.length : 0);
+      const totalVisualRows = pricedItems.length + (showSectionHeaders ? distinctCats.length : 0);
       const compactScale = totalVisualRows > 10 ? 0.78 : (totalVisualRows > 7 ? 0.86 : (totalVisualRows > 4 ? 0.93 : 1.0));
       const titleFont = `700 ${Math.round(18.5 * compactScale)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
       const descFont = `400 ${Math.round(15.5 * compactScale)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
@@ -9605,7 +9666,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       let globalRowIndex = 0;
       catOrder.forEach(catKey => {
-        const groupItems = rawItems.filter(it => it.itemCat === catKey);
+        const groupItems = pricedItems.filter(it => it.itemCat === catKey);
         if (groupItems.length === 0) return;
 
         if (showSectionHeaders) {
@@ -9622,7 +9683,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           ctx.textAlign = "left";
           ctx.font = "800 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
           ctx.fillStyle = "#0f172a";
-          ctx.fillText(secMeta.sectionTitle, M + 16, curY + 23);
+          fillTextClipped(secMeta.sectionTitle, M + 16, curY + 23, contentW - 280);
 
           ctx.textAlign = "right";
           ctx.font = "800 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
@@ -9633,22 +9694,19 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         }
 
         groupItems.forEach(it => {
-          // Texto completo: sin límite artificial de 2 líneas
-          const cLines = wrapTextLines(it.concept, wDesc - 32, titleFont);
-          const dLines = it.desc ? wrapTextLines(it.desc, wDesc - 32, descFont) : [];
+          const cLines = wrapTextLines(it.concept, descTextMaxW, titleFont);
+          const dLines = it.desc ? wrapTextLines(it.desc, descTextMaxW, descFont) : [];
           let rowH = Math.max(52 * compactScale, 18 + cLines.length * lineHTitle + dLines.length * lineHDesc);
 
-          // Si la partida no cabe, nueva página (mantiene márgenes y muestra todo el texto)
           if (curY + Math.min(rowH, maxTableBottomY - curY) > maxTableBottomY && globalRowIndex > 0) {
             startContinuationPage();
           }
-          // Si una sola descripción es más alta que la página, se parte en bloques
           let cIdx = 0, dIdx = 0;
           let firstChunk = true;
           while (cIdx < cLines.length || dIdx < dLines.length || firstChunk) {
             const avail = maxTableBottomY - curY;
             const maxC = Math.max(1, Math.floor((avail - 24) / lineHTitle));
-            const takeC = cLines.slice(cIdx, cIdx + (cIdx === 0 ? Math.min(cLines.length, maxC) : Math.min(cLines.length - cIdx, maxC)));
+            const takeC = cLines.slice(cIdx, cIdx + Math.min(cLines.length - cIdx, maxC));
             cIdx += takeC.length;
             const remainH = avail - (18 + takeC.length * lineHTitle);
             const maxD = Math.max(0, Math.floor(remainH / lineHDesc));
@@ -9691,18 +9749,17 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             let textY = curY + 25 * compactScale;
             ctx.font = titleFont;
             ctx.fillStyle = "#0f172a";
-            takeC.forEach(ln => { ctx.fillText(ln, xDesc + 16, textY); textY += lineHTitle; });
+            takeC.forEach(ln => { fillTextClipped(ln, xDesc + 16, textY, descTextMaxW); textY += lineHTitle; });
             if (takeD.length) {
               ctx.font = descFont;
               ctx.fillStyle = "#475569";
-              takeD.forEach(ln => { ctx.fillText(ln, xDesc + 16, textY); textY += lineHDesc; });
+              takeD.forEach(ln => { fillTextClipped(ln, xDesc + 16, textY, descTextMaxW); textY += lineHDesc; });
             }
 
             curY += chunkH;
             firstChunk = false;
             globalRowIndex++;
             if (cIdx >= cLines.length && dIdx >= dLines.length) break;
-            // Solo nueva página si ya no cabe al menos una línea más
             if (curY + lineHDesc + 24 > maxTableBottomY) startContinuationPage();
           }
         });
@@ -10004,6 +10061,76 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       ctx.textAlign = "left";
 
       pushPdfPage();
+
+      // Hojas de ANEXO (sin precios): van después de la cotización comercial
+      if (annexItems.length) {
+        const anxTitleFont = "800 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+        const anxBodyFont = "500 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+        const anxLineH = 22;
+        const anxMaxY = H - PAGE_FOOT_H - 24;
+        const anxTextW = contentW - 40;
+
+        function startAnnexPage(cont) {
+          clearCanvasWhite();
+          curY = M;
+          roundRect(M, curY, contentW, 48, 8, "#023e8a", null);
+          ctx.font = "800 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+          ctx.fillStyle = "#ffffff";
+          ctx.textAlign = "left";
+          fillTextClipped(
+            cont
+              ? ("ANEXO TÉCNICO (continuación) · " + qFolio)
+              : ("ANEXO TÉCNICO / LEYENDAS · " + qFolio),
+            M + 16, curY + 30, contentW - 32
+          );
+          curY += 64;
+          ctx.font = "500 14px -apple-system, sans-serif";
+          ctx.fillStyle = "#64748b";
+          fillTextClipped("Sin precios · solo alcance técnico, exclusiones y leyendas.", M, curY, contentW);
+          curY += 28;
+        }
+
+        startAnnexPage(false);
+        annexItems.forEach((it, idx) => {
+          const title = (idx + 1) + ". " + (it.concept || "Leyenda / alcance técnico");
+          const titleLines = wrapTextLines(title, anxTextW, anxTitleFont);
+          const bodyLines = it.desc ? wrapTextLines(it.desc, anxTextW, anxBodyFont) : [];
+          const need = 20 + titleLines.length * 26 + bodyLines.length * anxLineH + 28;
+          if (curY + Math.min(need, 120) > anxMaxY) {
+            pushPdfPage();
+            startAnnexPage(true);
+          }
+          titleLines.forEach(ln => {
+            if (curY + 28 > anxMaxY) { pushPdfPage(); startAnnexPage(true); }
+            ctx.font = anxTitleFont;
+            ctx.fillStyle = "#023e8a";
+            ctx.textAlign = "left";
+            fillTextClipped(ln, M, curY + 8, anxTextW);
+            curY += 26;
+          });
+          ctx.strokeStyle = "#e2e8f0";
+          ctx.beginPath(); ctx.moveTo(M, curY); ctx.lineTo(M + contentW, curY); ctx.stroke();
+          curY += 14;
+          bodyLines.forEach(ln => {
+            if (curY + anxLineH + 8 > anxMaxY) { pushPdfPage(); startAnnexPage(true); }
+            const hi = /\b(IMPORTANTE|ANTICIPO|IMSS|REPSE)\b/i.test(ln) || /^\s*(!!|>>)/.test(ln);
+            const clean = ln.replace(/^\s*(!!|>>)\s*/, "");
+            if (hi && clean) {
+              ctx.font = anxBodyFont;
+              const tw = Math.min(contentW, ctx.measureText(clean).width + 18);
+              ctx.fillStyle = "#fef08a";
+              ctx.fillRect(M, curY - 16, tw, anxLineH);
+            }
+            ctx.font = anxBodyFont;
+            ctx.fillStyle = "#0f172a";
+            fillTextClipped(clean || " ", M + 8, curY, anxTextW);
+            curY += anxLineH;
+          });
+          curY += 20;
+        });
+        pushPdfPage();
+      }
+
       finalizePdfPages();
       const pdfBlob = buildPDFBytesFromJpegPages(pdfPages);
       return { blob: pdfBlob, filename };
@@ -10035,21 +10162,46 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       function wrapTextLines(text, maxW, fontSpec) {
         ctx.font = fontSpec;
+        const limit = Math.max(40, Number(maxW) || 0);
         const paragraphs = String(text || "").split(/\r?\n/);
         const lines = [];
+        function breakLongWord(word) {
+          if (ctx.measureText(word).width <= limit) return [word];
+          const parts = [];
+          let cur = "";
+          for (const ch of Array.from(word)) {
+            const test = cur + ch;
+            if (!cur || ctx.measureText(test).width <= limit) cur = test;
+            else { parts.push(cur); cur = ch; }
+          }
+          if (cur) parts.push(cur);
+          return parts.length ? parts : [word];
+        }
         paragraphs.forEach(p => {
-          const words = String(p).split(/\s+/).filter(Boolean);
-          if (!words.length) { lines.push({ text: "", highlight: /^\s*!!/.test(p) || /^\s*>>/.test(p) }); return; }
           const highlight = /^\s*(!!|>>)/.test(p) || /\b(IMPORTANTE|ANTICIPO|IMSS|REPSE)\b/i.test(p);
+          const rawWords = String(p).split(/\s+/).filter(Boolean);
+          if (!rawWords.length) { lines.push({ text: "", highlight }); return; }
+          const words = [];
+          rawWords.forEach(w => breakLongWord(w).forEach(x => words.push(x)));
           let line = words[0];
           for (let i = 1; i < words.length; i++) {
             const test = line + " " + words[i];
-            if (ctx.measureText(test).width <= maxW) line = test;
+            if (ctx.measureText(test).width <= limit) line = test;
             else { lines.push({ text: line.replace(/^\s*(!!|>>)\s*/, ""), highlight }); line = words[i]; }
           }
           lines.push({ text: line.replace(/^\s*(!!|>>)\s*/, ""), highlight });
         });
         return lines.length ? lines : [{ text: "", highlight: false }];
+      }
+      function fillTextClipped(str, x, y, maxW) {
+        const s = String(str || "");
+        if (!s) return;
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x - 1, y - 28, Math.max(10, maxW) + 2, 40);
+        ctx.clip();
+        ctx.fillText(s, x, y);
+        ctx.restore();
       }
 
       clearWhite();
@@ -10062,28 +10214,37 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         ctx.drawImage(logoEl, M + (210 - dw) / 2, curY + (110 - dh) / 2, dw, dh);
       }
       const compName = (document.getElementById("company-name").value || "GASO INGENIERÍA").trim();
+      const headRight = W - M - (M + 240);
       ctx.font = "800 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
       ctx.fillStyle = "#023e8a";
-      ctx.fillText(compName, M + 240, curY + 48);
-      roundRect(M + 240, curY + 62, 520, 40, 8, "#023e8a", null);
-      ctx.font = "800 18px -apple-system, sans-serif";
+      fillTextClipped(compName, M + 240, curY + 48, headRight);
+      const bannerW = Math.min(560, headRight);
+      roundRect(M + 240, curY + 62, bannerW, 40, 8, "#023e8a", null);
+      ctx.font = "800 17px -apple-system, sans-serif";
       ctx.fillStyle = "#ffffff";
-      ctx.fillText("ANEXO TÉCNICO / LEYENDAS DE INSTALACIÓN", M + 256, curY + 88);
-      ctx.font = "600 16px -apple-system, sans-serif";
+      fillTextClipped("ANEXO TÉCNICO / LEYENDAS DE INSTALACIÓN", M + 256, curY + 88, bannerW - 28);
+      ctx.font = "600 15px -apple-system, sans-serif";
       ctx.fillStyle = "#475569";
-      ctx.fillText("Referencia cotización: " + folio + (clientName ? "  ·  Cliente: " + clientName : ""), M + 240, curY + 128);
+      fillTextClipped("Referencia cotización: " + folio + (clientName ? "  ·  Cliente: " + clientName : ""), M + 240, curY + 128, headRight);
       curY += 160;
 
-      ctx.font = "500 15px -apple-system, sans-serif";
+      ctx.font = "500 14px -apple-system, sans-serif";
       ctx.fillStyle = "#64748b";
-      ctx.fillText("Documento sin precios: solo alcance técnico, exclusiones y leyendas. Prefija una línea con !! o >> para resaltarla en amarillo.", M, curY);
-      curY += 36;
+      wrapTextLines("Documento sin precios: solo alcance técnico, exclusiones y leyendas. Prefija una línea con !! o >> para resaltarla en amarillo.", contentW, ctx.font).forEach(ln => {
+        fillTextClipped(ln.text || ln, M, curY, contentW);
+        curY += 20;
+      });
+      curY += 12;
 
-      const items = Array.from(document.querySelectorAll("#items-body tr")).map((tr, idx) => ({
+      // Preferir partidas marcadas como ANEXO; si no hay, usar todas con texto (compatibilidad)
+      const allRows = Array.from(document.querySelectorAll("#items-body tr")).map((tr, idx) => ({
         n: idx + 1,
+        cat: tr.querySelector(".row-item-category") ? tr.querySelector(".row-item-category").value : "EQUIPO",
         concept: (tr.querySelector(".row-concept") ? tr.querySelector(".row-concept").value : "").trim(),
         desc: (tr.querySelector(".row-desc") ? tr.querySelector(".row-desc").value : "").trim()
       })).filter(it => it.concept || it.desc);
+      const annexOnly = allRows.filter(it => it.cat === "ANEXO");
+      const items = (annexOnly.length ? annexOnly : allRows).map((it, i) => ({ ...it, n: i + 1 }));
 
       const termsText = (document.getElementById("commercial-terms").value || "").trim();
       const blocks = [];
@@ -10131,13 +10292,17 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       drawWatermark();
 
-      blocks.forEach((b, bi) => {
+      blocks.forEach((b) => {
+        const titleLines = wrapTextLines(b.title, contentW - 36, titleFont);
         const bodyLines = wrapTextLines(b.body, contentW - 36, bodyFont);
         ensureSpace(70);
-        ctx.font = titleFont;
-        ctx.fillStyle = "#023e8a";
-        ctx.fillText(b.title, M, curY + 8);
-        curY += 28;
+        titleLines.forEach(tl => {
+          ensureSpace(26);
+          ctx.font = titleFont;
+          ctx.fillStyle = "#023e8a";
+          fillTextClipped(tl.text || tl, M, curY + 8, contentW - 36);
+          curY += 26;
+        });
         ctx.strokeStyle = "#e2e8f0";
         ctx.beginPath(); ctx.moveTo(M, curY); ctx.lineTo(M + contentW, curY); ctx.stroke();
         curY += 16;
@@ -10145,13 +10310,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         bodyLines.forEach(ln => {
           ensureSpace(lineH + 8);
           if (ln.highlight && ln.text) {
+            ctx.font = bodyFont;
             const tw = Math.min(contentW, ctx.measureText(ln.text).width + 18);
             ctx.fillStyle = "#fef08a";
             ctx.fillRect(M, curY - 16, tw, lineH);
           }
           ctx.font = bodyFont;
           ctx.fillStyle = "#0f172a";
-          ctx.fillText(ln.text || " ", M + 8, curY);
+          fillTextClipped(ln.text || " ", M + 8, curY, contentW - 36);
           curY += lineH;
         });
         curY += 22;
