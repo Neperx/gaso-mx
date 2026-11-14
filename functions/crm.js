@@ -1,7 +1,9 @@
 import crm from "../lib/crm-handler.js";
 
+export async function onRequestGet(context) {
+  return crm(context.request, context.env);
+}
+
 export async function onRequestPost(context) {
-  const request = context.request;
-  const env = context.env;
-  return crm(request, env);
+  return crm(context.request, context.env);
 }
