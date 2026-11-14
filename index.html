@@ -4111,7 +4111,7 @@ CLABE: 722969010514249300</textarea>
               </button>
             </div>
             <div id="tecno-api-status-box" style="margin-top:0.55rem; font-size:0.78rem; color:#475569;">
-              🔒 Si dejas el campo vacío se usa el token del servidor (variable <code>TECNO_API_TOKEN</code> en Netlify). Si capturas uno y pulsas <strong>Guardar Token</strong>, ese tiene prioridad. Pulsa <strong>Probar /v3/status</strong> o <strong>Sincronizar Productos Ahora</strong>.
+              🔒 Si dejas el campo vacío se usa el secret <code>TECNO_API_TOKEN</code> de Cloudflare. Si capturas uno y pulsas <strong>Guardar Token</strong>, ese tiene prioridad. Rutas: <code>/v3/status</code> y <code>/v3/item/list</code> vía <code>/tecno-proxy</code>.
             </div>
           </div>
 
@@ -8487,7 +8487,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       // Todas las llamadas pasan por la función del servidor (token protegido; requiere sesión)
       if (!window.location.protocol.startsWith("http")) {
-        throw new Error("Abre el sitio desde su URL de Netlify (https://...) para usar la API de Tecnosinergia.");
+        throw new Error("Abre el sitio desde su URL de Cloudflare Pages (https://...) para usar la API de Tecnosinergia.");
       }
       return await tryGetAndPost("/tecno-proxy?path=" + encodeURIComponent(normPath));
     }

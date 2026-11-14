@@ -23,7 +23,7 @@ const snippet = (txt, env) => {
   secretsList(env).filter(Boolean).forEach((s) => { t = t.split(s).join("***"); });
   return t;
 };
-const MODEL_RE = /^[a-z0-9][a-z0-9.\-_]{1,60}$/i;
+const MODEL_RE = /^gemini-[a-z0-9][a-z0-9.\-_]{1,80}$/i;
 
 async function testGemini(env) {
   if (!settings.get("GEMINI_API_KEY") && !env.GEMINI_API_KEY) {

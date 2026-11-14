@@ -1,7 +1,9 @@
 import tecno from "../lib/tecno-handler.js";
 
+export async function onRequestGet(context) {
+  return tecno(context.request, context.env);
+}
+
 export async function onRequestPost(context) {
-  const request = context.request;
-  const env = context.env;
-  return tecno(request, env);
+  return tecno(context.request, context.env);
 }
