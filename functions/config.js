@@ -150,7 +150,7 @@ async function handle(context) {
     return json(403, { status: false, message: "Solo el superusuario puede abrir la configuración." });
   }
 
-  await settings.load(env.DB, true, env.SESSION_SECRET || "");
+  await settings.load(env.DB, true, env.SESSION_SECRET || "", env);
 
   if (request.method === "GET") return json(200, { status: true, settings: status(env) });
   if (request.method !== "POST") return json(405, { status: false, message: "Método no permitido" });
@@ -180,7 +180,7 @@ async function handle(context) {
     } catch (e) {
       return json(500, { status: false, message: "No se pudo guardar: " + e.message });
     }
-    await settings.load(env.DB, true, env.SESSION_SECRET || "");
+    await settings.load(env.DB, true, env.SESSION_SECRET || "", env);
     return json(200, { status: true, settings: status(env) });
   }
 

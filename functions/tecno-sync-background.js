@@ -1,8 +1,7 @@
 import session from "../lib/session.js";
 import settings from "../lib/settings.js";
-import tecno from "../lib/tecno-handler.js";
+import { slimList } from "../lib/tecno-handler.js";
 
-const { requireAuth } = session;
 const CHUNK = 1000;
 
 async function ensure(db) {
@@ -28,15 +27,15 @@ export async function onRequestPost(context) {
 
   const headers = {};
   request.headers.forEach((v, k) => { headers[k] = v; });
-  const auth = await session.requireAuth({ headers, httpMethod: request.method }, env.SESSION_SECRET || "");
-  if (auth.error) return new Response(auth.error.body, { status: auth.error.statusCode });
+  const auth = await session.requireAuth({ headers }, env.SESSION_SECRET || "", env);
+  if (auth.error) return auth.error;
 
   const db = env.DB;
   try {
     await ensure(db);
     await setMeta(db, "running", "Descargando catálogo de Tecnosinergia...");
-    await settings.load(db, true, env.SESSION_SECRET || "");
-    const token = settings.get("TECNO_API_TOKEN");
+    await settings.load(db, true, env.SESSION_SECRET || "", env);
+    const token = settings.get("TECNO_API_TOKEN") || env.TECNO_API_TOKEN || "";
     if (!token) {
       await setMeta(db, "error", "No hay variable TECNO_API_TOKEN en Cloudflare.", 0, 0, true);
       return new Response("ok");
@@ -52,7 +51,9 @@ export async function onRequestPost(context) {
         signal: ctl.signal
       });
       text = await r.text();
-    } finally { clearTimeout(timer); }
+    } finally {
+      clearTimeout(timer);
+    }
 
     let parsed = null;
     try { parsed = JSON.parse(text); } catch (e) { /* no JSON */ }
@@ -65,7 +66,7 @@ export async function onRequestPost(context) {
       return new Response("ok");
     }
 
-    const items = tecno.slimList(parsed);
+    const items = slimList(parsed);
     if (!items || !items.length) {
       await setMeta(db, "error", "Tecnosinergia respondió, pero sin lista de productos.", 0, 0, true);
       return new Response("ok");
@@ -74,13 +75,25 @@ export async function onRequestPost(context) {
     await db.prepare("DELETE FROM gaso_tecno_chunks").run();
     let n = 0;
     for (let i = 0; i < items.length; i += CHUNK) {
-      await db.prepare("INSERT INTO gaso_tecno_chunks (idx, data) VALUES (?1, ?2)").bind(n, JSON.stringify(items.slice(i, i + CHUNK))).run();
+      await db.prepare("INSERT INTO gaso_tecno_chunks (idx, data) VALUES (?1, ?2)")
+        .bind(n, JSON.stringify(items.slice(i, i + CHUNK)))
+        .run();
       n++;
     }
     await setMeta(db, "ok", "Catálogo guardado.", items.length, n, true);
   } catch (e) {
     try {
-      await setMeta(db, "error", (e.name === "AbortError" ? "Tecnosinergia tardó más de 12 minutos en responder." : String(e.message || e)).slice(0, 300), 0, 0, true);
+      await setMeta(
+        db,
+        "error",
+        (e.name === "AbortError"
+          ? "Tecnosinergia tardó más de 12 minutos en responder."
+          : String(e.message || e)
+        ).slice(0, 300),
+        0,
+        0,
+        true
+      );
     } catch (e2) { /* sin DB */ }
   }
   return new Response("ok");

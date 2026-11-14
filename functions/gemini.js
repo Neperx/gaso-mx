@@ -15,7 +15,7 @@ export async function onRequestPost(context) {
 
   const headers = {};
   request.headers.forEach((v, k) => { headers[k] = v; });
-  const auth = await requireAuth({ headers }, env.SESSION_SECRET || "");
+  const auth = await requireAuth({ headers }, env.SESSION_SECRET || "", env);
   if (auth.error) return auth.error;
   if (request.method !== "POST") return json(405, { error: { message: "Método no permitido" } });
 
@@ -48,7 +48,11 @@ export async function onRequestPost(context) {
       try { m = JSON.parse(r.text).error.message || m; } catch (e) { /* no JSON */ }
       return json(r.status, { error: { message: "Gemini: " + m } });
     }
-    return json(200, r.text);
+    // r.text ya es JSON del proveedor: no volver a stringify
+    return new Response(r.text, {
+      status: 200,
+      headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }
+    });
   } catch (err) {
     const timeout = err.name === "AbortError";
     return json(timeout ? 504 : 502, { error: { message: timeout ? "La IA tardó demasiado en responder" : "No se pudo contactar al proveedor de IA" } });

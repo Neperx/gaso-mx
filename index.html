@@ -3854,7 +3854,7 @@ CLABE: 722969010514249300</textarea>
     <div id="pane-config" class="tab-pane no-print">
       <div style="max-width:880px; margin:0 auto; padding:1.25rem 1rem 3rem;">
         <h2 style="font-size:1.3rem; margin:0 0 0.25rem;">⚙️ Configuración de conexiones</h2>
-        <p style="font-size:0.82rem; color:var(--gray-500); margin:0 0 1rem;">Prueba tus APIs. Las llaves viven <strong>solo en las variables de entorno de Netlify</strong>; aquí nunca se capturan ni se muestran.</p>
+        <p style="font-size:0.82rem; color:var(--gray-500); margin:0 0 1rem;">Prueba tus APIs. Las llaves viven <strong>solo en los Secrets de Cloudflare Pages</strong>; aquí nunca se capturan ni se muestran.</p>
 
         <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
           <button type="button" class="btn btn-primary btn-sm" onclick="cfgTest('all')" style="font-weight:700;">🔍 Probar todo</button>
@@ -3865,7 +3865,7 @@ CLABE: 722969010514249300</textarea>
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">🧠 Inteligencia Artificial (Google Gemini, gratis)</h3>
           <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0.7rem;">
-            <div style="font-size:0.78rem;">Llave de Gemini <strong id="cfg-st-GEMINI_API_KEY"></strong><br><span style="color:#64748b;">Variable <code>GEMINI_API_KEY</code> en Netlify</span></div>
+            <div style="font-size:0.78rem;">Llave de Gemini <strong id="cfg-st-GEMINI_API_KEY"></strong><br><span style="color:#64748b;">Secret <code>GEMINI_API_KEY</code> en Cloudflare</span></div>
             <label style="font-size:0.78rem; font-weight:700;">Modelo Gemini (opcional)
               <input type="text" id="cfg-GEMINI_MODEL" class="form-input" placeholder="gemini-flash-latest" style="width:100%;">
             </label>
@@ -3880,7 +3880,7 @@ CLABE: 722969010514249300</textarea>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">🔌 Tecnosinergia</h3>
-          <div style="font-size:0.78rem;">Token de la API <strong id="cfg-st-TECNO_API_TOKEN"></strong><br><span style="color:#64748b;">Variable <code>TECNO_API_TOKEN</code> en Netlify</span></div>
+          <div style="font-size:0.78rem;">Token de la API <strong id="cfg-st-TECNO_API_TOKEN"></strong><br><span style="color:#64748b;">Secret <code>TECNO_API_TOKEN</code> en Cloudflare</span></div>
           <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap; align-items:center;">
             
             <button type="button" class="btn btn-outline btn-sm" onclick="cfgTest('tecno')">Probar</button>
@@ -7321,7 +7321,7 @@ function updateDashboardKPIs() { renderDashboard(); }
     }
 
     const CFG_NAMES = ['AI_PROVIDER', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'ANTHROPIC_API_KEY', 'AI_MODEL', 'TECNO_API_TOKEN'];
-    const CFG_SRC = { panel: 'guardada en el panel', env: 'definida en Netlify', none: 'sin configurar' };
+    const CFG_SRC = { panel: 'guardada en el panel', env: 'definida en Cloudflare', none: 'sin configurar' };
     async function cfgApi(body) {
       const res = await fetch('/config', {
         method: body ? 'POST' : 'GET', credentials: 'same-origin',
