@@ -1240,15 +1240,33 @@
       .print-mirror {
         display: block !important;
         font-size: 7pt !important;
-        line-height: 1.22 !important;
+        line-height: 1.28 !important;
         color: #1e293b !important;
         white-space: pre-wrap !important;
+        overflow: visible !important;
+        max-height: none !important;
+        height: auto !important;
       }
 
       .print-mirror-title {
         font-weight: 700 !important;
         font-size: 7.4pt !important;
         color: #000000 !important;
+        white-space: pre-wrap !important;
+      }
+
+      .print-mirror-desc {
+        white-space: pre-wrap !important;
+        overflow: visible !important;
+        max-height: none !important;
+        word-break: break-word !important;
+      }
+
+      .items-table td.col-desc,
+      .items-table td.item-desc-cell {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
       }
 
       /* Bottom Section CFDI 4.0 in Print */
@@ -1521,14 +1539,19 @@
     .quote-paper.exporting-pdf-mode .print-mirror {
       display: block !important;
       font-size: 7.2pt !important;
-      line-height: 1.22 !important;
+      line-height: 1.28 !important;
       color: #1e293b !important;
-      white-space: normal !important;
+      white-space: pre-wrap !important;
+      overflow: visible !important;
+      max-height: none !important;
     }
     .quote-paper.exporting-pdf-mode .print-mirror-desc,
     .quote-paper.exporting-pdf-mode #print-banking-mirror,
     .quote-paper.exporting-pdf-mode #print-terms-mirror {
       white-space: pre-wrap !important;
+      overflow: visible !important;
+      max-height: none !important;
+      word-break: break-word !important;
     }
     .quote-paper.exporting-pdf-mode .print-client-type {
       display: block !important;
@@ -3070,6 +3093,7 @@
             <button type="button" role="menuitem" onclick="closeActionsMenu(); startNewQuote()">➕ Nueva cotización</button>
             <button type="button" role="menuitem" onclick="closeActionsMenu(); saveCurrentQuote()">💾 Guardar</button>
             <button type="button" role="menuitem" id="btn-export-pdf" onclick="closeActionsMenu(); exportDirectPDF()">📥 PDF directo</button>
+            <button type="button" role="menuitem" id="btn-export-annex" onclick="closeActionsMenu(); exportAnnexPDF()">📄 PDF Anexo técnico</button>
             <button type="button" role="menuitem" id="btn-share-wa" onclick="closeActionsMenu(); shareQuoteViaWhatsApp()">📲 WhatsApp</button>
           </div>
         </div>
@@ -8696,70 +8720,58 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       return `${prefix}_${folio}_${clientClean}.pdf`;
     }
 
-    function buildSinglePagePDFBytesFromJpegDataUrl(jpegDataUrl, imgWidthPx, imgHeightPx) {
-      const base64Data = jpegDataUrl.split(",")[1];
-      const binaryStr = atob(base64Data);
-      const imgBytes = new Uint8Array(binaryStr.length);
-      for (let i = 0; i < binaryStr.length; i++) {
-        imgBytes[i] = binaryStr.charCodeAt(i);
-      }
-
-      // US Letter in PDF points: 612 x 792 pt
-      const pageW = 612;
-      const pageH = 792;
+    function buildPDFBytesFromJpegPages(pages) {
+      const list = (pages || []).filter(p => p && p.jpegDataUrl);
+      if (!list.length) throw new Error("PDF sin páginas");
+      const pageW = 612, pageH = 792;
       const enc = new TextEncoder();
       const chunks = [];
       const offsets = [0];
       let currentOffset = 0;
+      function pushStr(s) { const b = enc.encode(s); chunks.push(b); currentOffset += b.length; }
+      function pushBytes(b) { chunks.push(b); currentOffset += b.length; }
+      function startObj() { offsets.push(currentOffset); }
 
-      function pushStr(s) {
-        const b = enc.encode(s);
-        chunks.push(b);
-        currentOffset += b.length;
-      }
-      function pushBytes(b) {
-        chunks.push(b);
-        currentOffset += b.length;
-      }
-      function startObj() {
-        offsets.push(currentOffset);
-      }
+      const pageRecords = list.map((pg) => {
+        const base64Data = pg.jpegDataUrl.split(",")[1];
+        const binaryStr = atob(base64Data);
+        const imgBytes = new Uint8Array(binaryStr.length);
+        for (let j = 0; j < binaryStr.length; j++) imgBytes[j] = binaryStr.charCodeAt(j);
+        return { imgBytes, w: pg.width || 1700, h: pg.height || 2200 };
+      });
+      const pageObjNums = pageRecords.map((_, i) => 3 + i * 3);
 
       pushStr("%PDF-1.4\n%\xFF\xFF\xFF\xFF\n");
-
-      // 1: Catalog
       startObj();
       pushStr("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
-
-      // 2: Pages
       startObj();
-      pushStr("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+      pushStr("2 0 obj\n<< /Type /Pages /Kids [" + pageObjNums.map(n => n + " 0 R").join(" ") + "] /Count " + pageRecords.length + " >>\nendobj\n");
 
-      // 3: Page (US Letter 612 x 792)
-      startObj();
-      pushStr(`3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageW} ${pageH}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n`);
+      pageRecords.forEach((rec, i) => {
+        const pageObj = 3 + i * 3;
+        const imgObj = pageObj + 1;
+        const contentObj = pageObj + 2;
+        startObj();
+        pushStr(pageObj + " 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + pageW + " " + pageH + "] /Resources << /XObject << /Im" + i + " " + imgObj + " 0 R >> >> /Contents " + contentObj + " 0 R >>\nendobj\n");
+        startObj();
+        pushStr(imgObj + " 0 obj\n<< /Type /XObject /Subtype /Image /Width " + rec.w + " /Height " + rec.h + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + rec.imgBytes.length + " >>\nstream\n");
+        pushBytes(rec.imgBytes);
+        pushStr("\nendstream\nendobj\n");
+        const contentStream = "q\n" + pageW + " 0 0 " + pageH + " 0 0 cm\n/Im" + i + " Do\nQ\n";
+        const contentBytes = enc.encode(contentStream);
+        startObj();
+        pushStr(contentObj + " 0 obj\n<< /Length " + contentBytes.length + " >>\nstream\n" + contentStream + "endstream\nendobj\n");
+      });
 
-      // 4: Image XObject (JPEG DCTDecode)
-      startObj();
-      pushStr(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imgWidthPx} /Height ${imgHeightPx} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${imgBytes.length} >>\nstream\n`);
-      pushBytes(imgBytes);
-      pushStr("\nendstream\nendobj\n");
-
-      // 5: Page Content Stream
-      const contentStream = `q\n${pageW} 0 0 ${pageH} 0 0 cm\n/Im0 Do\nQ\n`;
-      const contentBytes = enc.encode(contentStream);
-      startObj();
-      pushStr(`5 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n${contentStream}endstream\nendobj\n`);
-
-      // XRef table
       const xrefOffset = currentOffset;
-      pushStr(`xref\n0 ${offsets.length}\n0000000000 65535 f \n`);
-      for (let i = 1; i < offsets.length; i++) {
-        pushStr(String(offsets[i]).padStart(10, "0") + " 00000 n \n");
-      }
-      pushStr(`trailer\n<< /Size ${offsets.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
-
+      pushStr("xref\n0 " + offsets.length + "\n0000000000 65535 f \n");
+      for (let i = 1; i < offsets.length; i++) pushStr(String(offsets[i]).padStart(10, "0") + " 00000 n \n");
+      pushStr("trailer\n<< /Size " + offsets.length + " /Root 1 0 R >>\nstartxref\n" + xrefOffset + "\n%%EOF");
       return new Blob(chunks, { type: "application/pdf" });
+    }
+
+    function buildSinglePagePDFBytesFromJpegDataUrl(jpegDataUrl, imgWidthPx, imgHeightPx) {
+      return buildPDFBytesFromJpegPages([{ jpegDataUrl, width: imgWidthPx, height: imgHeightPx }]);
     }
 
     async function generateQuotePDFBlob() {
@@ -8776,6 +8788,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       canvas.width = W;
       canvas.height = H;
       const ctx = canvas.getContext("2d");
+      const pdfPages = [];
 
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, W, H);
@@ -8783,6 +8796,13 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const M = 56;
       const contentW = W - M * 2; // 1588px
       let curY = M;
+      function pushPdfPage() {
+        pdfPages.push({ jpegDataUrl: canvas.toDataURL("image/jpeg", 0.95), width: W, height: H });
+      }
+      function clearCanvasWhite() {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, W, H);
+      }
 
       function roundRect(x, y, w, h, r, fill, stroke, lineW = 1.5) {
         ctx.beginPath();
@@ -9126,12 +9146,44 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       curY += thH;
       const tableStartY = curY;
-      const maxTableBottomY = H - 660;
+      // Reserva pie (totales/firma). Con multipágina las descripciones ya no se cortan a 2 líneas.
+      const maxTableBottomY = H - 620;
       const totalVisualRows = rawItems.length + (showSectionHeaders ? distinctCats.length : 0);
-      const compactScale = totalVisualRows > 10 ? 0.65 : (totalVisualRows > 7 ? 0.75 : (totalVisualRows > 4 ? 0.86 : 1.0));
+      const compactScale = totalVisualRows > 10 ? 0.78 : (totalVisualRows > 7 ? 0.86 : (totalVisualRows > 4 ? 0.93 : 1.0));
       const titleFont = `700 ${Math.round(18.5 * compactScale)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
       const descFont = `400 ${Math.round(15.5 * compactScale)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
       const numFont = `700 ${Math.round(18.5 * compactScale)}px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif`;
+      const lineHTitle = Math.round(23 * compactScale);
+      const lineHDesc = Math.round(19 * compactScale);
+
+      function drawItemsTableHeader() {
+        roundRect(M, curY, contentW, thH, 8, "#023e8a", null);
+        ctx.fillStyle = "#023e8a";
+        ctx.fillRect(M, curY + thH - 8, contentW, 8);
+        ctx.font = "800 17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.fillText("CANT.", xCant + wCant / 2, curY + 30);
+        ctx.textAlign = "left";
+        ctx.fillText("DESCRIPCIÓN / CONCEPTO", xDesc + 16, curY + 30);
+        ctx.textAlign = "right";
+        ctx.fillText("VALOR UNITARIO", xUnit + wUnit - 16, curY + 30);
+        ctx.fillText("IMPORTE", xTot + wTot - 16, curY + 30);
+        ctx.textAlign = "left";
+        curY += thH;
+      }
+
+      function startContinuationPage(note) {
+        pushPdfPage();
+        clearCanvasWhite();
+        curY = M;
+        roundRect(M, curY, contentW, 44, 8, "#023e8a", null);
+        ctx.font = "800 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(note || ("GASO INGENIERÍA — continuación · " + qFolio), M + 16, curY + 28);
+        curY += 56;
+        drawItemsTableHeader();
+      }
 
       let globalRowIndex = 0;
       catOrder.forEach(catKey => {
@@ -9142,6 +9194,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           const secMeta = ITEM_CATEGORY_META[catKey] || ITEM_CATEGORY_META.EQUIPO;
           const groupSum = groupItems.reduce((acc, x) => acc + x.total, 0);
           const secBarH = 34;
+          if (curY + secBarH > maxTableBottomY) startContinuationPage();
           ctx.fillStyle = "#e2e8f0";
           ctx.fillRect(M, curY, contentW, secBarH);
           ctx.strokeStyle = "#cbd5e1";
@@ -9162,81 +9215,86 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         }
 
         groupItems.forEach(it => {
-          const cLines = wrapTextLines(it.concept, wDesc - 32, titleFont).slice(0, 2);
-          const dLines = it.desc ? wrapTextLines(it.desc, wDesc - 32, descFont).slice(0, 2) : [];
-          const lineHTitle = Math.round(23 * compactScale);
-          const lineHDesc = Math.round(19 * compactScale);
-          const rowH = Math.max(52 * compactScale, 18 + cLines.length * lineHTitle + dLines.length * lineHDesc);
+          // Texto completo: sin límite artificial de 2 líneas
+          const cLines = wrapTextLines(it.concept, wDesc - 32, titleFont);
+          const dLines = it.desc ? wrapTextLines(it.desc, wDesc - 32, descFont) : [];
+          let rowH = Math.max(52 * compactScale, 18 + cLines.length * lineHTitle + dLines.length * lineHDesc);
 
-          if (curY + rowH > maxTableBottomY && globalRowIndex > 0) return;
-
-          ctx.fillStyle = globalRowIndex % 2 === 1 ? "#f8fafc" : "#ffffff";
-          ctx.fillRect(M, curY, contentW, rowH);
-          ctx.strokeStyle = "#cbd5e1";
-          ctx.lineWidth = 1.2;
-          ctx.strokeRect(M, curY, contentW, rowH);
-
-          ctx.textAlign = "center";
-          ctx.font = numFont;
-          ctx.fillStyle = "#0f172a";
-          ctx.fillText(fmtQty(it.qty), xCant + wCant / 2, curY + 30 * compactScale);
-          const _us = UNIT_SHORT[String(it.unit || '').split(' - ')[0]];
-          if (_us) {
-            ctx.font = "600 " + Math.round(13 * compactScale) + "px -apple-system, sans-serif";
-            ctx.fillStyle = "#64748b";
-            ctx.fillText(_us, xCant + wCant / 2, curY + 30 * compactScale + 17 * compactScale);
+          // Si la partida no cabe, nueva página (mantiene márgenes y muestra todo el texto)
+          if (curY + Math.min(rowH, maxTableBottomY - curY) > maxTableBottomY && globalRowIndex > 0) {
+            startContinuationPage();
           }
+          // Si una sola descripción es más alta que la página, se parte en bloques
+          let cIdx = 0, dIdx = 0;
+          let firstChunk = true;
+          while (cIdx < cLines.length || dIdx < dLines.length || firstChunk) {
+            const avail = maxTableBottomY - curY;
+            const maxC = Math.max(1, Math.floor((avail - 24) / lineHTitle));
+            const takeC = cLines.slice(cIdx, cIdx + (cIdx === 0 ? Math.min(cLines.length, maxC) : Math.min(cLines.length - cIdx, maxC)));
+            cIdx += takeC.length;
+            const remainH = avail - (18 + takeC.length * lineHTitle);
+            const maxD = Math.max(0, Math.floor(remainH / lineHDesc));
+            const takeD = dLines.slice(dIdx, dIdx + maxD);
+            dIdx += takeD.length;
+            const chunkH = Math.max(52 * compactScale, 18 + takeC.length * lineHTitle + takeD.length * lineHDesc);
 
-          ctx.textAlign = "left";
-          ctx.font = titleFont;
-          ctx.fillStyle = "#0f172a";
-          let textY = curY + 25 * compactScale;
-          cLines.forEach(ln => {
-            ctx.fillText(ln, xDesc + 16, textY);
-            textY += lineHTitle;
-          });
+            if (chunkH > avail && globalRowIndex > 0 && firstChunk) {
+              startContinuationPage();
+              continue;
+            }
 
-          if (dLines.length > 0) {
-            ctx.font = descFont;
-            ctx.fillStyle = "#475569";
-            dLines.forEach(ln => {
-              ctx.fillText(ln, xDesc + 16, textY);
-              textY += lineHDesc;
-            });
+            ctx.fillStyle = globalRowIndex % 2 === 1 ? "#f8fafc" : "#ffffff";
+            ctx.fillRect(M, curY, contentW, chunkH);
+            ctx.strokeStyle = "#cbd5e1";
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(M, curY, contentW, chunkH);
+
+            if (firstChunk) {
+              ctx.textAlign = "center";
+              ctx.font = numFont;
+              ctx.fillStyle = "#0f172a";
+              ctx.fillText(fmtQty(it.qty), xCant + wCant / 2, curY + 30 * compactScale);
+              const _us = UNIT_SHORT[String(it.unit || '').split(' - ')[0]];
+              if (_us) {
+                ctx.font = "600 " + Math.round(13 * compactScale) + "px -apple-system, sans-serif";
+                ctx.fillStyle = "#64748b";
+                ctx.fillText(_us, xCant + wCant / 2, curY + 30 * compactScale + 17 * compactScale);
+              }
+              ctx.textAlign = "right";
+              ctx.font = `600 ${Math.round(18 * compactScale)}px -apple-system, sans-serif`;
+              ctx.fillStyle = "#1e293b";
+              ctx.fillText(formatCurrency(it.price), xUnit + wUnit - 16, curY + 30 * compactScale);
+              ctx.font = numFont;
+              ctx.fillStyle = "#0f172a";
+              ctx.fillText(formatCurrency(it.total), xTot + wTot - 16, curY + 30 * compactScale);
+            }
+
+            ctx.textAlign = "left";
+            let textY = curY + 25 * compactScale;
+            ctx.font = titleFont;
+            ctx.fillStyle = "#0f172a";
+            takeC.forEach(ln => { ctx.fillText(ln, xDesc + 16, textY); textY += lineHTitle; });
+            if (takeD.length) {
+              ctx.font = descFont;
+              ctx.fillStyle = "#475569";
+              takeD.forEach(ln => { ctx.fillText(ln, xDesc + 16, textY); textY += lineHDesc; });
+            }
+
+            curY += chunkH;
+            firstChunk = false;
+            globalRowIndex++;
+            if (cIdx >= cLines.length && dIdx >= dLines.length) break;
+            // Solo nueva página si ya no cabe al menos una línea más
+            if (curY + lineHDesc + 24 > maxTableBottomY) startContinuationPage();
           }
-
-          ctx.textAlign = "right";
-          ctx.font = `600 ${Math.round(18 * compactScale)}px -apple-system, sans-serif`;
-          ctx.fillStyle = "#1e293b";
-          ctx.fillText(formatCurrency(it.price), xUnit + wUnit - 16, curY + 30 * compactScale);
-
-          ctx.font = numFont;
-          ctx.fillStyle = "#0f172a";
-          ctx.fillText(formatCurrency(it.total), xTot + wTot - 16, curY + 30 * compactScale);
-          ctx.textAlign = "left";
-
-          curY += rowH;
-          globalRowIndex++;
         });
       });
 
-      const minTableBottomY = Math.min(maxTableBottomY, Math.max(curY, 1340));
       const openSpaceStartY = curY;
-      if (minTableBottomY > curY) {
-        const fillerH = minTableBottomY - curY;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(M, curY, contentW, fillerH);
-        ctx.strokeStyle = "#cbd5e1";
-        ctx.lineWidth = 1.2;
-        ctx.strokeRect(M, curY, contentW, fillerH);
-        ctx.strokeStyle = "#f1f5f9";
-        [xDesc, xUnit, xTot].forEach(vx => {
-          ctx.beginPath();
-          ctx.moveTo(vx, curY);
-          ctx.lineTo(vx, minTableBottomY);
-          ctx.stroke();
-        });
-        curY = minTableBottomY;
+      // En la última página de partidas, si sobra poco espacio no rellenamos forzado:
+      // el pie se dibuja abajo; si no cabe, se abre página de cierre.
+      if (curY > maxTableBottomY - 40) {
+        startContinuationPage("GASO INGENIERÍA — totales y condiciones · " + qFolio);
       }
 
       // =========================================================================
@@ -9560,9 +9618,185 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       ctx.textAlign = "left";
 
-      const jpegUrl = canvas.toDataURL("image/jpeg", 0.95);
-      const pdfBlob = buildSinglePagePDFBytesFromJpegDataUrl(jpegUrl, W, H);
+      pushPdfPage();
+      const pdfBlob = buildPDFBytesFromJpegPages(pdfPages);
       return { blob: pdfBlob, filename };
+    }
+
+    async function generateAnnexPDFBlob() {
+      syncPrintMirrors();
+      const folio = (document.getElementById("quote-number").value || "COT-2026-001").trim();
+      const clientName = (document.getElementById("client-name").value || "").trim();
+      const filename = ("ANEXO-" + folio + "-" + (clientName || "GASO")).replace(/[\\/:*?"<>|]+/g, "_").slice(0, 90) + ".pdf";
+      const W = 1700, H = 2200, M = 64;
+      const contentW = W - M * 2;
+      const pdfPages = [];
+      const canvas = document.createElement("canvas");
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext("2d");
+      let curY = M;
+
+      function pushPdfPage() { pdfPages.push({ jpegDataUrl: canvas.toDataURL("image/jpeg", 0.95), width: W, height: H }); }
+      function clearWhite() { ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H); }
+      function roundRect(x, y, w, h, r, fill, stroke, lineW = 1.5) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+        if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+        if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineW; ctx.stroke(); }
+      }
+      function wrapTextLines(text, maxW, fontSpec) {
+        ctx.font = fontSpec;
+        const paragraphs = String(text || "").split(/\r?\n/);
+        const lines = [];
+        paragraphs.forEach(p => {
+          const words = String(p).split(/\s+/).filter(Boolean);
+          if (!words.length) { lines.push({ text: "", highlight: /^\s*!!/.test(p) || /^\s*>>/.test(p) }); return; }
+          const highlight = /^\s*(!!|>>)/.test(p) || /\b(IMPORTANTE|ANTICIPO|IMSS|REPSE)\b/i.test(p);
+          let line = words[0];
+          for (let i = 1; i < words.length; i++) {
+            const test = line + " " + words[i];
+            if (ctx.measureText(test).width <= maxW) line = test;
+            else { lines.push({ text: line.replace(/^\s*(!!|>>)\s*/, ""), highlight }); line = words[i]; }
+          }
+          lines.push({ text: line.replace(/^\s*(!!|>>)\s*/, ""), highlight });
+        });
+        return lines.length ? lines : [{ text: "", highlight: false }];
+      }
+
+      clearWhite();
+      // Header GASO (mismo lenguaje visual de cotización, sin precios)
+      const logoEl = document.getElementById("logo-img");
+      roundRect(M, curY, 210, 110, 10, "#ffffff", "#cbd5e1", 2);
+      if (logoEl && logoEl.complete && logoEl.naturalWidth > 0) {
+        const scale = Math.min(180 / logoEl.naturalWidth, 90 / logoEl.naturalHeight);
+        const dw = logoEl.naturalWidth * scale, dh = logoEl.naturalHeight * scale;
+        ctx.drawImage(logoEl, M + (210 - dw) / 2, curY + (110 - dh) / 2, dw, dh);
+      }
+      const compName = (document.getElementById("company-name").value || "GASO INGENIERÍA").trim();
+      ctx.font = "800 34px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+      ctx.fillStyle = "#023e8a";
+      ctx.fillText(compName, M + 240, curY + 48);
+      roundRect(M + 240, curY + 62, 520, 40, 8, "#023e8a", null);
+      ctx.font = "800 18px -apple-system, sans-serif";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("ANEXO TÉCNICO / LEYENDAS DE INSTALACIÓN", M + 256, curY + 88);
+      ctx.font = "600 16px -apple-system, sans-serif";
+      ctx.fillStyle = "#475569";
+      ctx.fillText("Referencia cotización: " + folio + (clientName ? "  ·  Cliente: " + clientName : ""), M + 240, curY + 128);
+      curY += 160;
+
+      ctx.font = "500 15px -apple-system, sans-serif";
+      ctx.fillStyle = "#64748b";
+      ctx.fillText("Documento sin precios: solo alcance técnico, exclusiones y leyendas. Prefija una línea con !! o >> para resaltarla en amarillo.", M, curY);
+      curY += 36;
+
+      const items = Array.from(document.querySelectorAll("#items-body tr")).map((tr, idx) => ({
+        n: idx + 1,
+        concept: (tr.querySelector(".row-concept") ? tr.querySelector(".row-concept").value : "").trim(),
+        desc: (tr.querySelector(".row-desc") ? tr.querySelector(".row-desc").value : "").trim()
+      })).filter(it => it.concept || it.desc);
+
+      const termsText = (document.getElementById("commercial-terms").value || "").trim();
+      const blocks = [];
+      items.forEach(it => {
+        blocks.push({ title: it.n + ". " + (it.concept || "Partida técnica"), body: it.desc || "" });
+      });
+      if (termsText) blocks.push({ title: "CONDICIONES / LEYENDAS GENERALES", body: termsText });
+
+      const titleFont = "800 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+      const bodyFont = "500 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+      const lineH = 22;
+      const maxY = H - 80;
+
+      function ensureSpace(need) {
+        if (curY + need <= maxY) return;
+        // pie de página
+        ctx.font = "600 14px -apple-system, sans-serif";
+        ctx.fillStyle = "#94a3b8";
+        ctx.textAlign = "center";
+        ctx.fillText("GASO INGENIERÍA · Anexo técnico · " + folio, W / 2, H - 36);
+        ctx.textAlign = "left";
+        pushPdfPage();
+        clearWhite();
+        curY = M;
+        roundRect(M, curY, contentW, 42, 8, "#023e8a", null);
+        ctx.font = "800 17px -apple-system, sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("ANEXO TÉCNICO (continuación) · " + folio, M + 16, curY + 27);
+        curY += 58;
+      }
+
+      // Marca de agua suave
+      function drawWatermark() {
+        ctx.save();
+        ctx.globalAlpha = 0.06;
+        ctx.translate(W / 2, H * 0.62);
+        ctx.rotate(-0.2);
+        ctx.font = "900 120px -apple-system, sans-serif";
+        ctx.fillStyle = "#023e8a";
+        ctx.textAlign = "center";
+        ctx.fillText("GASO", 0, 0);
+        ctx.restore();
+        ctx.textAlign = "left";
+        ctx.globalAlpha = 1;
+      }
+      drawWatermark();
+
+      blocks.forEach((b, bi) => {
+        const bodyLines = wrapTextLines(b.body, contentW - 36, bodyFont);
+        ensureSpace(70);
+        ctx.font = titleFont;
+        ctx.fillStyle = "#023e8a";
+        ctx.fillText(b.title, M, curY + 8);
+        curY += 28;
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.beginPath(); ctx.moveTo(M, curY); ctx.lineTo(M + contentW, curY); ctx.stroke();
+        curY += 16;
+
+        bodyLines.forEach(ln => {
+          ensureSpace(lineH + 8);
+          if (ln.highlight && ln.text) {
+            const tw = Math.min(contentW, ctx.measureText(ln.text).width + 18);
+            ctx.fillStyle = "#fef08a";
+            ctx.fillRect(M, curY - 16, tw, lineH);
+          }
+          ctx.font = bodyFont;
+          ctx.fillStyle = "#0f172a";
+          ctx.fillText(ln.text || " ", M + 8, curY);
+          curY += lineH;
+        });
+        curY += 22;
+      });
+
+      ctx.font = "600 14px -apple-system, sans-serif";
+      ctx.fillStyle = "#94a3b8";
+      ctx.textAlign = "center";
+      ctx.fillText("GASO INGENIERÍA · Anexo técnico sin cotización · " + folio, W / 2, H - 36);
+      ctx.textAlign = "left";
+      pushPdfPage();
+      return { blob: buildPDFBytesFromJpegPages(pdfPages), filename };
+    }
+
+    async function exportAnnexPDF() {
+      const btnHint = document.getElementById("btn-export-pdf");
+      try {
+        if (btnHint) { btnHint.disabled = true; btnHint.textContent = "⏳ Anexo..."; }
+        const res = await generateAnnexPDFBlob();
+        const url = URL.createObjectURL(res.blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = res.filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 6000);
+        showToast("✅ Anexo técnico descargado: " + res.filename);
+      } catch (err) {
+        console.error(err);
+        showToast("Error al generar anexo: " + err.message);
+      } finally {
+        if (btnHint) { btnHint.disabled = false; btnHint.textContent = "📥 PDF Directo"; }
+      }
     }
 
     async function exportDirectPDF() {
