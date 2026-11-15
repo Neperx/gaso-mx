@@ -1,0 +1,21 @@
+#!/bin/sh
+# Auto-deploy a Cloudflare Pages al hacer push a main (usa la sesión local de wrangler).
+remote="$1"
+url="$2"
+
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ "$branch" != "main" ]; then
+  exit 0
+fi
+
+echo ""
+echo "==> Push a main: desplegando Cloudflare Pages (gaso-mx)..."
+npx wrangler pages deploy . --project-name=gaso-mx --branch=main --commit-dirty=true
+status=$?
+if [ $status -ne 0 ]; then
+  echo "ERROR: el deploy falló (código $status). El push se cancela."
+  exit $status
+fi
+echo "==> Deploy OK: https://gaso-mx.pages.dev"
+echo ""
+exit 0
