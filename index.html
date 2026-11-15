@@ -346,6 +346,16 @@
       transition: all 0.15s;
     }
 
+    /* Captura uniforme en MAYÚSCULAS (correo y contraseña se excluyen). */
+    input.form-input:not([type="password"]):not([type="email"]):not([type="number"]):not([type="date"]):not([type="datetime-local"]):not([type="time"]):not([type="file"]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="url"]):not(.no-uppercase),
+    textarea.form-input:not(.no-uppercase),
+    input.editable-field:not([type="password"]):not([type="email"]):not([type="number"]):not([type="date"]):not([type="datetime-local"]):not([type="time"]):not([type="file"]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="url"]):not(.no-uppercase),
+    textarea.editable-field:not(.no-uppercase),
+    input.item-input:not([type="number"]):not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(.no-uppercase),
+    textarea.item-input:not(.no-uppercase) {
+      text-transform: uppercase;
+    }
+
     .editable-field:hover {
       background-color: var(--gray-100);
       border-color: var(--gray-300);
@@ -2973,7 +2983,7 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.45rem;">
           <div>
             <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">✉️ Correo Electrónico</label>
-            <input type="email" id="pub-lead-email" class="form-input" placeholder="correo@ejemplo.com" style="width:100%; font-size:0.78rem; padding:0.4rem 0.55rem;">
+            <input type="email" id="pub-lead-email" class="form-input no-uppercase" placeholder="correo@ejemplo.com" style="width:100%; font-size:0.78rem; padding:0.4rem 0.55rem;" autocomplete="email">
           </div>
           <div>
             <label style="font-size:0.74rem; font-weight:700; color:#1e293b; display:block; margin-bottom:2px;">📍 Municipio / Zona</label>
@@ -3042,7 +3052,7 @@
             <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">
               👤 Usuario o Correo Electrónico:
             </label>
-            <input type="text" id="login-username" class="form-input" style="width:100%; font-size:0.9rem; padding:0.55rem 0.75rem;" placeholder="Ej. admin o gaso.ingenieria@gmail.com" required>
+            <input type="text" id="login-username" class="form-input no-uppercase" style="width:100%; font-size:0.9rem; padding:0.55rem 0.75rem;" placeholder="Ej. admin o gaso.ingenieria@gmail.com" required autocomplete="username">
           </div>
 
           <div style="margin-bottom:0.9rem;">
@@ -3050,7 +3060,7 @@
               🔑 Contraseña de Acceso:
             </label>
             <div style="display:flex; gap:0.4rem;">
-              <input type="password" id="login-password" class="form-input" style="flex:1; font-size:0.9rem; padding:0.55rem 0.75rem;" placeholder="Ingresa tu contraseña..." required>
+              <input type="password" id="login-password" class="form-input no-uppercase" style="flex:1; font-size:0.9rem; padding:0.55rem 0.75rem;" placeholder="Ingresa tu contraseña..." required autocomplete="current-password">
               <button type="button" class="btn btn-outline btn-sm" onclick="toggleLoginPassword()" id="btn-toggle-login-pass" title="Mostrar u ocultar contraseña">👁️</button>
             </div>
           </div>
@@ -3285,7 +3295,7 @@
               </div>
               <div class="cfdi-field-inline" style="grid-column: 1 / -1;">
                 <strong>Correo Oficial:</strong>
-                <input type="text" id="company-email" class="editable-field" value="gaso.ingenieria@gmail.com">
+                <input type="email" id="company-email" class="editable-field no-uppercase" value="gaso.ingenieria@gmail.com" autocomplete="email">
               </div>
               <div class="cfdi-field-inline" style="grid-column: 1 / -1;">
                 <strong>Responsable:</strong>
@@ -3413,7 +3423,7 @@
               </div>
               <div class="client-field-row">
                 <label>Correo:</label>
-                <input type="text" id="client-email" class="editable-field" value="" placeholder="correo@cliente.com">
+                <input type="email" id="client-email" class="editable-field no-uppercase" value="" placeholder="correo@cliente.com" autocomplete="email">
               </div>
               <div class="client-field-row no-print">
                 <label>CP fiscal:</label>
@@ -4259,7 +4269,7 @@ CLABE: 722969010514249300</textarea>
             </div>
             <div>
               <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Correo Electrónico:</label>
-              <input type="email" id="crm-modal-email" class="form-input" style="width:100%;" placeholder="compras@empresa.com">
+              <input type="email" id="crm-modal-email" class="form-input no-uppercase" style="width:100%;" placeholder="compras@empresa.com" autocomplete="email">
             </div>
           </div>
           <div>
@@ -4318,6 +4328,59 @@ CLABE: 722969010514249300</textarea>
     let quotesHistory = [];
     let crmClients = [];
     let storeProducts = [];
+
+    /* Captura uniforme: todo texto de formularios se guarda en MAYÚSCULAS (es-MX). */
+    function toGasoUpper(s) {
+      return String(s == null ? '' : s).toLocaleUpperCase('es-MX');
+    }
+    function shouldUppercaseField(el) {
+      if (!el || el.disabled) return false;
+      if (el.classList && el.classList.contains('no-uppercase')) return false;
+      const tag = (el.tagName || '').toLowerCase();
+      if (tag === 'textarea') return true;
+      if (tag !== 'input') return false;
+      const t = String(el.type || 'text').toLowerCase();
+      return t === 'text' || t === 'search' || t === 'tel' || t === '';
+    }
+    function enforceUppercaseField(el) {
+      if (!shouldUppercaseField(el)) return false;
+      const next = toGasoUpper(el.value);
+      if (el.value === next) return false;
+      const start = el.selectionStart, end = el.selectionEnd;
+      el.value = next;
+      try {
+        if (document.activeElement === el && typeof start === 'number' && typeof end === 'number') {
+          el.setSelectionRange(start, end);
+        }
+      } catch (e) { /* ignore */ }
+      return true;
+    }
+    function installUppercaseForms() {
+      document.addEventListener('input', function (e) { enforceUppercaseField(e.target); }, true);
+      document.addEventListener('change', function (e) { enforceUppercaseField(e.target); }, true);
+      document.addEventListener('blur', function (e) { enforceUppercaseField(e.target); }, true);
+      document.querySelectorAll('input, textarea').forEach(enforceUppercaseField);
+    }
+    function normalizeClientRecord(cli) {
+      if (!cli || typeof cli !== 'object') return cli;
+      ['name', 'rfc', 'contact', 'phone', 'address', 'cpFiscal'].forEach(function (k) {
+        if (cli[k] != null && cli[k] !== '') cli[k] = toGasoUpper(cli[k]);
+      });
+      if (cli.email) cli.email = String(cli.email).trim().toLowerCase();
+      return cli;
+    }
+    function normalizeAllCrmClients() {
+      let changed = false;
+      (crmClients || []).forEach(function (cli) {
+        const before = JSON.stringify(cli);
+        normalizeClientRecord(cli);
+        if (JSON.stringify(cli) !== before) changed = true;
+      });
+      if (changed) {
+        try { safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients)); } catch (e) {}
+      }
+      return changed;
+    }
 
     // Signature Canvas Context
     let canvasClient, ctxClient;
@@ -4515,7 +4578,9 @@ CLABE: 722969010514249300</textarea>
 
       // Load Storage & Initialize Security Gate / Public Landing Page
       loadStorageData();
+      try { normalizeAllCrmClients(); } catch (e) {}
       ensureDefaultPublicClients();
+      try { installUppercaseForms(); } catch (e) {}
       initAuthSystem();
 
       // Initialize Client Signature Canvas
@@ -4740,14 +4805,14 @@ CLABE: 722969010514249300</textarea>
 
     function saveAsDefaultCompany() {
       const comp = {
-        name: document.getElementById('company-name').value,
-        tagline: document.getElementById('company-tagline').value,
-        rfc: document.getElementById('company-rfc').value.trim(),
-        address: document.getElementById('company-address').value.trim(),
-        phone: document.getElementById('company-phone').value.trim(),
-        email: document.getElementById('company-email').value.trim(),
-        professional: (document.getElementById('company-professional') || { value: '' }).value.trim(),
-        banking: document.getElementById('banking-details').value
+        name: toGasoUpper(document.getElementById('company-name').value),
+        tagline: toGasoUpper(document.getElementById('company-tagline').value),
+        rfc: toGasoUpper(document.getElementById('company-rfc').value.trim()),
+        address: toGasoUpper(document.getElementById('company-address').value.trim()),
+        phone: toGasoUpper(document.getElementById('company-phone').value.trim()),
+        email: document.getElementById('company-email').value.trim().toLowerCase(),
+        professional: toGasoUpper((document.getElementById('company-professional') || { value: '' }).value.trim()),
+        banking: toGasoUpper(document.getElementById('banking-details').value)
       };
       safeStorage.setItem('gaso_default_company', JSON.stringify(comp));
       updateQRStamp();
@@ -5366,6 +5431,7 @@ ${JSON.stringify(list)}`;
       `;
 
       tbody.appendChild(tr);
+      try { tr.querySelectorAll('input, textarea').forEach(enforceUppercaseField); } catch (e) {}
       syncPrintMirrors();
       calculateTotals();
       try { if (data) markQuoteDirty(); } catch (e) {}
@@ -5906,13 +5972,13 @@ ${JSON.stringify(list)}`;
     }
 
     function saveCurrentClientToCRM() {
-      const name = document.getElementById('client-name').value.trim();
-      const rfc = document.getElementById('client-rfc').value.trim();
-      const contact = document.getElementById('client-contact').value.trim();
-      const phone = document.getElementById('client-phone').value.trim();
-      const email = document.getElementById('client-email').value.trim();
-      const address = document.getElementById('client-address').value.trim();
-      const cpFiscal = document.getElementById('client-cp-fiscal').value.trim();
+      const name = toGasoUpper(document.getElementById('client-name').value.trim());
+      const rfc = toGasoUpper(document.getElementById('client-rfc').value.trim());
+      const contact = toGasoUpper(document.getElementById('client-contact').value.trim());
+      const phone = toGasoUpper(document.getElementById('client-phone').value.trim());
+      const email = document.getElementById('client-email').value.trim().toLowerCase();
+      const address = toGasoUpper(document.getElementById('client-address').value.trim());
+      const cpFiscal = toGasoUpper(document.getElementById('client-cp-fiscal').value.trim());
       const regimen = document.getElementById('client-regimen').value;
       const usoCfdi = document.getElementById('client-uso-cfdi').value;
 
@@ -5993,14 +6059,14 @@ ${JSON.stringify(list)}`;
     }
 
     function saveClientFromModal() {
-      const name = document.getElementById('crm-modal-name').value.trim();
+      const name = toGasoUpper(document.getElementById('crm-modal-name').value.trim());
       if (!name) {
         showToast("Por favor ingresa la razón social o nombre.");
         return;
       }
 
       const editIdx = document.getElementById('crm-client-id').value;
-      const clientObj = {
+      const clientObj = normalizeClientRecord({
         name: name,
         type: document.getElementById('crm-modal-type').value,
         rfc: document.getElementById('crm-modal-rfc').value.trim(),
@@ -6011,7 +6077,7 @@ ${JSON.stringify(list)}`;
         cpFiscal: document.getElementById('crm-modal-cp').value.trim(),
         regimen: document.getElementById('crm-modal-regimen').value,
         usoCfdi: document.getElementById('crm-modal-uso').value
-      };
+      });
 
       if (editIdx !== '') {
         Object.assign(crmClients[editIdx], clientObj);
@@ -7729,7 +7795,7 @@ function updateDashboardKPIs() { renderDashboard(); }
           advanceDate: document.getElementById('stamp-advance-date') ? document.getElementById('stamp-advance-date').value : ''
         },
         totalAmount: totalAmt,
-        client: {
+        client: normalizeClientRecord({
           name: document.getElementById('client-name').value,
           rfc: document.getElementById('client-rfc').value,
           contact: document.getElementById('client-contact').value,
@@ -7739,8 +7805,15 @@ function updateDashboardKPIs() { renderDashboard(); }
           cpFiscal: document.getElementById('client-cp-fiscal') ? document.getElementById('client-cp-fiscal').value.trim() : '',
           regimen: document.getElementById('client-regimen') ? document.getElementById('client-regimen').value : '',
           usoCfdi: document.getElementById('client-uso-cfdi') ? document.getElementById('client-uso-cfdi').value : ''
-        },
-        items: items
+        }),
+        items: items.map(function (it) {
+          return Object.assign({}, it, {
+            concept: toGasoUpper(it.concept || ''),
+            description: toGasoUpper(it.description || ''),
+            sku: toGasoUpper(it.sku || ''),
+            satCode: toGasoUpper(it.satCode || '')
+          });
+        })
       };
     }
 
@@ -7762,12 +7835,13 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (q.status) document.getElementById('quote-status').value = q.status;
 
       if (q.client) {
-        document.getElementById('client-name').value = q.client.name || '';
-        document.getElementById('client-rfc').value = q.client.rfc || '';
-        document.getElementById('client-contact').value = q.client.contact || '';
-        document.getElementById('client-phone').value = q.client.phone || '';
-        document.getElementById('client-email').value = q.client.email || '';
-        document.getElementById('client-address').value = q.client.address || '';
+        const nc = normalizeClientRecord(Object.assign({}, q.client));
+        document.getElementById('client-name').value = nc.name || '';
+        document.getElementById('client-rfc').value = nc.rfc || '';
+        document.getElementById('client-contact').value = nc.contact || '';
+        document.getElementById('client-phone').value = nc.phone || '';
+        document.getElementById('client-email').value = nc.email || '';
+        document.getElementById('client-address').value = nc.address || '';
       }
       setClientType(q.clientType || 'fisica');
       restoreQuoteTerms(q);
