@@ -589,6 +589,13 @@
 
     .item-num { text-align: right; }
 
+    .row-price-editor { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+    .row-price-currency { width: 68px; flex: 0 0 68px; font-weight: 800; font-size: 0.72rem; padding: 0.12rem 0.15rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 4px; color: #0f172a; }
+    .row-price-currency.cur-usd { background: #eff6ff; color: #1d4ed8; border-color: #93c5fd; }
+    .row-price-editor .row-price { flex: 1; min-width: 0; max-width: 120px; }
+    .row-fx-hint { font-size: 0.68rem; font-weight: 700; color: #0369a1; text-align: right; line-height: 1.2; }
+    .row-fx-hint:empty { display: none; }
+
     .item-desc-cell textarea {
       resize: vertical;
       min-height: 22px;
@@ -2642,6 +2649,9 @@
     #items-body td.col-unit-price::before { content: "Valor unitario"; }
     #items-body td.col-total::before { content: "Importe: "; font-size: 0.75rem; font-weight: 700; color: #64748b; }
     #items-body .item-input { width: 100% !important; min-height: 46px; }
+    #items-body .row-price-editor { flex-direction: row; }
+    #items-body .row-price-currency { width: 84px !important; flex: 0 0 84px; min-height: 46px; }
+    #items-body .row-price-editor .row-price { width: auto !important; max-width: none; flex: 1; }
     #items-body .row-desc { min-height: 64px; }
     #items-body td.internal-control-td { display: none; grid-column: 1 / -1; order: 5; background: #fffbeb; border: 1px dashed #f59e0b !important; border-radius: 8px; padding: 0.5rem !important; }
     #items-body tr.row-adv-open td.internal-control-td { display: block; }
@@ -3153,7 +3163,7 @@
       <div class="quick-settings no-print">
         <div class="setting-group">
           <label for="currency-select">Moneda:</label>
-          <select id="currency-select" class="form-select" onchange="updateCurrency()">
+          <select id="currency-select" class="form-select" onchange="updateCurrency()" title="Moneda del documento. En cada concepto: MXN = precio de venta; USD = costo distribuidor (TC + ganancia + IVA).">
             <option value="MXN" data-symbol="$" selected>MXN ($) Pesos Mexicanos</option>
             <option value="USD" data-symbol="$">USD ($) Dólares Americanos</option>
           </select>
@@ -3426,7 +3436,7 @@
           <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.4rem; background:#fffbeb; border:1px solid #fde68a; border-radius:5px; padding:0.35rem 0.65rem; margin-bottom:0.35rem; font-size:0.73rem; color:#92400e;">
             <span>🔒 <strong>Control Interno (Oculto en PDF):</strong> Las columnas amarillas (<strong>ClaveProdServ</strong>, <strong>No. Identificación</strong> y <strong>% Margen</strong>) son solo para tu control.</span>
             <button type="button" id="btn-sat-ai-all" onclick="suggestSatWithAI(null)" title="La IA revisa cada partida y sugiere su ClaveProdServ y clave de unidad del SAT" style="background:#fff; border:1px solid #f59e0b; color:#92400e; padding:1px 8px; border-radius:4px; font-weight:800; cursor:pointer;">✨ Sugerir claves SAT con IA</button>
-            <span style="background:#fef3c7; border:1px solid #f59e0b; padding:1px 6px; border-radius:4px; font-weight:800;">📐 Fórmula Fija: Precio = Costo ÷ (1 - %Margen)</span>
+            <span style="background:#fef3c7; border:1px solid #f59e0b; padding:1px 6px; border-radius:4px; font-weight:800;">📐 MXN = venta · USD = distribuidor → TC → +margen → IVA</span>
             <datalist id="sat-common-codes"></datalist>
           </div>
           <div class="items-table-scroll-wrap">
@@ -3443,8 +3453,8 @@
                     </label>
                   </th>
                   <th class="col-cant" style="width: 6%; text-align:center;">Cant.</th>
-                  <th class="col-desc" style="width: 41%;">Descripción / Concepto</th>
-                  <th class="col-unit-price" style="width: 11%; text-align:right;">Valor Unitario</th>
+                  <th class="col-desc" style="width: 38%;">Descripción / Concepto</th>
+                  <th class="col-unit-price" style="width: 14%; text-align:right;" title="Precio en MXN o USD. Si el concepto está en otra moneda, se convierte con el tipo de cambio.">Valor Unitario</th>
                   <th class="col-total" style="width: 11%; text-align:right;">Importe</th>
                   <th class="th-action no-print" style="width:28px;"></th>
                 </tr>
@@ -3932,6 +3942,7 @@ CLABE: 722969010514249300</textarea>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">🔌 Tecnosinergia</h3>
+          <p style="font-size:0.78rem; color:#64748b; margin:0 0 0.55rem;"><strong>Actualización automática: 1 vez al día a las 3:00 p.m. (CDMX)</strong>, junto con Syscom y el tipo de cambio. Al entrar solo se usa la copia ya guardada; el botón manual fuerza una sync si lo necesitas. La API v3 trae el catálogo autorizado a tu cuenta (hoy ~2 400+ ítems); se indexa por modelo (ej. XVR-104G3) y por código interno.</p>
           <div style="font-size:0.78rem;">Token de la API <strong id="cfg-st-TECNO_API_TOKEN"></strong><br><span style="color:#64748b;">Secret <code>TECNO_API_TOKEN</code> en Cloudflare</span></div>
           <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap; align-items:center;">
             
@@ -3944,7 +3955,7 @@ CLABE: 722969010514249300</textarea>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">📡 Syscom — reporte CSV automático</h3>
-          <p style="font-size:0.78rem; color:#64748b; margin:0 0 0.65rem;">No necesitas crear otra API key. En Syscom genera el reporte formato <strong>SYSCOM</strong>, copia el <strong>Enlace de descarga automática</strong> y pégalo aquí. El token ya va en la URL. Límite Syscom: 1 descarga/hora; si no se usa en 12 días se desactiva.</p>
+          <p style="font-size:0.78rem; color:#64748b; margin:0 0 0.65rem;">No necesitas crear otra API key. En Syscom genera el reporte formato <strong>SYSCOM</strong> (elige las líneas/marcas que quieras incluir; si el reporte es parcial verás ~4–5 mil y no todo el catálogo web), copia el <strong>Enlace de descarga automática</strong> y pégalo aquí. <strong>Actualización automática: 1 vez al día a las 3:00 p.m. (CDMX)</strong>. Límite Syscom: 1 descarga/hora; si no se usa en 12 días se desactiva.</p>
           <label style="font-size:0.78rem; font-weight:700; display:block; margin-bottom:0.25rem;">Enlace de descarga automática
             <input type="password" id="cfg-SYSCOM_CSV_URL" class="form-input" autocomplete="off" placeholder="https://www.syscom.mx/api/reportes-csv/publico/…" style="width:100%; font-family:monospace; font-size:0.72rem;">
           </label>
@@ -3959,6 +3970,7 @@ CLABE: 722969010514249300</textarea>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">📦 Catálogos y nube</h3>
+          <p style="font-size:0.78rem; color:#64748b; margin:0 0 0.65rem;">Programación automática: <strong>todos los días a las 3:00 p.m. (CDMX)</strong> se actualizan Syscom, Tecnosinergia y el tipo de cambio. <strong>Al entrar al cotizador ya no se re-sincroniza</strong> (plan gratis Cloudflare): se usa la copia del día. El botón manual fuerza una sync si lo necesitas.</p>
           <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
             <button type="button" class="btn btn-outline btn-sm" onclick="cfgTest('catalogs')">Probar catálogos Syscom/CT</button>
             <button type="button" class="btn btn-outline btn-sm" onclick="openImportCTModal()">📋 Importar lista CT</button>
@@ -4327,6 +4339,37 @@ CLABE: 722969010514249300</textarea>
       }));
     }
     // Los catálogos de Syscom/CT ya NO viajan en el HTML: se piden al servidor por partes y requieren sesión.
+    // Caché local diaria (CDMX) para no saturar el plan gratis de Cloudflare en cada login.
+    const CAT_CACHE_KEY = 'gaso_cat_cache_v1';
+    function catalogCacheDayKey() {
+      try {
+        return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
+      } catch (e) {
+        return new Date().toISOString().slice(0, 10);
+      }
+    }
+    function readCatalogDayCache() {
+      try {
+        const raw = safeStorage.getItem(CAT_CACHE_KEY);
+        if (!raw) return null;
+        const d = JSON.parse(raw);
+        if (!d || d.day !== catalogCacheDayKey()) return null;
+        if (!Array.isArray(d.syscom) || !Array.isArray(d.ct)) return null;
+        return d;
+      } catch (e) { return null; }
+    }
+    function writeCatalogDayCache(syscom, ct) {
+      try {
+        safeStorage.setItem(CAT_CACHE_KEY, JSON.stringify({
+          day: catalogCacheDayKey(),
+          at: new Date().toISOString(),
+          syscom: syscom || [],
+          ct: ct || []
+        }));
+      } catch (e) {
+        try { safeStorage.removeItem(CAT_CACHE_KEY); } catch (e2) { /* quota */ }
+      }
+    }
     let _catalogError = '';
     function _setCatalogBanner(kind, msg) {
       let el = document.getElementById('catalog-status-banner');
@@ -4355,20 +4398,52 @@ CLABE: 722969010514249300</textarea>
     }
     async function loadProtectedCatalogs() {
       if (_catalogsLoaded) return true;
-      try {
-        _setCatalogBanner('info', '⏳ Cargando catálogos CT y Syscom…');
-        const sys = await _fetchCatalog('syscom');
-        const ct = await _fetchCatalog('ct');
-        sampleSyscomProducts = sys; _ctTuples = ct; sampleCTProducts = _mapCT(ct);
-        storeProducts = [...storeProducts, ...sampleSyscomProducts, ...sampleCTProducts];
-        _catalogsLoaded = true; _catalogError = '';
+      const errors = [];
+      let sys = [];
+      let ct = [];
+      const cached = readCatalogDayCache();
+      if (cached) {
+        sys = cached.syscom;
+        ct = cached.ct;
         _setCatalogBanner('', '');
-        return true;
-      } catch (e) {
-        _catalogError = String(e && e.message || e);
+      } else {
+        try {
+          _setCatalogBanner('info', '⏳ Cargando catálogo Syscom (1× al día)…');
+          sys = await _fetchCatalog('syscom');
+        } catch (e) {
+          errors.push(String(e && e.message || e));
+        }
+        try {
+          _setCatalogBanner('info', '⏳ Cargando catálogo CT (1× al día)…');
+          ct = await _fetchCatalog('ct');
+        } catch (e) {
+          errors.push(String(e && e.message || e));
+        }
+        if (sys.length || ct.length) writeCatalogDayCache(sys, ct);
+      }
+      // Evitar duplicados si se reintenta tras carga parcial
+      storeProducts = storeProducts.filter(function (p) {
+        return p && p.store !== 'Syscom' && p.store !== 'CT Internacional';
+      });
+      sampleSyscomProducts = sys;
+      _ctTuples = ct;
+      sampleCTProducts = _mapCT(ct);
+      storeProducts = storeProducts.concat(sampleSyscomProducts, sampleCTProducts);
+      if (!sys.length && !ct.length) {
+        _catalogError = errors.join('; ') || 'sin datos';
         _setCatalogBanner('error', '⚠️ No se pudieron cargar los catálogos CT/Syscom (' + _catalogError + ').');
         return false;
       }
+      _catalogsLoaded = true;
+      _catalogError = errors.length ? errors.join('; ') : '';
+      if (errors.length) {
+        _setCatalogBanner('error', '⚠️ Carga parcial de catálogos (' + _catalogError + '). CT/Syscom disponibles: ' +
+          (sys.length ? 'Syscom ' + sys.length.toLocaleString('es-MX') : 'Syscom 0') + ' · ' +
+          (ct.length ? 'CT ' + ct.length.toLocaleString('es-MX') : 'CT 0') + '.');
+      } else {
+        _setCatalogBanner('', '');
+      }
+      return true;
     }
     // Sesión: 30 min de inactividad (se renueva mientras uses la app). Con "Mantener sesión" dura 7 días.
     let _sessRemember = false, _lastActivity = Date.now(), _keepAliveOn = false;
@@ -4406,30 +4481,15 @@ CLABE: 722969010514249300</textarea>
       let ok = await loadProtectedCatalogs();
       if (!ok) { await new Promise(r => setTimeout(r, 2500)); ok = await loadProtectedCatalogs(); }
       try { populateDynamicStoreCategories(); renderStoreProducts(); } catch (e) {}
-      try { quickSyncTecnosinergia(false); } catch (e) {}
-      try { maybeRunDailyCatalogSync(); } catch (e) {}
+      // Solo lee la copia local/nube ya guardada. NO dispara sync a Syscom/Tecno en cada login
+      // (eso lo hace el cron de las 3:00 p.m. CDMX o el botón manual en Configuración).
+      try { await quickSyncTecnosinergia(false); } catch (e) {}
     }
-    function retryCatalogs() { _bootstrapped = false; _catalogsLoaded = false; _postLoginBootstrap(); }
-    function catalogFinishedAt(iso) {
-      if (!iso) return 0;
-      const t = new Date(iso).getTime();
-      return Number.isFinite(t) ? t : 0;
-    }
-    async function maybeRunDailyCatalogSync() {
-      // Si el último sync tiene >18 h, dispara actualización en segundo plano (Syscom+Tecno+FX).
-      try {
-        const st = await fetch('/catalog-cron', { credentials: 'same-origin' }).then(r => r.json()).catch(() => null);
-        const sysAt = catalogFinishedAt(st && st.syscom && st.syscom.finishedAt);
-        const tecAt = catalogFinishedAt(st && st.tecno && st.tecno.finishedAt);
-        const fxAt = catalogFinishedAt(st && st.fx && st.fx.at);
-        const oldest = Math.min(sysAt || 0, tecAt || 0, fxAt || 0);
-        const stale = !oldest || (Date.now() - oldest > 18 * 3600 * 1000);
-        const sysEmpty = !(st && st.syscom && st.syscom.total > 0);
-        if (!stale && !sysEmpty) return;
-        if (!(currentAuthUser && currentAuthUser.role === 'SUPERADMIN')) return;
-        fetch('/catalog-cron?async=1', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => {});
-        showToast('Actualizando catálogos Syscom/Tecnosinergia en segundo plano…');
-      } catch (e) { /* silencioso */ }
+    function retryCatalogs() {
+      try { safeStorage.removeItem(CAT_CACHE_KEY); } catch (e) {}
+      _bootstrapped = false;
+      _catalogsLoaded = false;
+      _postLoginBootstrap();
     }
 
     const LEGACY_DEFAULT_TECNO_SKUS = new Set([
@@ -4649,7 +4709,7 @@ CLABE: 722969010514249300</textarea>
       }
 
       // Cargar catálogos base (Syscom + CT) y únicamente los productos de Tecnosinergia extraídos vía API real
-      const customImportedRaw = safeStorage.getItem('gaso_tecno_api_products_v5') || safeStorage.getItem('gaso_custom_imported_products_v4');
+      const customImportedRaw = safeStorage.getItem('gaso_tecno_api_products_v6') || safeStorage.getItem('gaso_tecno_api_products_v5') || safeStorage.getItem('gaso_custom_imported_products_v4');
       let customImported = [];
       if (customImportedRaw) {
         try {
@@ -4702,48 +4762,16 @@ CLABE: 722969010514249300</textarea>
       const opt = select.options[select.selectedIndex];
       const newCode = select.value;
       const prevCode = lastActiveCurrencyCode || currentCurrency.code || "MXN";
-      const rate = parseFloat(document.getElementById("exchange-rate").value) || exchangeRate || 19.80;
-
-      if (newCode !== prevCode && rate > 0) {
-        document.querySelectorAll("#items-body tr").forEach(tr => {
-          const priceInput = tr.querySelector(".row-price");
-          const costInput = tr.querySelector(".row-base-cost");
-          if (priceInput) {
-            const curP = parseFloat(priceInput.value) || 0;
-            if (prevCode === "MXN" && newCode === "USD") {
-              priceInput.dataset.exactMxn = String(curP);
-              priceInput.value = (Math.round((curP / rate) * 100) / 100).toFixed(2);
-            } else if (prevCode === "USD" && newCode === "MXN") {
-              if (priceInput.dataset.exactMxn) {
-                priceInput.value = (Math.round(parseFloat(priceInput.dataset.exactMxn) * 100) / 100).toFixed(2);
-              } else {
-                priceInput.value = (Math.round((curP * rate) * 100) / 100).toFixed(2);
-              }
-            }
-          }
-          if (costInput) {
-            const curC = parseFloat(costInput.value) || 0;
-            if (prevCode === "MXN" && newCode === "USD") {
-              costInput.dataset.exactMxn = String(curC);
-              costInput.value = (Math.round((curC / rate) * 100) / 100).toFixed(2);
-            } else if (prevCode === "USD" && newCode === "MXN") {
-              if (costInput.dataset.exactMxn) {
-                costInput.value = (Math.round(parseFloat(costInput.dataset.exactMxn) * 100) / 100).toFixed(2);
-              } else {
-                costInput.value = (Math.round((curC * rate) * 100) / 100).toFixed(2);
-              }
-            }
-          }
-        });
-        showToast(newCode === "MXN"
-          ? `Precios convertidos a Pesos Mexicanos (TC: $${rate.toFixed(2)} MXN/USD).`
-          : `Precios convertidos a Dólares USD (TC: $${rate.toFixed(2)} MXN/USD).`);
-      }
-
       lastActiveCurrencyCode = newCode;
       currentCurrency.code = newCode;
       currentCurrency.symbol = opt.getAttribute("data-symbol") || "$";
       calculateTotals();
+      if (newCode !== prevCode) {
+        const rate = fxRateNow();
+        showToast(newCode === "MXN"
+          ? "Cotización en pesos. Los conceptos en USD se convierten con el tipo de cambio $" + rate.toFixed(4) + "."
+          : "Cotización en dólares. Los conceptos en MXN se convierten con el tipo de cambio $" + rate.toFixed(4) + ".");
+      }
     }
 
     async function refreshExchangeRate(force) {
@@ -4777,32 +4805,11 @@ CLABE: 722969010514249300</textarea>
       try { calculateTotals(); } catch (e) {}
     }
     function updateExchangeRate() {
-      const prevRate = exchangeRate || 19.80;
       const newRate = parseFloat(document.getElementById('exchange-rate').value) || 19.80;
       exchangeRate = newRate;
       const storeRateEl = document.getElementById('store-exchange-rate');
       if (storeRateEl) storeRateEl.value = exchangeRate;
       safeStorage.setItem('gaso_exchange_rate', exchangeRate);
-
-      // Si estamos en MXN y hay partidas con costo USD o convertidas, actualizar proporcionalmente
-      if (currentCurrency.code === 'MXN' && prevRate > 0 && newRate > 0 && prevRate !== newRate) {
-        const ratio = newRate / prevRate;
-        document.querySelectorAll('#items-body tr').forEach(tr => {
-          const priceInput = tr.querySelector('.row-price');
-          const costInput = tr.querySelector('.row-base-cost');
-          const marginInput = tr.querySelector('.row-margin');
-          const curCost = parseFloat(costInput ? costInput.value : 0) || 0;
-          const curPrice = parseFloat(priceInput ? priceInput.value : 0) || 0;
-          if (curCost > 0) {
-            const updatedCost = Math.round(curCost * ratio * 100) / 100;
-            costInput.value = updatedCost.toFixed(2);
-            const m = parseFloat(marginInput ? marginInput.value : 30) || 30;
-            if (priceInput) priceInput.value = calcPriceByMarginFormula(updatedCost, m).toFixed(2);
-          } else if (curPrice > 0) {
-            priceInput.value = (Math.round(curPrice * ratio * 100) / 100).toFixed(2);
-          }
-        });
-      }
       calculateTotals();
       renderStoreProducts();
     }
@@ -4818,6 +4825,88 @@ CLABE: 722969010514249300</textarea>
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       }) + " " + code;
+    }
+
+    function fxRateNow() {
+      const el = document.getElementById('exchange-rate');
+      const n = parseFloat(el && el.value);
+      return n > 0 ? n : (parseFloat(exchangeRate) || 19.80);
+    }
+    function rowPriceCurrency(tr) {
+      const sel = tr && tr.querySelector('.row-price-currency');
+      return sel && sel.value === 'USD' ? 'USD' : 'MXN';
+    }
+    function toQuoteAmount(amount, fromCurrency, decimals) {
+      const n = parseFloat(amount) || 0;
+      const places = decimals === undefined ? 2 : decimals;
+      const from = fromCurrency === 'USD' ? 'USD' : 'MXN';
+      const to = currentCurrency.code === 'USD' ? 'USD' : 'MXN';
+      let v = n;
+      if (n && from !== to) {
+        const rate = fxRateNow();
+        if (rate > 0 && from === 'USD' && to === 'MXN') v = n * rate;
+        else if (rate > 0 && from === 'MXN' && to === 'USD') v = n / rate;
+      }
+      const f = Math.pow(10, places);
+      return Math.round((v + Number.EPSILON) * f) / f;
+    }
+    // USD = costo distribuidor: TC → pesos → margen → (si la cotización está en USD, se regresa a dólares).
+    function usdDistributorToSell(usdCost, marginPct) {
+      const rate = fxRateNow();
+      const costMxn = (parseFloat(usdCost) || 0) * rate;
+      const sellMxn = calcPriceByMarginFormula(costMxn, marginPct);
+      if (currentCurrency.code === 'USD') {
+        return rate > 0 ? Math.round((sellMxn / rate) * 100) / 100 : sellMxn;
+      }
+      return sellMxn;
+    }
+    function rowMarginPct(tr) {
+      return Math.min(99, Math.max(0, parseFloat(tr && tr.querySelector('.row-margin') ? tr.querySelector('.row-margin').value : 30) || 30));
+    }
+    function rowSellUnitPrice(tr) {
+      const cur = rowPriceCurrency(tr);
+      const src = parseFloat(tr && tr.querySelector('.row-price') ? tr.querySelector('.row-price').value : 0) || 0;
+      if (cur === 'USD') return usdDistributorToSell(src, rowMarginPct(tr));
+      return toQuoteAmount(src, 'MXN');
+    }
+    function rowUnitCostInQuote(tr) {
+      const cur = rowPriceCurrency(tr);
+      const priceSrc = parseFloat(tr && tr.querySelector('.row-price') ? tr.querySelector('.row-price').value : 0) || 0;
+      if (cur === 'USD') return toQuoteAmount(priceSrc, 'USD', 4);
+      let unitCost = parseFloat(tr && tr.querySelector('.row-base-cost') ? tr.querySelector('.row-base-cost').value : 0) || 0;
+      if (unitCost <= 0 && priceSrc > 0) {
+        unitCost = priceSrc * (1 - (rowMarginPct(tr) / 100));
+      }
+      return toQuoteAmount(unitCost, 'MXN', 4);
+    }
+    function onRowPriceCurrencyChange(sel) {
+      const tr = sel && sel.closest('tr');
+      if (!tr) return;
+      const priceInput = tr.querySelector('.row-price');
+      const costInput = tr.querySelector('.row-base-cost');
+      const newCur = sel.value === 'USD' ? 'USD' : 'MXN';
+      const prevCur = sel.dataset.prevCur || (newCur === 'USD' ? 'MXN' : 'USD');
+      const rate = fxRateNow();
+      const m = rowMarginPct(tr);
+      const curVal = parseFloat(priceInput ? priceInput.value : 0) || 0;
+      if (prevCur !== newCur && curVal > 0 && rate > 0) {
+        if (newCur === 'USD') {
+          // MXN venta → sacar costo → USD distribuidor
+          let costMxn = parseFloat(costInput ? costInput.value : 0) || 0;
+          if (costMxn <= 0) costMxn = curVal * (1 - (m / 100));
+          const usd = Math.round((costMxn / rate) * 10000) / 10000;
+          if (priceInput) priceInput.value = usd;
+          if (costInput) costInput.value = usd;
+        } else {
+          // USD distribuidor → MXN venta con margen
+          const costMxn = Math.round((curVal * rate) * 10000) / 10000;
+          if (costInput) costInput.value = costMxn;
+          if (priceInput) priceInput.value = calcPriceByMarginFormula(costMxn, m).toFixed(2);
+        }
+      }
+      sel.dataset.prevCur = newCur;
+      syncPrintMirrors();
+      calculateTotals();
     }
 
     /* Clientes por Defecto: Venta al Público en General (Física y Moral) */
@@ -4953,7 +5042,7 @@ CLABE: 722969010514249300</textarea>
         const cVal = tr.querySelector('.row-concept') ? tr.querySelector('.row-concept').value : '';
         const dVal = tr.querySelector('.row-desc') ? tr.querySelector('.row-desc').value : '';
         const skuVal = tr.querySelector('.row-sku') ? tr.querySelector('.row-sku').value : '';
-        const priceNum = tr.querySelector('.row-price') ? (parseFloat(tr.querySelector('.row-price').value) || 0) : 0;
+        const priceNum = tr.querySelector('.row-price') ? rowSellUnitPrice(tr) : 0;
         const mirTitle = tr.querySelector('.print-mirror-title');
         const mirDesc = tr.querySelector('.print-mirror-desc');
         const mirSku = tr.querySelector('.print-mirror-sku');
@@ -4976,6 +5065,15 @@ CLABE: 722969010514249300</textarea>
       const _tr = marginInput.closest("tr"); if (_tr && _tr.querySelector(".row-price")) delete _tr.querySelector(".row-price").dataset.exactMxn;
       const tr = marginInput.closest('tr');
       if (!tr) return;
+      // En USD el input es costo distribuidor: el margen solo recalcula la venta, no pisa el costo.
+      if (rowPriceCurrency(tr) === 'USD') {
+        const priceInput = tr.querySelector('.row-price');
+        const baseCostInput = tr.querySelector('.row-base-cost');
+        if (baseCostInput && priceInput) baseCostInput.value = parseFloat(priceInput.value) || 0;
+        syncPrintMirrors();
+        calculateTotals();
+        return;
+      }
       const marginPct = Math.min(99, Math.max(0, parseFloat(marginInput.value) || 0));
       const baseCostInput = tr.querySelector('.row-base-cost');
       const priceInput = tr.querySelector('.row-price');
@@ -4999,9 +5097,11 @@ CLABE: 722969010514249300</textarea>
     }
 
     // Precio capturado CON IVA: se calcula el valor unitario sin IVA y el IVA se desglosa en la nota.
+    // Solo aplica a MXN (precio de venta). En USD el input es costo distribuidor.
     function onRowGrossInput(grossInput) {
       const tr = grossInput.closest('tr');
       if (!tr) return;
+      if (rowPriceCurrency(tr) === 'USD') return;
       const rate = parseFloat(document.getElementById('tax-preset').value) || 0;
       const gross = parseFloat(grossInput.value) || 0;
       const priceInput = tr.querySelector('.row-price');
@@ -5016,11 +5116,14 @@ CLABE: 722969010514249300</textarea>
       const tr = priceInput.closest('tr');
       if (tr) {
         const baseCostInput = tr.querySelector('.row-base-cost');
-        const marginInput = tr.querySelector('.row-margin');
         const curPrice = parseFloat(priceInput.value) || 0;
-        const m = Math.min(99, Math.max(0, parseFloat(marginInput ? marginInput.value : 30) || 30));
-        if (baseCostInput && (parseFloat(baseCostInput.value) || 0) <= 0 && curPrice > 0) {
-          baseCostInput.value = (curPrice * (1 - (m / 100))).toFixed(4);
+        if (rowPriceCurrency(tr) === 'USD') {
+          if (baseCostInput) baseCostInput.value = curPrice;
+        } else {
+          const m = rowMarginPct(tr);
+          if (baseCostInput && (parseFloat(baseCostInput.value) || 0) <= 0 && curPrice > 0) {
+            baseCostInput.value = (curPrice * (1 - (m / 100))).toFixed(4);
+          }
         }
       }
       syncPrintMirrors();
@@ -5178,10 +5281,23 @@ ${JSON.stringify(list)}`;
       const qty = data && data.quantity !== undefined ? data.quantity : 1;
       const unit = data && data.unit ? data.unit : catMeta.defaultUnit;
       const marginPct = (data && data.marginPct !== undefined) ? parseFloat(data.marginPct) : (parseFloat(document.getElementById('store-markup-pct') ? document.getElementById('store-markup-pct').value : 30) || 30);
-      let price = data && data.price !== undefined ? (parseFloat(data.price) || 0) : 0;
-      let baseCost = (data && data.baseCost !== undefined) ? parseFloat(data.baseCost) : (price > 0 ? Math.round(price * (1 - (marginPct / 100)) * 10000) / 10000 : 0);
-      if (baseCost > 0 && data && data.recalcWithFormula) {
-        price = calcPriceByMarginFormula(baseCost, marginPct);
+      const priceCurrency = (data && data.priceCurrency === 'USD') ? 'USD' : ((data && data.priceCurrency === 'MXN') ? 'MXN' : (currentCurrency.code === 'USD' ? 'USD' : 'MXN'));
+      const hasSourcePrice = data && data.sourcePrice !== undefined && data.sourcePrice !== null && String(data.sourcePrice) !== '';
+      const hasSourceCost = data && data.sourceCost !== undefined && data.sourceCost !== null && String(data.sourceCost) !== '';
+      let price = hasSourcePrice ? (parseFloat(data.sourcePrice) || 0) : (data && data.price !== undefined ? (parseFloat(data.price) || 0) : 0);
+      let baseCost;
+      if (priceCurrency === 'USD') {
+        // En USD el input es el costo distribuidor; no se le resta margen.
+        baseCost = hasSourceCost ? (parseFloat(data.sourceCost) || 0)
+          : ((data && data.baseCost !== undefined) ? parseFloat(data.baseCost) : price);
+        if (!(baseCost > 0) && price > 0) baseCost = price;
+      } else {
+        baseCost = hasSourceCost
+          ? (parseFloat(data.sourceCost) || 0)
+          : ((data && data.baseCost !== undefined && !hasSourcePrice) ? parseFloat(data.baseCost) : (price > 0 ? Math.round(price * (1 - (marginPct / 100)) * 10000) / 10000 : 0));
+        if (baseCost > 0 && data && data.recalcWithFormula) {
+          price = calcPriceByMarginFormula(baseCost, marginPct);
+        }
       }
 
       const billingToggle = document.getElementById('billing-mode-toggle');
@@ -5227,9 +5343,16 @@ ${JSON.stringify(list)}`;
           <button type="button" class="row-adv-toggle no-print" onclick="this.closest('tr').classList.toggle('row-adv-open')">⚙️ Ajustes de la partida (SAT, margen, IVA)</button>
         </td>
         <td class="col-unit-price" style="text-align:right;">
-          <input type="number" class="item-input item-num row-price screen-only-field" min="0" step="any" inputmode="decimal" value="${price}" oninput="onRowPriceManualInput(this)">
-          <div class="print-mirror print-mirror-price" style="text-align:right; font-weight:600; font-size:7.2pt;">${formatCurrency(price)}</div>
-          <div class="no-print row-gross-wrap" style="margin-top:3px; display:flex; align-items:center; justify-content:flex-end; gap:4px;" title="Escribe aquí el precio YA con IVA y se calcula el valor unitario sin IVA automáticamente">
+          <div class="row-price-editor no-print">
+            <select class="item-input row-price-currency${priceCurrency === 'USD' ? ' cur-usd' : ''}" data-prev-cur="${priceCurrency}" onchange="onRowPriceCurrencyChange(this)" title="MXN = precio de venta. USD = costo distribuidor (se convierte a pesos, se agrega ganancia y luego aplica IVA).">
+              <option value="MXN" ${priceCurrency === 'MXN' ? 'selected' : ''}>MXN</option>
+              <option value="USD" ${priceCurrency === 'USD' ? 'selected' : ''}>USD</option>
+            </select>
+            <input type="number" class="item-input item-num row-price screen-only-field" min="0" step="any" inputmode="decimal" value="${price}" oninput="onRowPriceManualInput(this)" title="${priceCurrency === 'USD' ? 'Costo distribuidor en USD (sin margen)' : 'Precio de venta unitario en MXN'}">
+          </div>
+          <div class="row-fx-hint no-print"></div>
+          <div class="print-mirror print-mirror-price" style="text-align:right; font-weight:600; font-size:7.2pt;">${formatCurrency(priceCurrency === 'USD' ? usdDistributorToSell(price, marginPct) : toQuoteAmount(price, 'MXN'))}</div>
+          <div class="no-print row-gross-wrap" style="margin-top:3px; display:${priceCurrency === 'USD' ? 'none' : 'flex'}; align-items:center; justify-content:flex-end; gap:4px;" title="Escribe aquí el precio YA con IVA y se calcula el valor unitario sin IVA">
             <span style="font-size:0.68rem; font-weight:700; color:#0369a1; white-space:nowrap;">c/IVA</span>
             <input type="number" class="item-input item-num row-price-gross" min="0" step="any" inputmode="decimal" placeholder="con IVA" style="max-width:96px; background:#f0f9ff; border-color:#bae6fd;" oninput="onRowGrossInput(this)">
           </div>
@@ -5410,22 +5533,49 @@ ${JSON.stringify(list)}`;
 
       rows.forEach(tr => {
         const qty = parseFloat(tr.querySelector('.row-qty').value) || 0;
-        const price = parseFloat(tr.querySelector('.row-price').value) || 0;
-        const marginVal = parseFloat(tr.querySelector('.row-margin') ? tr.querySelector('.row-margin').value : 30) || 0;
+        const priceCur = rowPriceCurrency(tr);
+        const priceSrc = parseFloat(tr.querySelector('.row-price').value) || 0;
+        const marginVal = rowMarginPct(tr);
+        const price = rowSellUnitPrice(tr);
+        const unitCost = rowUnitCostInQuote(tr);
         const catSel = tr.querySelector('.row-item-category');
         const itemCat = catSel ? catSel.value : 'EQUIPO';
         const applyIvaChk = tr.querySelector('.row-apply-iva');
         const rowHasIva = globalInvoiceEnabled && (applyIvaChk ? applyIvaChk.checked : true);
         if (rowHasIva) anyRowHasIva = true;
 
-        let unitCost = parseFloat(tr.querySelector('.row-base-cost') ? tr.querySelector('.row-base-cost').value : 0) || 0;
-        if (unitCost <= 0 && price > 0) {
-          unitCost = price * (1 - (Math.min(99, Math.max(0, marginVal)) / 100));
-        }
         const total = mulDec2(qty, price);
+        const priceInput = tr.querySelector('.row-price');
+        if (priceInput) {
+          priceInput.title = priceCur === 'USD'
+            ? 'Costo distribuidor en USD (sin margen). Se convierte a pesos, se agrega ganancia y luego IVA.'
+            : 'Precio de venta unitario en MXN';
+          priceInput.placeholder = priceCur === 'USD' ? 'Costo USD' : '';
+        }
+        const grossWrap = tr.querySelector('.row-gross-wrap');
         const grossEl = tr.querySelector('.row-price-gross');
-        if (grossEl && document.activeElement !== grossEl) {
-          grossEl.value = (rowHasIva && taxRate > 0 && price > 0) ? (Math.round(price * (1 + taxRate / 100) * 100) / 100).toFixed(2) : '';
+        if (grossWrap) grossWrap.style.display = priceCur === 'USD' ? 'none' : 'flex';
+        if (grossEl && document.activeElement !== grossEl && priceCur !== 'USD') {
+          grossEl.value = (rowHasIva && taxRate > 0 && priceSrc > 0) ? (Math.round(priceSrc * (1 + taxRate / 100) * 100) / 100).toFixed(2) : '';
+        }
+        const curSel = tr.querySelector('.row-price-currency');
+        if (curSel) {
+          curSel.classList.toggle('cur-usd', priceCur === 'USD');
+          curSel.dataset.prevCur = priceCur;
+        }
+        const hint = tr.querySelector('.row-fx-hint');
+        if (hint) {
+          if (priceCur === 'USD' && priceSrc > 0) {
+            const costMxn = Math.round(priceSrc * fxRateNow() * 100) / 100;
+            const ivaTxt = rowHasIva && taxRate > 0
+              ? (' · c/IVA ' + formatCurrency(Math.round(price * (1 + taxRate / 100) * 100) / 100))
+              : ' · sin IVA';
+            hint.textContent = '$' + priceSrc.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 4 })
+              + ' USD → $' + costMxn.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+              + ' +' + marginVal + '% = ' + formatCurrency(price) + ivaTxt;
+          } else {
+            hint.textContent = '';
+          }
         }
         rowsData.push({ qty, price, ivaOn: rowHasIva });
         const _uh = tr.querySelector('.row-unit-hint'), _us = tr.querySelector('.row-unit');
@@ -5597,7 +5747,84 @@ ${JSON.stringify(list)}`;
     /* ========================================================= */
     /* CRM & CLIENT MANAGEMENT LOGIC */
     /* ========================================================= */
+    function _normCliName(n) {
+      return String(n || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    }
+    /** Un solo documento por folio (el más reciente). Evita doble conteo financiero. */
+    function dedupeQuotesHistoryInPlace() {
+      const best = new Map();
+      (quotesHistory || []).forEach(function (q) {
+        if (!q || !q.number) return;
+        const prev = best.get(q.number);
+        if (!prev) { best.set(q.number, q); return; }
+        const ta = new Date(q.updatedAt || q.date || 0).getTime() || 0;
+        const tb = new Date(prev.updatedAt || prev.date || 0).getTime() || 0;
+        if (ta >= tb) best.set(q.number, q);
+      });
+      const next = Array.from(best.values());
+      if (next.length !== (quotesHistory || []).length) {
+        quotesHistory = next;
+        try { safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory)); } catch (e) {}
+      }
+    }
+    /**
+     * Recalcula lastFolio / totales de TODOS los clientes desde quotesHistory.
+     * Así, si reasignas una NV de "Público en general" a un cliente real,
+     * el público ya no conserva ese folio ni el monto (evita duplicar en finanzas).
+     */
+    function recomputeAllCRMStats() {
+      dedupeQuotesHistoryInPlace();
+      const linked = new Set(
+        (quotesHistory || [])
+          .filter(function (q) { return q && q.status === 'sales_note' && q.refCotFolio; })
+          .map(function (q) { return q.refCotFolio; })
+      );
+      const effective = (quotesHistory || []).filter(function (q) {
+        if (!q || q.status === 'cancelled') return false;
+        if (q.status !== 'sales_note' && linked.has(q.number)) return false;
+        return true;
+      });
+      const nowU = Date.now();
+      (crmClients || []).forEach(function (cli) {
+        if (!cli) return;
+        const key = _normCliName(cli.name);
+        const clientQuotes = effective.filter(function (q) {
+          return q.client && _normCliName(q.client.name) === key;
+        }).sort(function (a, b) {
+          const da = String(b.date || '');
+          const db = String(a.date || '');
+          if (da !== db) return da.localeCompare(db);
+          return String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''));
+        });
+        const last = clientQuotes[0];
+        const nextDate = last ? (last.date || '-') : 'Sin cotizaciones';
+        const nextFolio = last ? last.number : '';
+        const nextCount = clientQuotes.length;
+        const nextQuoted = clientQuotes.reduce(function (acc, q) {
+          return acc + (parseFloat(q.totalAmount) || 0);
+        }, 0);
+        const nextWon = clientQuotes
+          .filter(function (q) { return q.status === 'approved' || q.status === 'sales_note'; })
+          .reduce(function (acc, q) { return acc + (parseFloat(q.totalAmount) || 0); }, 0);
+        const changed =
+          cli.lastDate !== nextDate ||
+          cli.lastFolio !== nextFolio ||
+          Number(cli.quotesCount || 0) !== nextCount ||
+          Number(cli.totalQuoted || 0) !== nextQuoted ||
+          Number(cli.totalWon || 0) !== nextWon;
+        cli.lastDate = nextDate;
+        cli.lastFolio = nextFolio;
+        cli.quotesCount = nextCount;
+        cli.totalQuoted = nextQuoted;
+        cli.totalWon = nextWon;
+        // Subir _u para que la nube no vuelva a pisar con totales viejos del cliente.
+        if (changed) cli._u = nowU;
+      });
+      try { safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients)); } catch (e) {}
+    }
+
     function refreshCRMViews() {
+      try { recomputeAllCRMStats(); } catch (e) {}
       document.getElementById('crm-badge-count').textContent = crmClients.length;
 
       const select = document.getElementById('select-crm-client');
@@ -6071,11 +6298,15 @@ function updateDashboardKPIs() { renderDashboard(); }
           p.satDesc = decodeHtmlEntities(p.satDesc || "Equipo TI").trim();
           p._skuNorm = normText(p.sku);
           p._skuClean = p._skuNorm.replace(/[^a-z0-9]/g, "");
+          p._codeNorm = normText(p.code || "");
+          p._codeClean = p._codeNorm.replace(/[^a-z0-9]/g, "");
+          p._modelNorm = normText(p.model || "");
+          p._modelClean = p._modelNorm.replace(/[^a-z0-9]/g, "");
           p._brandNorm = normText(p.brand);
           p._catNorm = normText(p.category);
           p._descNorm = normText(p.desc);
           p._firstWords = p._descNorm.split(/\s+/).slice(0, 4).join(" ");
-          p._fullNorm = `${p._skuNorm} ${p._skuClean} ${p._brandNorm} ${p._catNorm} ${p._descNorm} ${p.satCode || ""} ${normText(p.satDesc)}`;
+          p._fullNorm = `${p._skuNorm} ${p._skuClean} ${p._codeNorm} ${p._codeClean} ${p._modelNorm} ${p._modelClean} ${p._brandNorm} ${p._catNorm} ${p._descNorm} ${p.satCode || ""} ${normText(p.satDesc)}`;
           p._isAccessory = /\b(cable|conector|funda|mochila|maletin|cubierta|refaccion|tornillo|soporte|montaje|bracket|protector|jack|plug|coples|tapa|etiqueta|limpiador|aire comprimido|mousepad|tapete)\b/.test(p._firstWords);
           p._indexed = true;
         }
@@ -6245,7 +6476,15 @@ function updateDashboardKPIs() { renderDashboard(); }
             const termSingular = term.length > 4 && term.endsWith("s") ? term.slice(0, -1) : term;
 
             let tokenMatched = false;
-            if (p._fullNorm.includes(term) || (termClean.length >= 2 && p._skuClean.includes(termClean)) || (termSingular !== term && p._fullNorm.includes(termSingular))) {
+            if (
+              p._fullNorm.includes(term) ||
+              (termClean.length >= 2 && (
+                p._skuClean.includes(termClean) ||
+                (p._codeClean && p._codeClean.includes(termClean)) ||
+                (p._modelClean && p._modelClean.includes(termClean))
+              )) ||
+              (termSingular !== term && p._fullNorm.includes(termSingular))
+            ) {
               tokenMatched = true;
             } else if (SEARCH_SYNONYMS[term] || SEARCH_SYNONYMS[termSingular]) {
               const syns = SEARCH_SYNONYMS[term] || SEARCH_SYNONYMS[termSingular];
@@ -6396,8 +6635,8 @@ function updateDashboardKPIs() { renderDashboard(); }
       }
 
       const markupPct = parseFloat(document.getElementById('store-markup-pct') ? document.getElementById('store-markup-pct').value : 30) || 30;
-      const baseCostMxn = p.currency === 'USD' ? (p.rawPrice * exchangeRate) : p.rawPrice;
-      const baseCostInQuoteCurr = currentCurrency.code === 'USD' ? (baseCostMxn / exchangeRate) : baseCostMxn;
+      const isUsd = p.currency === 'USD';
+      const baseCost = p.rawPrice;
 
       addNewRow({
         satCode: p.satCode || "43211500",
@@ -6406,16 +6645,20 @@ function updateDashboardKPIs() { renderDashboard(); }
         description: `Marca: ${p.brand || 'Original'} | Categoría: ${p.category || p.satDesc || 'Equipamiento'}`,
         quantity: 1,
         unit: "H87 - Pieza",
-        baseCost: Math.round(baseCostInQuoteCurr * 10000) / 10000,
+        priceCurrency: isUsd ? 'USD' : 'MXN',
+        // USD: se guarda el costo distribuidor; MXN: ya va como precio de venta con margen.
+        baseCost: Math.round(baseCost * 10000) / 10000,
         marginPct: markupPct,
-        price: calcPriceByMarginFormula(baseCostInQuoteCurr, markupPct)
+        price: isUsd ? baseCost : calcPriceByMarginFormula(baseCost, markupPct)
       });
 
       try { markQuoteDirty(); } catch (e) {}
       if (p.store === 'Syscom' && !(Number(p.stockPuebla) > 0) && ((Number(p.stockOther) > 0) || (Number(p.stockTotal) > 0))) {
         showToast('Agregado ' + p.sku + '. Aviso: sin existencia en Puebla; hay en otra sucursal.');
+      } else if (isUsd) {
+        showToast('Producto ' + p.sku + ' en USD (distribuidor): se convierte a pesos + ganancia ' + markupPct + '%.');
       } else {
-        showToast(`Producto ${p.sku} agregado a la cotización (${currentCurrency.code}).`);
+        showToast('Producto ' + p.sku + ' agregado a la cotización (MXN).');
       }
       switchTab('cotizador');
     }
@@ -6700,13 +6943,23 @@ function updateDashboardKPIs() { renderDashboard(); }
       rawList.forEach((item, i) => {
         if (!item || typeof item !== 'object') return;
         let storeName = preferredStore === 'auto' ? 'Tecnosinergia' : preferredStore;
-        let sku = decodeHtmlEntities(item.code || item.item_code || item.modelo || item.model || item.sku || item.codigo || item.clave || item.part_number || item.item_id || item.producto_id || ('ITEM-' + (i+1))).trim();
-        let desc = decodeHtmlEntities(item.titulo || item.descripcion || item.description || item.name || item.producto || item.nombre || sku).trim();
+        // Tecno: model/sku = modelo de fabricante (XVR-104G3); code = clave interna (DV104UNI02).
+        // Preferir modelo para búsqueda/cotización; conservar code en la descripción.
+        const internalCode = decodeHtmlEntities(item.code || item.item_code || item.codigo || item.clave || item.part_number || '').trim();
+        const modelSku = decodeHtmlEntities(item.sku || item.model || item.modelo || '').trim();
+        let sku = (modelSku || internalCode || String(item.item_id || item.producto_id || ('ITEM-' + (i + 1)))).trim();
+        // name = título comercial (trae modelo); description suele ser ficha genérica sin la clave buscable.
+        let desc = decodeHtmlEntities(item.name || item.titulo || item.nombre || item.producto || item.descripcion || item.description || sku).trim();
+        if (internalCode && modelSku && internalCode.toUpperCase() !== modelSku.toUpperCase() && !desc.toUpperCase().includes(internalCode.toUpperCase())) {
+          desc = modelSku + ' · ' + internalCode + ' — ' + desc;
+        } else if (internalCode && !modelSku && !desc.toUpperCase().includes(internalCode.toUpperCase())) {
+          desc = internalCode + ' — ' + desc;
+        }
         let brand = decodeHtmlEntities(item.marca || item.brand || item.brand_name || item.trademark || item.fabricante || '').trim();
-        if (!brand || brand === 'TECNOSINERGIA') {
+        if (!brand || brand === 'TECNOSINERGIA' || brand === 'TECNOSINERIA') {
           // Try to detect brand from description if missing in JSON
-          const descUp = desc.toUpperCase();
-          const commonBrands = ["DAHUA","ZKTECO","HIKVISION","GRANDSTREAM","AJAX","SECO-LARM","ENSON","BELDEN","VIGITRON","UBIQUITI","TP-LINK","MIKROTIK","SAXXON","EPCOM","EZVIZ","IMOU","WESTERN DIGITAL","WD","KINGSTON","TRIPP LITE","APC","CYBERPOWER","SONOFF","FLUKE","HONEYWELL","DSC","PARADOX","YONUSA","GARRETT","HUAWEI","CISCO"];
+          const descUp = (desc + ' ' + sku).toUpperCase();
+          const commonBrands = ["DAHUA","ZKTECO","HIKVISION","UNIARCH","UNV","GRANDSTREAM","AJAX","SECO-LARM","ENSON","BELDEN","VIGITRON","UBIQUITI","TP-LINK","MIKROTIK","SAXXON","EPCOM","EZVIZ","IMOU","WESTERN DIGITAL","WD","KINGSTON","TRIPP LITE","APC","CYBERPOWER","SONOFF","FLUKE","HONEYWELL","DSC","PARADOX","YONUSA","GARRETT","HUAWEI","CISCO","AXCEZE"];
           for (let b of commonBrands) {
             if (descUp.includes(b)) { brand = b; break; }
           }
@@ -6734,6 +6987,8 @@ function updateDashboardKPIs() { renderDashboard(); }
             store: storeName,
             category: category,
             sku: String(sku),
+            code: String(internalCode || ''),
+            model: String(modelSku || sku),
             brand: String(brand),
             desc: String(desc),
             rawPrice: price,
@@ -6751,7 +7006,8 @@ function updateDashboardKPIs() { renderDashboard(); }
         }
         storeProducts = [...imported, ...storeProducts];
         try {
-          safeStorage.setItem('gaso_tecno_api_products_v5', JSON.stringify(imported.slice(0, 3500)));
+          safeStorage.setItem('gaso_tecno_api_products_v6', JSON.stringify(imported));
+          try { safeStorage.removeItem('gaso_tecno_api_products_v5'); } catch (e) {}
         } catch(e) {}
         populateDynamicStoreCategories();
         renderStoreProducts();
@@ -7010,7 +7266,8 @@ function updateDashboardKPIs() { renderDashboard(); }
         seenC[c.id] = 1;
         var h = cloudStrip(c);
         if (snap.c[c.id] !== h) {
-          if (first) { if (!c._u) c._u = 0; } else c._u = now;
+          // Nunca mandar _u=0: si no, D1 rechaza el update y quedan totales viejos en el cliente.
+          c._u = now;
           out.clients.push(c); out.sentC[c.id] = h;
         }
       });
@@ -7019,7 +7276,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         seenQ[q.number] = 1;
         var h = cloudStrip(q);
         if (snap.q[q.number] !== h) {
-          if (first) { if (!q._u) q._u = 0; } else q._u = now;
+          q._u = now;
           out.quotes.push(q); out.sentQ[q.number] = h;
         }
       });
@@ -7062,13 +7319,23 @@ function updateDashboardKPIs() { renderDashboard(); }
         var sc = Array.isArray(s.clients) ? s.clients : [], sq = Array.isArray(s.quotes) ? s.quotes : [];
         crmClients.splice.apply(crmClients, [0, crmClients.length].concat(sc));
         quotesHistory.splice.apply(quotesHistory, [0, quotesHistory.length].concat(sq));
+        // Totales del CRM siempre desde cotizaciones (no confiar en lastFolio/totalQuoted guardados en el cliente).
+        try { recomputeAllCRMStats(); } catch (e) {}
         var ns = { c: {}, q: {} };
-        sc.forEach(function(c) { ns.c[c.id] = cloudStrip(c); });
-        sq.forEach(function(q) { ns.q[q.number] = cloudStrip(q); });
+        crmClients.forEach(function(c) { if (c && c.id) ns.c[c.id] = cloudStrip(c); });
+        quotesHistory.forEach(function(q) { if (q && q.number) ns.q[q.number] = cloudStrip(q); });
         cloudSnapSave(ns);
         safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients));
         safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
-        if (before !== JSON.stringify([crmClients, quotesHistory])) { try { refreshCRMViews(); } catch (e) {} }
+        try { refreshCRMViews(); } catch (e) {}
+        // Si el recálculo corrigió totales, súbelos a la nube en el siguiente ciclo.
+        try {
+          var d2 = cloudDiff();
+          if ((d2.clients && d2.clients.length) || (d2.quotes && d2.quotes.length)) {
+            clearTimeout(CLOUD.timer);
+            CLOUD.timer = setTimeout(cloudSync, 800);
+          }
+        } catch (e2) {}
         cloudStatus('☁ Guardado en la nube', 'ok');
         return true;
       } catch (e) {
@@ -7228,17 +7495,9 @@ function updateDashboardKPIs() { renderDashboard(); }
         safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
         safeStorage.setItem('gaso_last_open_folio', data.number);
 
-        const clientName = data.client.name.trim();
-        const cli = crmClients.find(c => c.name.toLowerCase() === clientName.toLowerCase());
-        if (cli) {
-          const clientQuotes = quotesHistory.filter(q => q.client && q.client.name && q.client.name.toLowerCase() === cli.name.toLowerCase());
-          cli.lastDate = data.date;
-          cli.lastFolio = data.number;
-          cli.quotesCount = clientQuotes.length;
-          cli.totalQuoted = clientQuotes.reduce((acc, q) => acc + (parseFloat(q.totalAmount) || 0), 0);
-          cli.totalWon = clientQuotes.filter(q => q.status === 'approved' || q.status === 'sales_note').reduce((acc, q) => acc + (parseFloat(q.totalAmount) || 0), 0);
-          safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients));
-        }
+        // Recalcular CRM completo: el folio solo cuenta en el cliente actual
+        // (si antes estaba en "Público en general", ese ya no lo muestra ni lo suma).
+        try { recomputeAllCRMStats(); } catch (e) {}
 
         refreshCRMViews();
         try { cloudPushSoon(); } catch (e) {}
@@ -7422,18 +7681,26 @@ function updateDashboardKPIs() { renderDashboard(); }
     function getQuoteData() {
       const items = [];
       document.querySelectorAll('#items-body tr').forEach(tr => {
+        const priceCurrency = rowPriceCurrency(tr);
+        const sourcePrice = parseFloat(tr.querySelector('.row-price').value) || 0;
+        const sourceCost = priceCurrency === 'USD'
+          ? sourcePrice
+          : (parseFloat(tr.querySelector('.row-base-cost') ? tr.querySelector('.row-base-cost').value : 0) || 0);
         items.push({
           itemCategory: tr.querySelector('.row-item-category') ? tr.querySelector('.row-item-category').value : 'EQUIPO',
           satCode: tr.querySelector('.row-sat') ? tr.querySelector('.row-sat').value : '43211500',
           sku: tr.querySelector('.row-sku') ? tr.querySelector('.row-sku').value : '',
-          marginPct: tr.querySelector('.row-margin') ? (parseFloat(tr.querySelector('.row-margin').value) || 30) : 30,
-          baseCost: tr.querySelector('.row-base-cost') ? (parseFloat(tr.querySelector('.row-base-cost').value) || 0) : 0,
+          marginPct: rowMarginPct(tr),
+          baseCost: rowUnitCostInQuote(tr),
+          sourceCost: sourceCost,
           applyIva: tr.querySelector('.row-apply-iva') ? tr.querySelector('.row-apply-iva').checked : true,
           concept: tr.querySelector('.row-concept').value,
           description: tr.querySelector('.row-desc').value,
           quantity: parseFloat(tr.querySelector('.row-qty').value) || 0,
           unit: tr.querySelector('.row-unit').value,
-          price: parseFloat(tr.querySelector('.row-price').value) || 0
+          priceCurrency: priceCurrency,
+          sourcePrice: sourcePrice,
+          price: rowSellUnitPrice(tr)
         });
       });
 
@@ -7505,6 +7772,15 @@ function updateDashboardKPIs() { renderDashboard(); }
       setClientType(q.clientType || 'fisica');
       restoreQuoteTerms(q);
       setClientFiscal(q.client);
+
+      if (q.currency) {
+        const code = q.currency === 'USD' ? 'USD' : 'MXN';
+        const sel = document.getElementById('currency-select');
+        if (sel) sel.value = code;
+        lastActiveCurrencyCode = code;
+        currentCurrency.code = code;
+        currentCurrency.symbol = '$';
+      }
 
       if (q.billingWithInvoice !== undefined && document.getElementById('billing-mode-toggle')) {
         document.getElementById('billing-mode-toggle').checked = Boolean(q.billingWithInvoice);
@@ -7889,6 +8165,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         const sysRows = await _fetchCatalog('syscom');
         sampleSyscomProducts = sysRows;
         storeProducts = storeProducts.filter(p => p.store !== 'Syscom').concat(sysRows);
+        try { safeStorage.removeItem(CAT_CACHE_KEY); } catch (e) {}
         _catalogsLoaded = true;
         populateDynamicStoreCategories();
         renderStoreProducts();
@@ -8342,7 +8619,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const aiMarginPct = parseFloat(document.getElementById('ai-margin-pct') ? document.getElementById('ai-margin-pct').value : 30) || 30;
       lastGeneratedAIParts.forEach(it => {
         const found = it.sku ? storeProducts.find(p => p.sku === it.sku) : null;
-        const baseMxn = found ? (found.currency === 'USD' ? found.rawPrice * exchangeRate : found.rawPrice) : ((it.price || 0) * (1 - aiMarginPct / 100));
+        const isUsd = !!(found && found.currency === 'USD');
+        const base = found ? found.rawPrice : ((it.price || 0) * (1 - aiMarginPct / 100));
         addNewRow({
           itemCategory: it.itemCategory || undefined,
           satCode: it.satCode || (found && found.satCode) || "43211500",
@@ -8351,9 +8629,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           description: it.description || `Marca: ${it.brand || (found && found.brand) || 'Original'}`,
           quantity: it.quantity || 1,
           unit: it.unit || "H87 - Pieza",
-          baseCost: Math.round(baseMxn * 10000) / 10000,
+          priceCurrency: isUsd ? 'USD' : 'MXN',
+          baseCost: Math.round(base * 10000) / 10000,
           marginPct: aiMarginPct,
-          price: found ? calcPriceByMarginFormula(baseMxn, aiMarginPct) : Math.round((it.price || 0) * 100) / 100
+          price: isUsd ? base : (found ? calcPriceByMarginFormula(base, aiMarginPct) : Math.round((it.price || 0) * 100) / 100)
         });
       });
 
@@ -9065,60 +9344,69 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     /* AUTOMATIC & 1-CLICK TECNOSINERGIA API V3 SYNC             */
     /* ========================================================= */
     async function quickSyncTecnosinergia(isManualClick = true) {
-      const token = (safeStorage.getItem("tecno_api_token") || DEFAULT_TECNO_API_TOKEN).trim();
       const btn = document.getElementById("btn-quick-sync-tecno");
       const indicator = document.getElementById("tecno-sync-indicator");
+      const paintOk = (n) => {
+        if (!indicator) return;
+        indicator.style.background = "#dcfce7";
+        indicator.style.color = "#166534";
+        indicator.textContent = `✅ Tecnosinergia (${n.toLocaleString("es-MX")} prod.)`;
+      };
+
+      // Login automático: si ya hay copia local, no pegarle a Cloudflare/API.
+      if (!isManualClick) {
+        const localCount = storeProducts.filter(p => p.store === "Tecnosinergia").length;
+        if (localCount > 0) {
+          paintOk(localCount);
+          return;
+        }
+      }
 
       if (btn) {
         btn.disabled = true;
-        btn.textContent = "⏳ Extrayendo API...";
+        btn.textContent = isManualClick ? "⏳ Extrayendo API..." : "⏳ Cargando…";
       }
       if (indicator) {
         indicator.style.background = "#e0f2fe";
         indicator.style.color = "#0369a1";
-        indicator.textContent = "⏳ Conectando API Tecnosinergia...";
+        indicator.textContent = isManualClick
+          ? "⏳ Sincronizando Tecnosinergia (manual)…"
+          : "⏳ Cargando copia guardada…";
       }
 
       try {
-        // Carga la copia guardada en la nube; solo una acción manual lanza una descarga nueva.
+        // Sync upstream SOLO con clic manual. En login solo se lee la copia ya en D1/local.
+        // Actualización diaria automática: cron 3:00 p.m. CDMX.
         let count = 0;
-        const st = await tecnoCatalogApi();
-        if (isManualClick || st.state === 'none') {
-          if (isManualClick) count = await tecnoSyncViaCloud(m => { if (indicator) indicator.textContent = '⏳ ' + m; });
-        }
-        if (!count && st.state === 'ok' && st.chunks) {
-          let all = [];
-          for (let i = 0; i < st.chunks; i++) all = all.concat((await tecnoCatalogApi('?chunk=' + i)).items || []);
-          if (all.length) { parseAndImportStoreJSON({ status: true, items: all }, 'Tecnosinergia'); }
+        if (isManualClick) {
+          count = await tecnoSyncViaCloud(m => { if (indicator) indicator.textContent = '⏳ ' + m; });
+        } else {
+          const st = await tecnoCatalogApi();
+          if (st.state === 'ok' && st.chunks) {
+            let all = [];
+            for (let i = 0; i < st.chunks; i++) all = all.concat((await tecnoCatalogApi('?chunk=' + i)).items || []);
+            if (all.length) { parseAndImportStoreJSON({ status: true, items: all }, 'Tecnosinergia'); }
+          }
         }
         const countTec = storeProducts.filter(p => p.store === "Tecnosinergia").length;
         if (!countTec) throw new Error('Aún no hay catálogo de Tecnosinergia. Pulsa "Sincronizar catálogo" en ⚙️ Configuración.');
-        if (indicator) {
-          indicator.style.background = "#dcfce7";
-          indicator.style.color = "#166534";
-          indicator.textContent = `✅ API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
-        }
-        if (isManualClick) {
-          setStoreFilter("Tecnosinergia");
-        }
+        paintOk(countTec);
+        if (isManualClick) setStoreFilter("Tecnosinergia");
       } catch (err) {
         const countTec = storeProducts.filter(p => p.store === "Tecnosinergia").length;
         if (indicator) {
-          if (countTec > 0) {
-            indicator.style.background = "#dcfce7";
-            indicator.style.color = "#166534";
-            indicator.textContent = `✅ API Tecnosinergia (${countTec.toLocaleString("es-MX")} prod.)`;
-          } else {
+          if (countTec > 0) paintOk(countTec);
+          else {
             indicator.style.background = "#fef3c7";
             indicator.style.color = "#92400e";
-            indicator.textContent = `🔌 API Tecnosinergia (0 prod. • Lista para extraer en Netlify)`;
+            indicator.textContent = `🔌 Tecnosinergia (0 prod.)`;
           }
         }
         if (isManualClick) {
           setStoreFilter("Tecnosinergia");
           showToast(countTec > 0
-            ? `Catálogo API Tecnosinergia activo (${countTec} productos).`
-            : "Error al sincronizar API Tecnosinergia: " + err.message);
+            ? `Catálogo Tecnosinergia activo (${countTec} productos).`
+            : "Error al sincronizar Tecnosinergia: " + err.message);
         }
       } finally {
         if (btn) {
@@ -9577,7 +9865,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const itemCat = catSel ? catSel.value : "EQUIPO";
         const concept = (tr.querySelector(".row-concept") ? tr.querySelector(".row-concept").value : "").trim();
         const desc = (tr.querySelector(".row-desc") ? tr.querySelector(".row-desc").value : "").trim();
-        const price = parseFloat(tr.querySelector(".row-price") ? tr.querySelector(".row-price").value : 0) || 0;
+        const price = rowSellUnitPrice(tr);
         return {
           qty,
           unit: tr.querySelector(".row-unit") ? tr.querySelector(".row-unit").value : "",
