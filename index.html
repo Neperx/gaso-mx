@@ -2548,7 +2548,7 @@
       margin: 0 auto !important;
       padding: 0 0.5rem !important;
       box-sizing: border-box !important;
-      gap: 0.6rem !important;
+      gap: 0.5rem !important;
     }
     .top-bar-inner .brand-section {
       flex: 0 0 auto !important;
@@ -2557,34 +2557,39 @@
       display: flex !important;
       align-items: center !important;
       flex-wrap: nowrap !important;
-      gap: 0.35rem !important;
-      padding: 3px !important;
+      gap: 0.2rem !important;
+      padding: 2px !important;
       background: rgba(15, 23, 42, 0.6) !important;
       border: 1px solid rgba(255, 255, 255, 0.08) !important;
       border-radius: 8px !important;
+      overflow: visible !important;
+      flex: 1 1 auto !important;
+      justify-content: center !important;
     }
     .top-bar-inner .nav-tab-btn {
-      padding: 0.38rem 0.65rem !important;
-      font-size: 0.77rem !important;
+      padding: 0.35rem 0.48rem !important;
+      font-size: 0.74rem !important;
       white-space: nowrap !important;
       border-radius: 6px !important;
-      gap: 0.38rem !important;
+      gap: 0.25rem !important;
       line-height: 1.2 !important;
+      flex-shrink: 0 !important;
     }
     .top-bar-inner .nav-tab-btn svg {
-      width: 14px !important;
-      height: 14px !important;
+      width: 13px !important;
+      height: 13px !important;
+      flex-shrink: 0 !important;
     }
     .top-bar-inner .toolbar-actions {
       display: flex !important;
       align-items: center !important;
       flex-wrap: nowrap !important;
-      gap: 0.45rem !important;
+      gap: 0.35rem !important;
       flex: 0 0 auto !important;
     }
     .top-bar-inner .toolbar-actions .btn {
-      padding: 0.38rem 0.68rem !important;
-      font-size: 0.77rem !important;
+      padding: 0.35rem 0.55rem !important;
+      font-size: 0.74rem !important;
       white-space: nowrap !important;
       line-height: 1.2 !important;
     }
@@ -2614,8 +2619,7 @@
   .row-adv-toggle { display: none; }
 
   /* ====== Menú Acciones y barra superior ====== */
-  .top-bar-inner .nav-tabs { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .top-bar-inner .nav-tabs::-webkit-scrollbar { display: none; }
+  .top-bar-inner .nav-tabs { flex-wrap: nowrap !important; overflow: visible !important; }
   .exec-hero-split > *, .exec-hero > * { min-width: 0; }
   #public-landing-page { overflow-x: hidden; }
 
