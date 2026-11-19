@@ -3120,6 +3120,11 @@
           Tiendas
         </button>
 
+        <button class="nav-tab-btn" id="tab-btn-vault" onclick="switchTab('vault')" style="border:1px solid rgba(16, 185, 129, 0.4); color:#a7f3d0;" title="Bóveda de Contraseñas y Secretos (Segunda Verificación)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+          Caja Fuerte
+        </button>
+
         <button class="nav-tab-btn" id="tab-btn-users" onclick="switchTab('users')" style="border:1px solid rgba(251, 191, 36, 0.4); color:#fde68a;" title="Administración de Usuarios y Seguridad (Exclusivo Superusuario)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           Seguridad<span id="users-badge-count" style="display:none;">1</span>
@@ -3816,6 +3821,295 @@ CLABE: 722969010514249300</textarea>
     </div>
 
     <!-- =================================================================== -->
+    <!-- TAB: CAJA FUERTE / BÓVEDA SEGURA CON SEGUNDA VERIFICACIÓN          -->
+    <!-- =================================================================== -->
+    <div id="pane-vault" class="tab-pane no-print">
+      <div class="crm-container">
+
+        <!-- PANTALLA 1: BLOQUEADA (SEGUNDA VERIFICACIÓN GOOGLE AUTHENTICATOR / TOTP) -->
+        <div id="vault-locked-screen" style="max-width:480px; margin:3rem auto; padding:2rem; background:#fff; border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.1); text-align:center;">
+          <div style="width:68px; height:68px; background:#ecfdf5; border:2px solid #10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:2rem;">
+            🛡️
+          </div>
+          <h2 style="font-size:1.35rem; margin:0 0 0.4rem; color:#0f172a;">Caja Fuerte Protegida</h2>
+          <p style="font-size:0.83rem; color:var(--gray-500); margin:0 0 1.5rem; line-height:1.4;">
+            Segunda verificación de seguridad con <strong>Google Authenticator</strong> (código dinámico 2FA).
+          </p>
+
+          <!-- VISTA A: INGRESO DE CÓDIGO TOTP (CUANDO YA ESTÁ VINCULADO) -->
+          <div id="vault-totp-login-view">
+            <form onsubmit="vaultVerifyTotpCode(event)">
+              <div style="margin-bottom:1.25rem; text-align:left;">
+                <label style="font-size:0.8rem; font-weight:700; color:#334155; display:block; margin-bottom:0.35rem;">Código de 6 dígitos:</label>
+                <input type="text" id="vault-totp-input" class="form-input" placeholder="000 000" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required style="width:100%; font-size:1.4rem; text-align:center; font-family:monospace; letter-spacing:0.35em; font-weight:700; padding:0.5rem;" autocomplete="one-time-code" autofocus>
+                <div style="font-size:0.75rem; color:#64748b; margin-top:0.4rem; text-align:center;">
+                  Abre <strong>Google Authenticator</strong> en tu celular e ingresa el código activo.
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%; background:#10b981; border-color:#059669; font-weight:700; font-size:0.95rem; padding:0.65rem;">
+                🔓 Desbloquear con Authenticator
+              </button>
+            </form>
+
+            <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--gray-100); display:flex; justify-content:center;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="vaultShowTotpSetup(true)" style="font-size:0.75rem; color:#64748b; border:none; text-decoration:underline;">
+                📲 Re-vincular o escanear QR nuevamente
+              </button>
+            </div>
+          </div>
+
+          <!-- VISTA B: VINCULACIÓN INICIAL (CÓDIGO QR PARA ESCANEAR) -->
+          <div id="vault-totp-setup-view" style="display:none; text-align:left;">
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:0.85rem; margin-bottom:1rem; font-size:0.8rem; color:#166534; line-height:1.4;">
+              <strong>Paso 1:</strong> Abre <strong>Google Authenticator</strong> (o Authy) en tu teléfono y selecciona <em>Escanear código QR</em>.
+            </div>
+
+            <div style="display:flex; justify-content:center; margin:1rem 0; background:#fff; padding:0.75rem; border-radius:8px; border:1px solid var(--gray-200); width:fit-content; margin-left:auto; margin-right:auto;">
+              <canvas id="vault-qr-canvas" width="160" height="160"></canvas>
+            </div>
+
+            <div style="margin-bottom:1rem; font-size:0.76rem; color:#475569; text-align:center;">
+              ¿No puedes escanear? Clave manual:<br>
+              <code id="vault-totp-secret-text" style="font-size:0.85rem; font-weight:700; color:#0f172a; background:#f1f5f9; padding:0.2rem 0.5rem; border-radius:4px; user-select:all; display:inline-block; margin-top:0.3rem;"></code>
+            </div>
+
+            <form onsubmit="vaultConfirmSetup(event)">
+              <div style="margin-bottom:1rem;">
+                <label style="font-size:0.8rem; font-weight:700; color:#334155; display:block; margin-bottom:0.35rem;"><strong>Paso 2:</strong> Confirma el código de 6 dígitos que muestra tu app:</label>
+                <input type="text" id="vault-totp-setup-input" class="form-input" placeholder="000 000" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required style="width:100%; font-size:1.3rem; text-align:center; font-family:monospace; letter-spacing:0.3em; font-weight:700;">
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%; background:#10b981; border-color:#059669; font-weight:700; padding:0.6rem;">
+                ✅ Confirmar y Activar Google Authenticator
+              </button>
+            </form>
+
+            <div id="vault-setup-cancel-btn" style="margin-top:0.75rem; text-align:center;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="vaultCancelTotpSetup()" style="font-size:0.75rem;">
+                Volver al ingreso
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- PANTALLA 2: DESBLOQUEADA (CONTENIDO DE LA CAJA FUERTE) -->
+        <div id="vault-unlocked-screen" style="display:none;">
+          <div class="crm-header">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <h2 style="margin:0;">🔐 Caja Fuerte & Gestor de Contraseñas</h2>
+                <span class="badge" style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; font-size:0.75rem; padding:0.2rem 0.5rem; border-radius:9999px;">🔒 Cifrado AES-256</span>
+              </div>
+              <p style="font-size:0.85rem; color:var(--gray-500); margin:0.3rem 0 0;">
+                Tus credenciales y accesos protegidos. Auto-bloqueo activo tras 10 minutos de inactividad.
+              </p>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+              <button class="btn btn-outline btn-sm" onclick="vaultLockNow()" title="Bloquear bóveda de inmediato">
+                🔒 Bloquear Bóveda
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="vaultShowTotpSetup(true)" style="border-color:#cbd5e1;">
+                📲 Reconfigurar Authenticator
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="vaultOpenItemModal()" style="background:#10b981; border-color:#059669; font-weight:700;">
+                + Nueva Contraseña
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros y Búsqueda -->
+          <div style="display:flex; gap:0.75rem; margin-bottom:1.25rem; flex-wrap:wrap; align-items:center;">
+            <div style="flex:1; min-width:220px; position:relative;">
+              <input type="text" id="vault-search-input" class="form-input" placeholder="🔍 Buscar por servicio, cliente, usuario, IP o notas..." oninput="vaultFilterRender()" style="width:100%; padding-left:0.75rem;">
+            </div>
+            <div style="min-width:200px;">
+              <select id="vault-filter-client" class="form-select" onchange="vaultFilterRender()" style="width:100%; font-size:0.83rem;">
+                <option value="all">👥 Todos los Clientes / General</option>
+                <!-- Se llena dinámicamente con clientes del CRM -->
+              </select>
+            </div>
+            <div style="display:flex; gap:0.35rem; flex-wrap:wrap;" id="vault-category-pills">
+              <button class="btn btn-sm btn-primary vault-pill active" onclick="vaultSetCategory('all')">Todos</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('cctv_dvr')">📹 CCTV / DVR</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('redes_wifi')">🌐 Redes / WiFi</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('correos')">✉️ Correos</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('proveedores')">🏢 Proveedores</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('sat_bancos')">🏦 SAT / Bancos</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('general')">📌 Otros</button>
+            </div>
+          </div>
+
+          <!-- Tabla / Tarjetas de Secretos -->
+          <div class="crm-table-box" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; overflow:hidden;">
+            <table class="crm-table" style="width:100%; font-size:0.85rem;">
+              <thead>
+                <tr style="background:var(--gray-50); border-bottom:1px solid var(--gray-200); text-align:left;">
+                  <th style="padding:0.65rem 0.85rem;">Servicio / Cuenta</th>
+                  <th style="padding:0.65rem 0.85rem;">Categoría</th>
+                  <th style="padding:0.65rem 0.85rem;">Usuario / Correo</th>
+                  <th style="padding:0.65rem 0.85rem;">Contraseña</th>
+                  <th style="padding:0.65rem 0.85rem;">Enlace</th>
+                  <th style="padding:0.65rem 0.85rem; text-align:right;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="vault-items-body">
+                <!-- Se renderiza vía JS -->
+              </tbody>
+            </table>
+            <div id="vault-empty-state" style="display:none; padding:3rem; text-align:center; color:var(--gray-400);">
+              <div style="font-size:2rem; margin-bottom:0.5rem;">📂</div>
+              <p style="margin:0; font-size:0.9rem;">No hay registros en la Caja Fuerte que coincidan con la búsqueda.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODAL: REGISTRAR / EDITAR CREDENCIAL EN CAJA FUERTE -->
+    <div class="modal-backdrop no-print" id="modal-vault-item">
+      <div class="modal-box" style="max-width:680px;">
+        <div class="modal-header">
+          <h3 id="modal-vault-title">🔐 Ficha de Activo & Credencial</h3>
+          <button class="modal-close" onclick="closeModal('modal-vault-item')">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:0.9rem; max-height:75vh; overflow-y:auto;">
+          <input type="hidden" id="vault-item-id">
+
+          <!-- Vinculación con Cliente del CRM y Categoría -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div>
+              <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">👥 Cliente Asociado (CRM):</label>
+              <select id="vault-item-client-id" class="form-select" style="width:100%;">
+                <option value="">(Ninguno / Uso Interno Propio)</option>
+                <!-- Opciones dinámicas de crmClients -->
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">🏷️ Tipo de Activo / Categoría:</label>
+              <select id="vault-item-category" class="form-select" onchange="vaultOnCategoryChange()" style="width:100%;">
+                <option value="cctv_dvr">📹 CCTV / DVR / NVR / Cámaras</option>
+                <option value="redes_wifi">🌐 Redes / WiFi / Routers</option>
+                <option value="correos">✉️ Correos & Hosting</option>
+                <option value="proveedores">🏢 Proveedores (Syscom, Tecnosinergia...)</option>
+                <option value="sat_bancos">🏦 SAT / Bancos</option>
+                <option value="general">📌 General / Otro</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Título / Nombre del Servicio o Equipo *:</label>
+            <input type="text" id="vault-item-title" class="form-input" placeholder="Ej. DVR Entrada Principal (Hikvision 8 Ch), WiFi Bodega, SAT Firma" style="width:100%; font-weight:600;" required>
+          </div>
+
+          <!-- Campos de Acceso / Red (IP, Puerto, P2P / Stream) -->
+          <div id="vault-section-tech" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
+            <div style="font-size:0.75rem; font-weight:700; color:#475569; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">
+              ⚙️ Parámetros de Red / Enlace
+            </div>
+            <div style="display:grid; grid-template-columns:2fr 1fr 1.5fr; gap:0.5rem;">
+              <div>
+                <label style="font-size:0.75rem; color:#64748b; display:block; margin-bottom:0.2rem;">IP Local / Dominio / URL:</label>
+                <input type="text" id="vault-item-url" class="form-input" placeholder="192.168.1.100 ó https://..." style="width:100%; font-family:monospace; font-size:0.83rem;">
+              </div>
+              <div>
+                <label style="font-size:0.75rem; color:#64748b; display:block; margin-bottom:0.2rem;">Puerto(s):</label>
+                <input type="text" id="vault-item-port" class="form-input" placeholder="8000 / 554" style="width:100%; font-family:monospace; font-size:0.83rem;">
+              </div>
+              <div>
+                <label style="font-size:0.75rem; color:#64748b; display:block; margin-bottom:0.2rem;">Serial / P2P / Stream Key:</label>
+                <input type="text" id="vault-item-p2p" class="form-input" placeholder="D12345678 / Clave Verif" style="width:100%; font-family:monospace; font-size:0.83rem;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Credenciales: Usuario y Contraseña -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div>
+              <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Usuario / Cuenta:</label>
+              <input type="text" id="vault-item-user" class="form-input" placeholder="admin / usuario@empresa.com" style="width:100%;">
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                <label style="font-size:0.8rem; font-weight:700;">Contraseña *:</label>
+                <button type="button" class="btn btn-outline btn-sm" onclick="vaultGeneratePassword()" style="font-size:0.72rem; padding:0.15rem 0.4rem;">
+                  ⚡ Generar
+                </button>
+              </div>
+              <div style="position:relative;">
+                <input type="text" id="vault-item-pass" class="form-input" placeholder="••••••••••••" style="width:100%; font-family:monospace; padding-right:2.5rem;" required>
+                <button type="button" onclick="vaultCopyModalPass()" title="Copiar" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#64748b;">📋</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- EDITOR DE TEXTO ENRIQUECIDO PARA NOTAS, PROCEDIMIENTOS Y CONTRATOS -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+              <label style="font-size:0.8rem; font-weight:700; color:#334155;">
+                📝 Procedimiento, Notas y Detalles del Activo:
+              </label>
+              <span style="font-size:0.72rem; color:#64748b;">Editor enriquecido (se entrega en la ficha técnica)</span>
+            </div>
+
+            <!-- Barra de herramientas de formato -->
+            <div style="display:flex; gap:0.25rem; background:#f1f5f9; border:1px solid #cbd5e1; border-bottom:none; border-radius:6px 6px 0 0; padding:0.35rem 0.5rem; flex-wrap:wrap; align-items:center;">
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('bold')" title="Negrita" style="padding:0.15rem 0.45rem; font-weight:bold; font-size:0.8rem;">B</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('italic')" title="Cursiva" style="padding:0.15rem 0.45rem; font-style:italic; font-size:0.8rem;">I</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('underline')" title="Subrayado" style="padding:0.15rem 0.45rem; text-decoration:underline; font-size:0.8rem;">U</button>
+              <span style="color:#cbd5e1; margin:0 0.15rem;">|</span>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('formatBlock', '<h3>')" title="Título" style="padding:0.15rem 0.4rem; font-size:0.75rem;">H3</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('formatBlock', '<p>')" title="Párrafo normal" style="padding:0.15rem 0.4rem; font-size:0.75rem;">P</button>
+              <span style="color:#cbd5e1; margin:0 0.15rem;">|</span>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('insertUnorderedList')" title="Viñetas / Lista" style="padding:0.15rem 0.4rem; font-size:0.75rem;">• Lista</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('insertOrderedList')" title="Lista numerada" style="padding:0.15rem 0.4rem; font-size:0.75rem;">1. Lista</button>
+              <span style="color:#cbd5e1; margin:0 0.15rem;">|</span>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultRichExec('hiliteColor', '#fef08a')" title="Resaltar en amarillo" style="padding:0.15rem 0.4rem; background:#fef08a; font-size:0.75rem; color:#854d0e;">🖍️ Resaltar</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultInsertTemplate('dvr')" title="Plantilla rápida CCTV" style="padding:0.15rem 0.4rem; font-size:0.72rem; color:#0284c7;">+ Plantilla DVR</button>
+              <button type="button" class="btn btn-sm btn-outline" onclick="vaultInsertTemplate('wifi')" title="Plantilla rápida WiFi" style="padding:0.15rem 0.4rem; font-size:0.72rem; color:#0284c7;">+ Plantilla WiFi</button>
+            </div>
+
+            <!-- Área editable con contenteditable -->
+            <div id="vault-rich-editor" contenteditable="true" style="min-height:120px; max-height:220px; overflow-y:auto; border:1px solid #cbd5e1; border-radius:0 0 6px 6px; padding:0.65rem; background:#fff; font-size:0.85rem; line-height:1.5;"></div>
+          </div>
+        </div>
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <button type="button" class="btn btn-outline" onclick="closeModal('modal-vault-item')">Cancelar</button>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button type="button" class="btn btn-primary" onclick="vaultSaveItemFromModal()" style="background:#10b981; border-color:#059669; font-weight:700;">💾 Guardar Ficha</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: FICHA TÉCNICA DE ENTREGA AL CLIENTE (COMPARTIR / PDF / WHATSAPP) -->
+    <div class="modal-backdrop no-print" id="modal-vault-handover">
+      <div class="modal-box" style="max-width:640px;">
+        <div class="modal-header">
+          <h3>📄 Ficha de Entrega Técnica para Cliente</h3>
+          <button class="modal-close" onclick="closeModal('modal-vault-handover')">✕</button>
+        </div>
+        <div class="modal-body" id="vault-handover-body" style="max-height:70vh; overflow-y:auto;">
+          <!-- Se genera dinámicamente -->
+        </div>
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn btn-outline" onclick="closeModal('modal-vault-handover')">Cerrar</button>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-outline" onclick="vaultShareWhatsApp()" style="color:#16a34a; border-color:#86efac; font-weight:700;">
+              📲 Compartir en WhatsApp
+            </button>
+            <button class="btn btn-primary" onclick="vaultPrintHandover()" style="background:#0284c7; border-color:#0284c7; font-weight:700;">
+              🖨️ Imprimir / Guardar PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
     <!-- TAB 5: ADMINISTRACIÓN DE USUARIOS Y SEGURIDAD (SOLO SUPERUSUARIO)   -->
     <!-- =================================================================== -->
     <div id="pane-users" class="tab-pane no-print">
@@ -4153,17 +4447,17 @@ CLABE: 722969010514249300</textarea>
               <strong>¡Hola! ¿En qué te ayudo hoy?</strong><br>
               Pídeme una cotización, pega el mensaje de WhatsApp de tu cliente, o pregúntame lo que necesites del negocio: compatibilidad de componentes, comparar equipos, qué precio poner, cuánto cobrar de mano de obra, claves SAT, redactar un mensaje de venta, etc. Recuerdo lo que vamos hablando en la charla.<br>
               <div style="margin-top:0.55rem; display:flex; gap:0.4rem; flex-wrap:wrap;">
+                <button type="button" onclick="fillQuickAIPrompt('Lee la cotización actual y redacta una memoria técnica completa con justificación de ingeniería, alcance y canalización')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
+                  📐 Memoria técnica de cotización actual
+                </button>
                 <button type="button" onclick="fillQuickAIPrompt('Cotízame 4 cámaras bala IP 4MP para exterior, 1 NVR de 8 canales PoE, 1 disco duro WD Purple de 4TB y 1 bobina de cable Cat6')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
                   📹 Ej: Kit 4 Cámaras IP + NVR + Disco 4TB
                 </button>
-                <button type="button" onclick="fillQuickAIPrompt('Cotízame 2 laptops Core i5 con 16GB RAM y 512GB SSD, 2 monitores de 24 pulgadas y 1 multifuncional Epson EcoTank')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
-                  💻 Ej: 2 Laptops i5 + Monitores + Impresora
+                <button type="button" onclick="fillQuickAIPrompt('Calcula la canalización de tubería conduit pared gruesa, cajas registro y cable THW para una carga de 15A a 35 metros con factor de potencia 0.9 y caída de tensión máx 3%')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
+                  ⚡ Cálculo Eléctrico & Conduit (NOM-001)
                 </button>
-                <button type="button" onclick="fillQuickAIPrompt('Quiero armar una PC para diseño con un Ryzen 7. ¿Qué tarjeta madre, memoria RAM, fuente y gabinete son compatibles? Recomiéndame opciones del catálogo')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
-                  🖥️ Ej: Armar PC compatible
-                </button>
-                <button type="button" onclick="fillQuickAIPrompt('Ayúdame a determinar un precio de venta para la instalación de 8 cámaras con cableado de 30 m por cámara. ¿Cuánto cobro de mano de obra y qué margen me conviene?')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
-                  💲 Ej: ¿Qué precio pongo?
+                <button type="button" onclick="fillQuickAIPrompt('Sugiere 5 contraseñas seguras de alta entropía con símbolos y números para entregar a clientes')" style="background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; border-radius:999px; padding:0.22rem 0.65rem; font-size:0.73rem; cursor:pointer; font-weight:600;">
+                  🔑 Sugerir contraseñas seguras
                 </button>
               </div>
             </div>
@@ -4719,6 +5013,10 @@ CLABE: 722969010514249300</textarea>
         showToast("Acceso restringido exclusivamente al Superusuario.");
         return;
       }
+      if (tabName === 'vault' && (!currentAuthUser || currentAuthUser.role !== 'SUPERADMIN')) {
+        showToast("La Caja Fuerte es exclusiva para el Superusuario.");
+        return;
+      }
       if (tabName === 'dashboard' && currentAuthUser && currentAuthUser.role !== 'SUPERADMIN') {
         showToast("El Dashboard financiero es exclusivo para el Superusuario.");
         return;
@@ -4747,6 +5045,9 @@ CLABE: 722969010514249300</textarea>
       }
       if (tabName === 'config') {
         cfgLoad();
+      }
+      if (tabName === 'vault') {
+        vaultInit();
       }
     }
 
@@ -8628,36 +8929,69 @@ ${promptText}`;
         const searches = await planCatalogSearches(promptText, preferredModel, apiKey);
         const relevantCatalog = gatherCatalogContext(promptText, searches, storePref);
 
-        const systemInstruction = `Eres el colega y mano derecha técnico del dueño de 'GASO INGENIERÍA' (México). Él es ingeniero en mecatrónica: háblale de tú a tú, como un compañero experimentado, directo y sin rodeos ni sermones. Opina con criterio propio, haz preguntas cuando falte un dato clave (distancia, uso, presupuesto, tipo de instalación) y avisa de riesgos o errores comunes. Ayudas con TODO el negocio, no solo con el catálogo:
-- Cotizar: productos del catálogo Y trabajos de campo (mano de obra, instalación, programación, materiales menores).
-- Electricidad: bajadas y contactos (por ejemplo una bajada de contacto duplex: cable, canalización, caja, placa, pastilla, mano de obra), cargas, calibres de cable, protecciones, tierra física, UPS y respaldo.
-- Radiocomunicación: radios DMR/analógicos, programación (codeplug, canales, contactos, zonas, repetidores), antenas, alcance y costo de programar equipos.
-- Armado de PC: si te dan una tarjeta madre sugiere procesador, RAM, fuente, disipador y gabinete compatibles (socket, chipset, DDR4/DDR5), y viceversa; revisa cuellos de botella.
-- CCTV, redes, control de acceso, PoE, almacenamiento en días, cableado estructurado, energía solar básica.
-- Instalación: consejos de campo, materiales, tiempos, buenas prácticas y normas (NOM-001-SEDE cuando aplique).
-- Precios y negocio: sugerir precio de venta, margen, costo de mano de obra, detectar precios fuera de mercado, alcances, garantías, mensajes de WhatsApp o correo, seguimiento a clientes.
-- Fiscal en México: IVA, RESICO, CFDI 4.0, claves SAT.
-Usa tu conocimiento general con total libertad; el catálogo es solo una referencia, nunca un límite. Si el catálogo no tiene algo, NO digas que "no hay" y te detengas: da tu mejor recomendación técnica y un precio estimado de mercado en México, aclarando que es aproximado.
+        // --- CONTEXTO SEGURO DEL SISTEMA (EXCLUYENDO CAJA FUERTE POR SEGURIDAD) ---
+        let currentQuoteContext = "";
+        try {
+          const qd = getQuoteData();
+          if (qd && qd.items && qd.items.length) {
+            currentQuoteContext = `COTIZACIÓN ACTIVA EN PANTALLA (${qd.number || 'Borrador'}, Cliente: ${qd.client ? qd.client.name : 'No asignado'}):\n` +
+              JSON.stringify(qd.items.map(it => ({
+                cant: it.quantity,
+                concepto: it.concept,
+                desc: it.description,
+                sku: it.sku,
+                precio: it.price
+              }))) + "\nTotal cotización: $" + (qd.total || 0) + " MXN\n";
+          }
+        } catch (e) {}
 
-Reglas:
-1) Responde en "explanation" en español, natural y práctico, como un colega. Puedes usar **negritas** y viñetas con "- " (no uses tablas). Si haces cálculos, muestra los números. Sé conciso, pero da el detalle técnico que sirva.
-2) Si el usuario pide cotizar o armar una propuesta, ponlo en "items" para agregarlo con un clic. Para productos del CATÁLOGO usa SOLO sku y precios reales del catálogo. Para cosas que no estén en el catálogo (materiales como cable, placas, tubería, contactos, o servicios), agrégalas igual en "items" con "itemCategory": "MATERIAL" o "SERVICIO"/"MANO_OBRA", sku "MAT-01"/"SERV-01"/"MO-01" y un "price" de venta estimado de mercado en MXN; indica en la explicación que esos precios son estimados y que conviene confirmarlos.
-3) Precio de venta en MXN con margen +${marginPct}% sobre costo: si está en USD, PrecioVenta = redondear((PrecioUSD * ${exchangeRate}) / (1 - ${marginPct}/100), 2); si está en MXN, PrecioVenta = redondear(PrecioMXN / (1 - ${marginPct}/100), 2).
-4) Mano de obra y servicios van en "items" sin sku de catálogo: usa "itemCategory": "MANO_OBRA" o "SERVICIO", sku "MO-01"/"SERV-01", unidad "E48 - Unidad de servicio" y la clave SAT (ClaveProdServ) que corresponda al servicio específico (instalación de sistemas de seguridad/CCTV, cableado y redes, servicios eléctricos, mantenimiento de hardware, soporte de software, configuración y programación de equipos de radio, etc.). Para productos usa el satCode del catálogo.
-5) En "description" pon solo especificaciones para el cliente final (sin mencionar mayorista ni clave SAT).
-6) Si es una pregunta o charla sin productos concretos, deja "items": [].
-7) Toma en cuenta la conversación previa (el usuario puede referirse a algo anterior).
-8) "price" es SIEMPRE el precio UNITARIO y el total de cada partida es quantity × price. No repitas la misma partida en varias líneas. Si cobras una instalación o servicio como paquete o kit (por ejemplo "instalación de kit de 4 cámaras"), pon UNA sola partida con "quantity": 1 y en "price" el precio total del paquete. Solo usa quantity mayor a 1 si el precio es por pieza o por punto, y entonces "price" es el precio de cada una (por ejemplo 4 cámaras a $550 = $2,200). El total de "items" debe coincidir con las cantidades que das en la explicación.
+        // Historial reciente de cotizaciones (por si pide "lee la cotización COT-2026-XXX")
+        let historyContext = "";
+        try {
+          if (typeof quotesHistory !== "undefined" && Array.isArray(quotesHistory) && quotesHistory.length) {
+            historyContext = `HISTORIAL DE COTIZACIONES RECIENTES (Últimas 5):\n` +
+              quotesHistory.slice(0, 5).map(q => `- Folio: ${q.number}, Cliente: ${(q.client && q.client.name) || 'S/N'}, Fecha: ${q.date || ''}, Total: $${q.total || 0}, Partidas: ${(q.items || []).map(i => (i.quantity || 1) + 'x ' + (i.concept || '')).join(', ')}`).join("\n") + "\n";
+          }
+        } catch (e) {}
+
+        const systemInstruction = `Eres el Asistente Técnico y Colega Senior de Ingeniería de 'GASO INGENIERÍA' (México).
+El usuario es Ingeniero en Mecatrónica y dueño de la empresa. Háblale de tú a tú, con lenguaje técnico riguroso pero directo, práctico y sin rodeos corporativos ni textos robóticos. Tienes criterio propio, pensamiento crítico de ingeniería y total libertad para interactuar entre los módulos de GASO (Cotizador, CRM, Catálogos, Historial de Cotizaciones).
+
+🔒 POLÍTICA DE SEGURIDAD ESTRICTA (CAJA FUERTE / VAULT):
+- Tienes ESTRICTAMENTE PROHIBIDO solicitar, acceder, leer, procesar o almacenar contraseñas reales, PINs, tokens bancarios o datos de la Caja Fuerte (Vault).
+- Si el usuario te pide sugerencias de contraseñas seguras, dale listas de contraseñas de alta entropía (aleatorias con mayúsculas, minúsculas, números y símbolos) generadas al vuelo para que él las use donde quiera, pero NUNCA le preguntes para qué servicio o cuenta las usará ni intentes guardarlas. La Caja Fuerte está aislada por seguridad.
+
+🛠️ TUS CAPACIDADES COMO ASISTENTE TÉCNICO Y DE INGENIERÍA:
+1) MEMORIAS TÉCNICAS Y JUSTIFICACIÓN DE PROYECTO:
+   - Si el usuario dice "lee la cotización actual" o "de la cotización COT-XXXX haz una memoria técnica", revisa las partidas del contexto.
+   - Desarrolla el contexto y la memoria técnica profesional:
+     * Objetivo del sistema y alcance de los trabajos.
+     * Criterios de diseño y topología (estrella, bus, wireless, etc.).
+     * Especificaciones de equipos principales (cámaras, NVRs, switches PoE, routers, discos duros).
+     * Infraestructura pasiva y canalización: incluye cálculo y recomendación de tubería conduit (pared delgada / pared gruesa para intemperie según NOM-001-SEDE), cajas de registro condulet (LB, LL, LR, C, T), coples, conectores, soportería tipo unicanal, taquetes y cableado UTP (Cat6 100% cobre para exterior/interior).
+2) INGENIERÍA ELÉCTRICA Y NORMATIVA (NOM-001-SEDE-2012 / CÓDIGO DE RED):
+   - Realiza cálculos de caída de tensión máxima permisible (3% en alimentadores, 5% total circuito derivado + alimentador).
+   - Cálculos de factor de potencia ($FP = P / S$), compensación con bancos de capacitores ($kVAR$), cálculo de corriente nominal y de corto circuito ($I_{cc} = S / (\sqrt{3} \cdot V \cdot Z_{cc})$).
+   - Selección de calibres de conductores THW-2-LS / THHN, canalizaciones por factor de relleno (40% para 3 o más conductores) y protecciones termomagnéticas.
+3) COTIZACIÓN COMERCIAL Y CATÁLOGOS:
+   - Sugerir productos de mayoristas (Syscom, Tecnosinergia, CT) y proponer partidas listas en JSON cuando amerite.
+   - Precios en MXN con margen +${marginPct}% sobre costo: si está en USD, PrecioVenta = ((PrecioUSD * ${exchangeRate}) / (1 - ${marginPct}/100)); si está en MXN, PrecioVenta = (PrecioMXN / (1 - ${marginPct}/100)).
+4) ARMADO DE PC, RADIOS DMR, CONTROL DE ACCESO Y ENERGÍA SOLAR:
+   - Compatibilidades de sockets (AM4/AM5, LGA1700), cuellos de botella CPU/GPU, codeplugs DMR, repetidores y cálculo de baterías/días de autonomía solar.
+
+Reglas de formato:
+- Responde en "explanation" en español, con redacción fluida de ingeniero a ingeniero. Puedes usar títulos, **negritas**, viñetas y fórmulas matemáticas claras.
+- Si la respuesta incluye partidas de cotización sugeridas, inclúyelas en "items" para que se agreguen en 1 clic. Si solo es una memoria técnica, cálculo o consulta, deja "items": [].
 
 RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 {
-  "explanation": "respuesta para el usuario",
+  "explanation": "tu respuesta técnica, memoria o cálculo aquí",
   "items": [
-    { "itemCategory": "EQUIPO", "satCode": "43201503", "sku": "CODIGO_SKU", "brand": "MARCA", "concept": "Nombre comercial", "description": "Especificación técnica", "quantity": 1, "unit": "H87 - Pieza", "price": 2200.00 }
+    { "itemCategory": "EQUIPO", "satCode": "43201503", "sku": "SKU", "brand": "MARCA", "concept": "Concepto", "description": "Detalle técnico", "quantity": 1, "unit": "H87 - Pieza", "price": 1500.00 }
   ]
 }`;
 
-        const buildPrompt = () => `${systemInstruction}\n\nCATÁLOGO RELEVANTE (${relevantCatalog.length} productos; precio = costo del mayorista):\n${JSON.stringify(relevantCatalog)}\n\nCONVERSACIÓN PREVIA:\n${aiHistoryText() || '(sin mensajes previos)'}\n\nMENSAJE DEL USUARIO:\n${promptText}\nFiltro de tienda: ${storePref}`;
+        const buildPrompt = () => `${systemInstruction}\n\n${currentQuoteContext}${historyContext}CATÁLOGO RELEVANTE DISPONIBLE (${relevantCatalog.length} productos):\n${JSON.stringify(relevantCatalog)}\n\nCONVERSACIÓN PREVIA:\n${aiHistoryText() || '(sin mensajes previos)'}\n\nMENSAJE DEL USUARIO:\n${promptText}`;
         let fullPrompt = buildPrompt();
         while (fullPrompt.length > 58000 && relevantCatalog.length) { relevantCatalog.splice(-10); fullPrompt = buildPrompt(); } // límite del servidor
         const result = await callGeminiWithFallback(fullPrompt, preferredModel, apiKey, { json: true, temperature: 0.55 });
@@ -8718,6 +9052,782 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     /* ========================================================= */
     /* SECURITY, LOGIN GATE & SUPERUSER ADMINISTRATION ENGINE    */
     /* ========================================================= */
+    // =========================================================================
+    // MÓDULO: CAJA FUERTE (VAULT) CON GOOGLE AUTHENTICATOR (TOTP RFC 6238) + AES-GCM-256
+    // =========================================================================
+    let vaultItems = [];
+    let vaultDecryptedKey = null; // CryptoKey derivada del secreto para cifrado
+    let vaultLockTimer = null;
+    let vaultCurrentCategory = "all";
+    let vaultPendingTotpSecret = null; // Secret temporal durante vinculación
+
+    // --- Funciones Base32 & TOTP (RFC 6238) Nativas en Navegador ---
+    const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+    function base32Encode(buffer) {
+      let bits = 0;
+      let value = 0;
+      let output = "";
+      for (let i = 0; i < buffer.length; i++) {
+        value = (value << 8) | buffer[i];
+        bits += 8;
+        while (bits >= 5) {
+          output += BASE32_ALPHABET[(value >>> (bits - 5)) & 31];
+          bits -= 5;
+        }
+      }
+      if (bits > 0) {
+        output += BASE32_ALPHABET[(value << (5 - bits)) & 31];
+      }
+      return output;
+    }
+
+    function base32Decode(str) {
+      str = str.toUpperCase().replace(/=+$/, "");
+      let bits = 0;
+      let value = 0;
+      const bytes = [];
+      for (let i = 0; i < str.length; i++) {
+        const idx = BASE32_ALPHABET.indexOf(str[i]);
+        if (idx === -1) continue;
+        value = (value << 5) | idx;
+        bits += 5;
+        if (bits >= 8) {
+          bytes.push((value >>> (bits - 8)) & 255);
+          bits -= 8;
+        }
+      }
+      return new Uint8Array(bytes);
+    }
+
+    function generateRandomBase32Secret(length = 20) {
+      const bytes = new Uint8Array(length);
+      window.crypto.getRandomValues(bytes);
+      return base32Encode(bytes).slice(0, 32);
+    }
+
+    async function generateTotpCode(secretBase32, timeOffsetSteps = 0) {
+      const keyBytes = base32Decode(secretBase32);
+      const epochSeconds = Math.floor(Date.now() / 1000);
+      const timeStep = Math.floor(epochSeconds / 30) + timeOffsetSteps;
+
+      const buffer = new ArrayBuffer(8);
+      const view = new DataView(buffer);
+      view.setUint32(0, Math.floor(timeStep / 0x100000000));
+      view.setUint32(4, timeStep & 0xffffffff);
+
+      const cryptoKey = await window.crypto.subtle.importKey(
+        "raw",
+        keyBytes,
+        { name: "HMAC", hash: "SHA-1" },
+        false,
+        ["sign"]
+      );
+
+      const signature = await window.crypto.subtle.sign("HMAC", cryptoKey, buffer);
+      const hmac = new Uint8Array(signature);
+      const offset = hmac[hmac.length - 1] & 0x0f;
+      const binary =
+        ((hmac[offset] & 0x7f) << 24) |
+        ((hmac[offset + 1] & 0xff) << 16) |
+        ((hmac[offset + 2] & 0xff) << 8) |
+        (hmac[offset + 3] & 0xff);
+
+      const otp = binary % 1000000;
+      return String(otp).padStart(6, "0");
+    }
+
+    async function verifyTotpCode(secretBase32, inputCode) {
+      inputCode = String(inputCode).trim();
+      if (!secretBase32 || inputCode.length !== 6) return false;
+      // Permite margen de deriva de reloj de ±1 paso (±30 segundos)
+      for (let offset = -1; offset <= 1; offset++) {
+        const expected = await generateTotpCode(secretBase32, offset);
+        if (expected === inputCode) return true;
+      }
+      return false;
+    }
+
+    async function vaultDeriveKeyFromSecret(secretBase32) {
+      const enc = new TextEncoder();
+      const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        enc.encode(secretBase32),
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+      );
+      return window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: enc.encode("gaso-vault-totp-salt-2026"),
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    async function vaultEncryptText(plainText, key) {
+      if (!plainText) return "";
+      const enc = new TextEncoder();
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const ciphertext = await window.crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        key,
+        enc.encode(plainText)
+      );
+      const combined = new Uint8Array(iv.length + ciphertext.byteLength);
+      combined.set(iv, 0);
+      combined.set(new Uint8Array(ciphertext), iv.length);
+      return btoa(String.fromCharCode.apply(null, combined));
+    }
+
+    async function vaultDecryptText(cipherBase64, key) {
+      if (!cipherBase64) return "";
+      try {
+        const binStr = atob(cipherBase64);
+        const combined = new Uint8Array(binStr.length);
+        for (let i = 0; i < binStr.length; i++) combined[i] = binStr.charCodeAt(i);
+        const iv = combined.slice(0, 12);
+        const data = combined.slice(12);
+        const decrypted = await window.crypto.subtle.decrypt(
+          { name: "AES-GCM", iv },
+          key,
+          data
+        );
+        return new TextDecoder().decode(decrypted);
+      } catch (e) {
+        return "⚠️ Error al descifrar secreto";
+      }
+    }
+
+    function vaultResetLockTimer() {
+      if (vaultLockTimer) clearTimeout(vaultLockTimer);
+      // Auto-bloqueo tras 10 minutos (600,000 ms)
+      vaultLockTimer = setTimeout(() => {
+        if (vaultDecryptedKey) {
+          vaultLockNow();
+          showToast("🔒 Caja Fuerte bloqueada automáticamente por inactividad.");
+        }
+      }, 10 * 60 * 1000);
+    }
+
+    function vaultInit() {
+      const lockedScreen = document.getElementById("vault-locked-screen");
+      const unlockedScreen = document.getElementById("vault-unlocked-screen");
+      const loginView = document.getElementById("vault-totp-login-view");
+      const setupView = document.getElementById("vault-totp-setup-view");
+
+      if (vaultDecryptedKey) {
+        if (lockedScreen) lockedScreen.style.display = "none";
+        if (unlockedScreen) unlockedScreen.style.display = "block";
+        vaultResetLockTimer();
+        vaultFetchAndRender();
+      } else {
+        if (lockedScreen) lockedScreen.style.display = "block";
+        if (unlockedScreen) unlockedScreen.style.display = "none";
+
+        const savedSecret = safeStorage.getItem("gaso_vault_totp_secret");
+        if (!savedSecret) {
+          // No está configurado: mostrar pantalla de vinculación QR
+          vaultShowTotpSetup(false);
+        } else {
+          // Ya está configurado: mostrar campo para ingresar los 6 dígitos
+          if (loginView) loginView.style.display = "block";
+          if (setupView) setupView.style.display = "none";
+          const inp = document.getElementById("vault-totp-input");
+          if (inp) { inp.value = ""; inp.focus(); }
+        }
+      }
+    }
+
+    function vaultShowTotpSetup(isReconfig = false) {
+      const loginView = document.getElementById("vault-totp-login-view");
+      const setupView = document.getElementById("vault-totp-setup-view");
+      const cancelBtn = document.getElementById("vault-setup-cancel-btn");
+
+      if (loginView) loginView.style.display = "none";
+      if (setupView) setupView.style.display = "block";
+      if (cancelBtn) cancelBtn.style.display = isReconfig ? "block" : "none";
+
+      vaultPendingTotpSecret = generateRandomBase32Secret(20);
+      const secretTextEl = document.getElementById("vault-totp-secret-text");
+      if (secretTextEl) secretTextEl.textContent = vaultPendingTotpSecret;
+
+      // otpauth://totp/GASO%20Ingenier%C3%ADa:Superadmin?secret=SECRET&issuer=GASO%20MX
+      const otpauthUrl = `otpauth://totp/GASO%20Ingenier%C3%ADa:Superadmin?secret=${vaultPendingTotpSecret}&issuer=GASO%20MX&algorithm=SHA1&digits=6&period=30`;
+      const canvas = document.getElementById("vault-qr-canvas");
+      if (canvas && typeof window.renderQRCodeToCanvas === "function") {
+        window.renderQRCodeToCanvas(canvas, otpauthUrl, 160);
+      }
+
+      const inp = document.getElementById("vault-totp-setup-input");
+      if (inp) { inp.value = ""; inp.focus(); }
+    }
+
+    function vaultCancelTotpSetup() {
+      vaultPendingTotpSecret = null;
+      vaultInit();
+    }
+
+    async function vaultConfirmSetup(e) {
+      if (e) e.preventDefault();
+      const inp = document.getElementById("vault-totp-setup-input");
+      const code = inp ? inp.value.trim() : "";
+      if (!vaultPendingTotpSecret || code.length !== 6) {
+        showToast("Ingresa el código de 6 dígitos que muestra tu Google Authenticator.");
+        return;
+      }
+
+      const isValid = await verifyTotpCode(vaultPendingTotpSecret, code);
+      if (!isValid) {
+        showToast("❌ Código incorrecto. Verifica la hora de tu teléfono e inténtalo de nuevo.");
+        return;
+      }
+
+      // Guardar secreto permanentemente
+      safeStorage.setItem("gaso_vault_totp_secret", vaultPendingTotpSecret);
+      vaultDecryptedKey = await vaultDeriveKeyFromSecret(vaultPendingTotpSecret);
+      vaultPendingTotpSecret = null;
+      vaultResetLockTimer();
+
+      showToast("🎉 ¡Google Authenticator vinculado y Caja Fuerte desbloqueada!");
+      vaultInit();
+    }
+
+    async function vaultVerifyTotpCode(e) {
+      if (e) e.preventDefault();
+      const inp = document.getElementById("vault-totp-input");
+      const code = inp ? inp.value.trim() : "";
+      if (code.length !== 6) {
+        showToast("Ingresa los 6 dígitos del Authenticator.");
+        return;
+      }
+
+      const savedSecret = safeStorage.getItem("gaso_vault_totp_secret");
+      if (!savedSecret) {
+        vaultShowTotpSetup(false);
+        return;
+      }
+
+      const isValid = await verifyTotpCode(savedSecret, code);
+      if (!isValid) {
+        showToast("❌ Código de Google Authenticator incorrecto o expirado.");
+        if (inp) { inp.value = ""; inp.focus(); }
+        return;
+      }
+
+      vaultDecryptedKey = await vaultDeriveKeyFromSecret(savedSecret);
+      vaultResetLockTimer();
+      showToast("🔓 Caja Fuerte desbloqueada exitosamente.");
+      vaultInit();
+    }
+
+    function vaultLockNow() {
+      vaultDecryptedKey = null;
+      if (vaultLockTimer) clearTimeout(vaultLockTimer);
+      vaultInit();
+    }
+
+    function vaultTogglePinVisibility() {
+      const pinInp = document.getElementById("vault-master-pin");
+      if (pinInp) pinInp.type = pinInp.type === "password" ? "text" : "password";
+    }
+
+    async function vaultFetchAndRender() {
+      try {
+        const r = await fetch("/vault", { credentials: "same-origin" });
+        if (!r.ok) {
+          if (r.status === 401 || r.status === 403) {
+            showToast("Sesión o permisos insuficientes para la Caja Fuerte.");
+            return;
+          }
+        }
+        const data = await r.json();
+        if (data.ok && Array.isArray(data.items)) {
+          vaultItems = data.items;
+          safeStorage.setItem("gaso_vault_backup", JSON.stringify(vaultItems));
+        }
+      } catch (e) {
+        const cached = safeStorage.getItem("gaso_vault_backup");
+        if (cached) {
+          try { vaultItems = JSON.parse(cached); } catch(ex) {}
+        }
+      }
+      vaultPopulateClientFilters();
+      vaultFilterRender();
+    }
+
+    function vaultPopulateClientFilters() {
+      const filterSelect = document.getElementById("vault-filter-client");
+      const modalSelect = document.getElementById("vault-item-client-id");
+      const clientsList = typeof crmClients !== "undefined" && Array.isArray(crmClients) ? crmClients : [];
+
+      if (filterSelect) {
+        const currentVal = filterSelect.value || "all";
+        let opts = `<option value="all">👥 Todos los Clientes / General</option><option value="internal">🔒 Uso Interno Propio</option>`;
+        clientsList.forEach(c => {
+          opts += `<option value="${escapeHtml(c.id || c.name)}">👤 ${escapeHtml(c.name)}</option>`;
+        });
+        filterSelect.innerHTML = opts;
+        filterSelect.value = currentVal;
+      }
+
+      if (modalSelect) {
+        let mOpts = `<option value="">(Ninguno / Uso Interno Propio)</option>`;
+        clientsList.forEach(c => {
+          mOpts += `<option value="${escapeHtml(c.id || c.name)}">👤 ${escapeHtml(c.name)}</option>`;
+        });
+        modalSelect.innerHTML = mOpts;
+      }
+    }
+
+    async function vaultFilterRender() {
+      const tbody = document.getElementById("vault-items-body");
+      const emptyState = document.getElementById("vault-empty-state");
+      if (!tbody) return;
+
+      const q = (document.getElementById("vault-search-input")?.value || "").toLowerCase().trim();
+      const clientFilter = document.getElementById("vault-filter-client")?.value || "all";
+
+      const filtered = vaultItems.filter(item => {
+        const matchesCat = (vaultCurrentCategory === "all") || (item.category === vaultCurrentCategory);
+        let matchesClient = true;
+        if (clientFilter === "internal") {
+          matchesClient = !item.client_id;
+        } else if (clientFilter !== "all") {
+          matchesClient = item.client_id === clientFilter;
+        }
+
+        const matchesText = !q ||
+          (item.title && item.title.toLowerCase().includes(q)) ||
+          (item.client_name && item.client_name.toLowerCase().includes(q)) ||
+          (item.username && item.username.toLowerCase().includes(q)) ||
+          (item.url && item.url.toLowerCase().includes(q));
+        return matchesCat && matchesClient && matchesText;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "";
+        if (emptyState) emptyState.style.display = "block";
+        return;
+      }
+
+      if (emptyState) emptyState.style.display = "none";
+      let html = "";
+
+      for (let i = 0; i < filtered.length; i++) {
+        const it = filtered[i];
+        const categoryLabels = {
+          cctv_dvr: "📹 CCTV / DVR",
+          redes_wifi: "🌐 Redes / WiFi",
+          correos: "✉️ Correos",
+          proveedores: "🏢 Proveedores",
+          sat_bancos: "🏦 SAT/Bancos",
+          general: "📌 General"
+        };
+        const catBadge = categoryLabels[it.category] || "📌 " + (it.category || "General");
+        const clientLabel = it.client_name ? `👤 ${escapeHtml(it.client_name)}` : "🔒 Interno";
+
+        html += `
+          <tr style="border-bottom:1px solid var(--gray-100);">
+            <td style="padding:0.75rem 0.85rem; font-weight:700; color:#1e293b;">
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <span style="font-size:1.1rem;">${it.category === 'cctv_dvr' ? '📹' : (it.category === 'redes_wifi' ? '🌐' : '🔑')}</span>
+                <div>
+                  <div>${escapeHtml(it.title)}</div>
+                  <div style="font-size:0.73rem; color:#64748b; font-weight:normal;">
+                    <span style="color:#0284c7; font-weight:600;">${clientLabel}</span>
+                    ${it.port ? ` • Puerto: <code>${escapeHtml(it.port)}</code>` : ""}
+                    ${it.p2p ? ` • Serial: <code>${escapeHtml(it.p2p)}</code>` : ""}
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td style="padding:0.75rem 0.85rem;">
+              <span class="badge" style="background:#f1f5f9; color:#475569; font-size:0.73rem; border:1px solid #cbd5e1; border-radius:4px; padding:0.15rem 0.4rem;">
+                ${catBadge}
+              </span>
+            </td>
+            <td style="padding:0.75rem 0.85rem; font-family:monospace; color:#334155;">
+              <div style="display:flex; align-items:center; gap:0.35rem;">
+                <span>${escapeHtml(it.username || "—")}</span>
+                ${it.username ? `<button type="button" class="btn btn-outline btn-sm" onclick="vaultCopy('${it.id}', 'user')" style="padding:0.1rem 0.3rem; font-size:0.7rem;" title="Copiar usuario">📋</button>` : ""}
+              </div>
+            </td>
+            <td style="padding:0.75rem 0.85rem;">
+              <div style="display:flex; align-items:center; gap:0.35rem;">
+                <span id="vault-pass-display-${it.id}" style="font-family:monospace; font-weight:600; letter-spacing:0.1em; color:#0f172a;">••••••••••••</span>
+                <button type="button" class="btn btn-outline btn-sm" onclick="vaultToggleSecret('${it.id}')" style="padding:0.1rem 0.35rem; font-size:0.75rem;" title="Mostrar / Ocultar">👁️</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="vaultCopy('${it.id}', 'pass')" style="padding:0.1rem 0.35rem; font-size:0.75rem;" title="Copiar contraseña">📋</button>
+              </div>
+            </td>
+            <td style="padding:0.75rem 0.85rem;">
+              ${it.url ? (it.url.startsWith("http") ? `<a href="${escapeHtml(it.url)}" target="_blank" rel="noopener noreferrer" style="color:#0284c7; text-decoration:none; font-size:0.8rem; display:inline-flex; align-items:center; gap:0.2rem;">Abrir ↗</a>` : `<span style="font-family:monospace; font-size:0.78rem; background:#f8fafc; padding:0.15rem 0.3rem; border:1px solid #e2e8f0; border-radius:4px;">${escapeHtml(it.url)}</span>`) : "—"}
+            </td>
+            <td style="padding:0.75rem 0.85rem; text-align:right;">
+              <div style="display:inline-flex; gap:0.25rem;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="vaultOpenHandover('${it.id}')" style="padding:0.2rem 0.45rem; font-size:0.78rem; color:#0284c7; border-color:#bae6fd;" title="Ficha de Entrega al Cliente">📄 Ficha</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="vaultEditItem('${it.id}')" style="padding:0.2rem 0.45rem; font-size:0.78rem;" title="Editar">✏️</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="vaultDeleteItem('${it.id}')" style="padding:0.2rem 0.45rem; font-size:0.78rem; color:#dc2626; border-color:#fca5a5;" title="Eliminar">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+    }
+
+    function vaultSetCategory(cat) {
+      vaultCurrentCategory = cat;
+      const pills = document.querySelectorAll("#vault-category-pills .vault-pill");
+      pills.forEach(p => {
+        p.classList.remove("active", "btn-primary");
+        p.classList.add("btn-outline");
+      });
+      if (event && event.target) {
+        event.target.classList.add("active", "btn-primary");
+        event.target.classList.remove("btn-outline");
+      }
+      vaultFilterRender();
+    }
+
+    // --- Editor Enriquecido & Plantillas de Activos ---
+    function vaultRichExec(cmd, val = null) {
+      document.execCommand(cmd, false, val);
+      const ed = document.getElementById("vault-rich-editor");
+      if (ed) ed.focus();
+    }
+
+    function vaultInsertTemplate(type) {
+      const ed = document.getElementById("vault-rich-editor");
+      if (!ed) return;
+      if (type === "dvr") {
+        ed.innerHTML += `
+          <h4>📹 Configuración de Canales & Acceso Móvil</h4>
+          <ul>
+            <li><strong>App móvil:</strong> Hik-Connect / DMSS</li>
+            <li><strong>Canal 1:</strong> Entrada principal / Exterior</li>
+            <li><strong>Canal 2:</strong> Patio de maniobras / Almacén</li>
+            <li><strong>Canal 3:</strong> Pasillo central</li>
+            <li><strong>Canal 4:</strong> Caja / Mostrador</li>
+          </ul>
+          <p><span style="background-color:#fef08a; color:#854d0e;">⚠️ IMPORTANTE: No presionar botón de reset posterior sin autorización técnica.</span></p>
+        `;
+      } else if (type === "wifi") {
+        ed.innerHTML += `
+          <h4>🌐 Parámetros de Red Inalámbrica</h4>
+          <ul>
+            <li><strong>SSID Principal:</strong> MiEmpresa_WiFi (WPA2-PSK)</li>
+            <li><strong>SSID Invitados:</strong> MiEmpresa_Invitados (Aislada)</li>
+            <li><strong>IP Puerta de enlace:</strong> 192.168.1.1</li>
+            <li><strong>Rango DHCP:</strong> 192.168.1.100 - 192.168.1.200</li>
+          </ul>
+        `;
+      }
+    }
+
+    function vaultOnCategoryChange() {
+      const cat = document.getElementById("vault-item-category")?.value;
+      const techSec = document.getElementById("vault-section-tech");
+      if (techSec) {
+        techSec.style.display = (cat === "sat_bancos" || cat === "correos") ? "none" : "block";
+      }
+    }
+
+    async function vaultToggleSecret(id) {
+      const it = vaultItems.find(x => x.id === id);
+      if (!it || !vaultDecryptedKey) return;
+      const el = document.getElementById("vault-pass-display-" + id);
+      if (!el) return;
+
+      if (el.dataset.revealed === "true") {
+        el.textContent = "••••••••••••";
+        el.dataset.revealed = "false";
+      } else {
+        const plain = await vaultDecryptText(it.password_encrypted, vaultDecryptedKey);
+        el.textContent = plain;
+        el.dataset.revealed = "true";
+      }
+    }
+
+    async function vaultCopy(id, field) {
+      const it = vaultItems.find(x => x.id === id);
+      if (!it) return;
+      if (field === "user") {
+        navigator.clipboard.writeText(it.username || "");
+        showToast("📋 Usuario copiado al portapapeles.");
+      } else if (field === "pass") {
+        if (!vaultDecryptedKey) return;
+        const plain = await vaultDecryptText(it.password_encrypted, vaultDecryptedKey);
+        navigator.clipboard.writeText(plain || "");
+        showToast("📋 Contraseña copiada al portapapeles.");
+      }
+    }
+
+    function vaultOpenItemModal(item = null) {
+      vaultPopulateClientFilters();
+
+      document.getElementById("vault-item-id").value = item ? item.id : ("v_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6));
+      document.getElementById("vault-item-title").value = item ? item.title : "";
+      document.getElementById("vault-item-category").value = item ? (item.category || "cctv_dvr") : "cctv_dvr";
+      document.getElementById("vault-item-client-id").value = item ? (item.client_id || "") : "";
+      document.getElementById("vault-item-url").value = item ? (item.url || "") : "";
+      document.getElementById("vault-item-port").value = item ? (item.port || "") : "";
+      document.getElementById("vault-item-p2p").value = item ? (item.p2p || "") : "";
+      document.getElementById("vault-item-user").value = item ? (item.username || "") : "";
+      document.getElementById("vault-item-pass").value = "";
+
+      const ed = document.getElementById("vault-rich-editor");
+      if (ed) ed.innerHTML = "";
+
+      vaultOnCategoryChange();
+      document.getElementById("modal-vault-title").textContent = item ? "✏️ Editar Ficha de Activo & Credencial" : "🔐 Nueva Ficha de Activo & Credencial";
+
+      if (item && vaultDecryptedKey) {
+        vaultDecryptText(item.password_encrypted, vaultDecryptedKey).then(p => {
+          document.getElementById("vault-item-pass").value = p;
+        });
+        if (item.notes_encrypted) {
+          vaultDecryptText(item.notes_encrypted, vaultDecryptedKey).then(n => {
+            if (ed) ed.innerHTML = n;
+          });
+        }
+      }
+
+      openModal("modal-vault-item");
+    }
+
+    function vaultEditItem(id) {
+      const it = vaultItems.find(x => x.id === id);
+      if (it) vaultOpenItemModal(it);
+    }
+
+    async function vaultSaveItemFromModal() {
+      const id = document.getElementById("vault-item-id").value;
+      const title = document.getElementById("vault-item-title").value.trim();
+      const category = document.getElementById("vault-item-category").value;
+      const clientId = document.getElementById("vault-item-client-id").value;
+      const clientSelect = document.getElementById("vault-item-client-id");
+      const clientName = (clientSelect && clientSelect.selectedIndex > 0) ? clientSelect.options[clientSelect.selectedIndex].text.replace(/^👤\s*/, "") : "";
+
+      const url = document.getElementById("vault-item-url").value.trim();
+      const port = document.getElementById("vault-item-port").value.trim();
+      const p2p = document.getElementById("vault-item-p2p").value.trim();
+      const username = document.getElementById("vault-item-user").value.trim();
+      const pass = document.getElementById("vault-item-pass").value;
+      const ed = document.getElementById("vault-rich-editor");
+      const notesHtml = ed ? ed.innerHTML.trim() : "";
+
+      if (!title) { showToast("El título o equipo es obligatorio."); return; }
+      if (!pass) { showToast("La contraseña es obligatoria."); return; }
+      if (!vaultDecryptedKey) { showToast("Bóveda bloqueada."); return; }
+
+      try {
+        const passEnc = await vaultEncryptText(pass, vaultDecryptedKey);
+        const notesEnc = notesHtml ? await vaultEncryptText(notesHtml, vaultDecryptedKey) : "";
+
+        const payload = {
+          action: "save",
+          item: {
+            id,
+            title,
+            category,
+            client_id: clientId,
+            client_name: clientName,
+            url,
+            port,
+            p2p,
+            username,
+            password_encrypted: passEnc,
+            notes_encrypted: notesEnc
+          }
+        };
+
+        const res = await fetch("/vault", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          const idx = vaultItems.findIndex(x => x.id === id);
+          if (idx >= 0) vaultItems[idx] = payload.item;
+          else vaultItems.unshift(payload.item);
+          safeStorage.setItem("gaso_vault_backup", JSON.stringify(vaultItems));
+        }
+
+        closeModal("modal-vault-item");
+        showToast("✅ Ficha técnica de credenciales guardada.");
+        vaultFetchAndRender();
+      } catch (err) {
+        showToast("Error al guardar: " + err.message);
+      }
+    }
+
+    async function vaultDeleteItem(id) {
+      if (!confirm("¿Seguro que deseas eliminar este registro de la Caja Fuerte?")) return;
+      try {
+        await fetch("/vault", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "delete", id })
+        });
+      } catch (e) {}
+
+      vaultItems = vaultItems.filter(x => x.id !== id);
+      safeStorage.setItem("gaso_vault_backup", JSON.stringify(vaultItems));
+      showToast("🗑️ Registro eliminado.");
+      vaultFilterRender();
+    }
+
+    // --- FICHA DE ENTREGA TÉCNICA (IMPRESIÓN Y WHATSAPP) ---
+    let vaultActiveHandoverItem = null;
+    let vaultActiveHandoverPass = "";
+
+    async function vaultOpenHandover(id) {
+      const it = vaultItems.find(x => x.id === id);
+      if (!it || !vaultDecryptedKey) return;
+
+      vaultActiveHandoverItem = it;
+      vaultActiveHandoverPass = await vaultDecryptText(it.password_encrypted, vaultDecryptedKey);
+      const notesHtml = it.notes_encrypted ? await vaultDecryptText(it.notes_encrypted, vaultDecryptedKey) : "";
+
+      const body = document.getElementById("vault-handover-body");
+      if (!body) return;
+
+      body.innerHTML = `
+        <div id="vault-printable-sheet" style="font-family:sans-serif; color:#0f172a; line-height:1.4;">
+          <!-- Membrete GASO -->
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0284c7; padding-bottom:0.75rem; margin-bottom:1rem;">
+            <div>
+              <h2 style="margin:0; font-size:1.25rem; color:#0284c7; font-weight:800;">GASO INGENIERÍA</h2>
+              <div style="font-size:0.78rem; color:#64748b;">Seguridad Electrónica, CCTV, Redes & TI</div>
+            </div>
+            <div style="text-align:right; font-size:0.75rem; color:#64748b;">
+              <strong>Ficha de Entrega Técnica</strong><br>
+              Fecha: ${new Date().toLocaleDateString("es-MX")}
+            </div>
+          </div>
+
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.85rem; margin-bottom:1rem;">
+            <div style="font-size:0.8rem; margin-bottom:0.35rem;">
+              <strong>Cliente:</strong> ${escapeHtml(it.client_name || "Cliente Particular")}
+            </div>
+            <div style="font-size:0.8rem;">
+              <strong>Equipo / Servicio:</strong> ${escapeHtml(it.title)}
+            </div>
+          </div>
+
+          <table style="width:100%; border-collapse:collapse; margin-bottom:1rem; font-size:0.83rem;">
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:0.4rem 0.6rem; font-weight:700; width:35%; background:#f1f5f9;">Usuario / Cuenta:</td>
+              <td style="padding:0.4rem 0.6rem; font-family:monospace;">${escapeHtml(it.username || "admin")}</td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:0.4rem 0.6rem; font-weight:700; background:#f1f5f9;">Contraseña de Acceso:</td>
+              <td style="padding:0.4rem 0.6rem; font-family:monospace; font-weight:700; color:#0f172a;">${escapeHtml(vaultActiveHandoverPass)}</td>
+            </tr>
+            ${it.url ? `
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:0.4rem 0.6rem; font-weight:700; background:#f1f5f9;">IP / Enlace:</td>
+              <td style="padding:0.4rem 0.6rem; font-family:monospace;">${escapeHtml(it.url)}</td>
+            </tr>` : ""}
+            ${it.port ? `
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:0.4rem 0.6rem; font-weight:700; background:#f1f5f9;">Puertos:</td>
+              <td style="padding:0.4rem 0.6rem; font-family:monospace;">${escapeHtml(it.port)}</td>
+            </tr>` : ""}
+            ${it.p2p ? `
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:0.4rem 0.6rem; font-weight:700; background:#f1f5f9;">Serial / P2P Cloud:</td>
+              <td style="padding:0.4rem 0.6rem; font-family:monospace;">${escapeHtml(it.p2p)}</td>
+            </tr>` : ""}
+          </table>
+
+          ${notesHtml ? `
+          <div style="margin-bottom:1rem;">
+            <div style="font-weight:700; font-size:0.82rem; margin-bottom:0.35rem; color:#334155;">Detalles y Procedimiento:</div>
+            <div style="border:1px solid #e2e8f0; border-radius:6px; padding:0.75rem; font-size:0.8rem; background:#fff;">
+              ${notesHtml}
+            </div>
+          </div>` : ""}
+
+          <div style="border-top:1px dashed #cbd5e1; padding-top:0.75rem; font-size:0.72rem; color:#64748b; line-height:1.4;">
+            🛡️ <strong>Aviso de Confidencialidad:</strong> Guarde esta ficha en un lugar seguro. GASO Ingeniería entrega este sistema configurado y operativo. Se recomienda no compartir contraseñas con personal no autorizado.
+          </div>
+        </div>
+      `;
+
+      openModal("modal-vault-handover");
+    }
+
+    function vaultPrintHandover() {
+      const sheet = document.getElementById("vault-printable-sheet");
+      if (!sheet) return;
+      const w = window.open("", "_blank");
+      w.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Ficha de Entrega Técnica - GASO</title>
+          <style>body { font-family: system-ui, sans-serif; padding: 20px; }</style>
+        </head>
+        <body>${sheet.innerHTML}</body>
+        </html>
+      `);
+      w.document.close();
+      w.focus();
+      setTimeout(() => { w.print(); }, 250);
+    }
+
+    function vaultShareWhatsApp() {
+      if (!vaultActiveHandoverItem) return;
+      const it = vaultActiveHandoverItem;
+      const msg = `*GASO INGENIERÍA — Ficha de Entrega Técnica* 🛠️\n\n` +
+        `👤 *Cliente:* ${it.client_name || "Cliente"}\n` +
+        `📹 *Equipo/Servicio:* ${it.title}\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `👤 *Usuario:* ${it.username || "admin"}\n` +
+        `🔑 *Contraseña:* ${vaultActiveHandoverPass}\n` +
+        (it.url ? `🌐 *IP/URL:* ${it.url}\n` : "") +
+        (it.port ? `⚙️ *Puertos:* ${it.port}\n` : "") +
+        (it.p2p ? `📲 *Serial/P2P:* ${it.p2p}\n` : "") +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `_Sistema entregado y verificado por GASO Ingeniería._`;
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, "_blank");
+    }
+
+    function vaultGeneratePassword() {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~|}{[]:;?><,.-=";
+      let pass = "";
+      const randValues = new Uint32Array(16);
+      window.crypto.getRandomValues(randValues);
+      for (let i = 0; i < 16; i++) {
+        pass += chars[randValues[i] % chars.length];
+      }
+      const el = document.getElementById("vault-item-pass");
+      if (el) el.value = pass;
+      showToast("⚡ Contraseña aleatoria de alta seguridad generada.");
+    }
+
+    function vaultCopyModalPass() {
+      const el = document.getElementById("vault-item-pass");
+      if (el && el.value) {
+        navigator.clipboard.writeText(el.value);
+        showToast("📋 Contraseña copiada.");
+      }
+    }
+
     const defaultSystemUsers = []; // Las cuentas viven en el servidor (variables de entorno de Netlify)
 
     let systemUsers = [];
@@ -8885,8 +9995,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const isCotizador = user.role === "COTIZADOR";
 
       const btnUsers = document.getElementById("tab-btn-users");
+      const btnVault = document.getElementById("tab-btn-vault");
       const btnCfg = document.getElementById("tab-btn-config");
       if (btnCfg) btnCfg.style.display = isSuper ? "inline-flex" : "none";
+      if (btnVault) btnVault.style.display = isSuper ? "inline-flex" : "none";
       const btnDash = document.getElementById("tab-btn-dashboard");
       const btnCrm = document.getElementById("tab-btn-crm");
 
@@ -8908,6 +10020,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const activePane = document.querySelector(".tab-pane.active");
       if (activePane) {
         if (activePane.id === "pane-users" && !isSuper) switchTab("cotizador");
+        if (activePane.id === "pane-vault" && !isSuper) switchTab("cotizador");
         if (activePane.id === "pane-dashboard" && !isSuper) switchTab("cotizador");
         if (activePane.id === "pane-crm" && isCotizador) switchTab("cotizador");
       }

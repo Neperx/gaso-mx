@@ -1,4 +1,4 @@
-/** Cron diario: dispara /catalog-cron en Pages (FX + Syscom + Tecnosinergia). */
+/** Cron diario 15:00 CDMX: dispara /catalog-cron (FX + Syscom + Tecnosinergia). */
 export default {
   async scheduled(event, env, ctx) {
     const base = String(env.GASO_BASE_URL || "https://gaso-mx.pages.dev").replace(/\/$/, "");

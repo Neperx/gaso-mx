@@ -1,5 +1,7 @@
 /**
  * Sincronización diaria Syscom + Tecnosinergia + tipo de cambio.
+ * Programada a las 15:00 hora Ciudad de México (cron worker 0 21 * * * UTC),
+ * cuando ya suelen estar capturados los productos que llegaron en paquetería.
  * Auth: Authorization: Bearer <CRON_SECRET>  OR  sesión SUPERADMIN.
  */
 import { requireAuth, resp } from "../lib/session.js";
@@ -123,8 +125,13 @@ export async function onRequestGet(context) {
   const auth = await requireAuth({ headers }, context.env.SESSION_SECRET || "", context.env);
   if (auth.error) return auth.error;
   let sys = {}, tec = {}, fx = null;
+  let sysPartsTotal = 0;
   try {
     sys = await context.env.DB.prepare("SELECT status, total, message, finished_at FROM gaso_syscom_sync_meta WHERE id=1").first() || {};
+  } catch (e) { /* ignore */ }
+  try {
+    const row = await context.env.DB.prepare("SELECT COALESCE(SUM(n),0) AS total FROM gaso_catalog_parts WHERE name = 'syscom'").first();
+    sysPartsTotal = Number(row && row.total) || 0;
   } catch (e) { /* ignore */ }
   try {
     tec = await context.env.DB.prepare("SELECT status, total, message, finished_at FROM gaso_tecno_meta WHERE id=1").first() || {};
@@ -133,10 +140,12 @@ export async function onRequestGet(context) {
     const { loadFx } = await import("../lib/fx.js");
     fx = await loadFx(context.env.DB);
   } catch (e) { /* ignore */ }
+  const sysTotal = Math.max(Number(sys.total) || 0, sysPartsTotal);
+  const tecTotal = Number(tec.total) || 0;
   return resp(200, {
     status: true,
     fx,
-    syscom: { state: sys.status, total: sys.total, message: sys.message, finishedAt: sys.finished_at },
-    tecno: { state: tec.status, total: tec.total, message: tec.message, finishedAt: tec.finished_at }
+    syscom: { state: sys.status || (sysTotal ? "ok" : "none"), total: sysTotal, message: sys.message || "", finishedAt: sys.finished_at || null },
+    tecno: { state: tec.status || (tecTotal ? "ok" : "none"), total: tecTotal, message: tec.message || "", finishedAt: tec.finished_at || null }
   });
 }
