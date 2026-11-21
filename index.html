@@ -3973,9 +3973,9 @@ CLABE: 722969010514249300</textarea>
           </div>
 
           <!-- Filtros y Búsqueda -->
-          <div style="display:flex; gap:0.75rem; margin-bottom:1.25rem; flex-wrap:wrap; align-items:center;">
+          <div style="display:flex; gap:0.75rem; margin-bottom:1rem; flex-wrap:wrap; align-items:center;">
             <div style="flex:1; min-width:220px; position:relative;">
-              <input type="text" id="vault-search-input" class="form-input" placeholder="🔍 Buscar por servicio, cliente, usuario, IP o notas..." oninput="vaultFilterRender()" style="width:100%; padding-left:0.75rem;">
+              <input type="text" id="vault-search-input" class="form-input" placeholder="🔍 Buscar por servicio, cliente, usuario, URL o notas..." oninput="vaultFilterRender()" style="width:100%; padding-left:0.75rem;">
             </div>
             <div style="min-width:200px;">
               <select id="vault-filter-client" class="form-select" onchange="vaultFilterRender()" style="width:100%; font-size:0.83rem;">
@@ -3983,22 +3983,29 @@ CLABE: 722969010514249300</textarea>
                 <!-- Se llena dinámicamente con clientes del CRM -->
               </select>
             </div>
-            <div style="display:flex; gap:0.35rem; flex-wrap:wrap;" id="vault-category-pills">
-              <button class="btn btn-sm btn-primary vault-pill active" onclick="vaultSetCategory('all')">Todos</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('streaming')">🎬 Streaming (Netflix...)</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('servicios')">📡 Servicios (Totalplay, CFE...)</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('pagos')">💳 Pagos (PayPal, MeLi...)</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('cctv_dvr')">📹 CCTV / DVR</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('redes_wifi')">🌐 Redes / WiFi</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('correos')">✉️ Correos & Hosting</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('proveedores')">🏢 Proveedores (Syscom...)</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('sat_bancos')">🏦 SAT / Bancos</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('general')">📌 Otros</button>
+            <!-- Selector de Vista: Lista Individual vs Agrupado por Cliente / Plataforma -->
+            <div style="display:inline-flex; border:1px solid var(--gray-300); border-radius:6px; overflow:hidden; background:#fff;">
+              <button id="vault-view-btn-table" type="button" class="btn btn-sm" onclick="vaultSwitchView('table')" style="background:#0284c7; color:#fff; border:none; padding:0.35rem 0.65rem; font-weight:700; border-radius:0;">📋 Lista</button>
+              <button id="vault-view-btn-grouped" type="button" class="btn btn-sm btn-outline" onclick="vaultSwitchView('grouped')" style="border:none; padding:0.35rem 0.65rem; font-weight:700; border-radius:0;">🗂️ Agrupado por Cliente</button>
             </div>
           </div>
 
-          <!-- Tabla / Tarjetas de Secretos -->
-          <div class="crm-table-box" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; overflow:hidden;">
+          <div style="display:flex; gap:0.35rem; margin-bottom:1.25rem; flex-wrap:wrap;" id="vault-category-pills">
+            <button class="btn btn-sm btn-primary vault-pill active" onclick="vaultSetCategory('all')">Todos</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('streaming')">🎬 Streaming</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('servicios')">📡 Servicios</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('pagos')">💳 Pagos</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('apps')">📱 Apps & SaaS</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('cctv_dvr')">📹 CCTV / DVR</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('redes_wifi')">🌐 Redes / WiFi</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('correos')">✉️ Correos & Hosting</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('proveedores')">🏢 Proveedores</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('sat_bancos')">🏦 SAT / Bancos</button>
+            <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('general')">📌 Otros</button>
+          </div>
+
+          <!-- CONTENEDOR VISTA 1: TABLA PLANA -->
+          <div id="vault-view-table-container" class="crm-table-box" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; overflow:hidden;">
             <table class="crm-table" style="width:100%; font-size:0.85rem;">
               <thead>
                 <tr style="background:var(--gray-50); border-bottom:1px solid var(--gray-200); text-align:left;">
@@ -4014,10 +4021,16 @@ CLABE: 722969010514249300</textarea>
                 <!-- Se renderiza vía JS -->
               </tbody>
             </table>
-            <div id="vault-empty-state" style="display:none; padding:3rem; text-align:center; color:var(--gray-400);">
-              <div style="font-size:2rem; margin-bottom:0.5rem;">📂</div>
-              <p style="margin:0; font-size:0.9rem;">No hay registros en la Caja Fuerte que coincidan con la búsqueda.</p>
-            </div>
+          </div>
+
+          <!-- CONTENEDOR VISTA 2: AGRUPADO POR CLIENTE (CARDS / FOLDERS EXPANDIBLES) -->
+          <div id="vault-view-grouped-container" style="display:none; flex-direction:column; gap:1rem;">
+            <!-- Renderizado dinámico de tarjetas agrupadas -->
+          </div>
+
+          <div id="vault-empty-state" style="display:none; padding:3rem; text-align:center; color:var(--gray-400);">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">📂</div>
+            <p style="margin:0; font-size:0.9rem;">No hay registros en la Caja Fuerte que coincidan con la búsqueda.</p>
           </div>
         </div>
 
@@ -4062,13 +4075,19 @@ CLABE: 722969010514249300</textarea>
 
           <div>
             <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Título / Nombre del Servicio o Equipo *:</label>
-            <input type="text" id="vault-item-title" class="form-input" placeholder="Ej. DVR Entrada Principal (Hikvision 8 Ch), WiFi Bodega, SAT Firma" style="width:100%; font-weight:600;" required>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <select id="vault-preset-select" class="form-select" onchange="vaultApplyPreset()" style="width:230px; font-size:0.83rem;">
+                <option value="">✨ Elegir plataforma...</option>
+                <!-- Opciones dinámicas según categoría elegida -->
+              </select>
+              <input type="text" id="vault-item-title" class="form-input" placeholder="Nombre específico (ej. Netflix Plan Familiar)" style="flex:1; font-weight:600;" required>
+            </div>
           </div>
 
-          <!-- Campos de Acceso / Red (IP, Puerto, P2P / Stream) -->
-          <div id="vault-section-tech" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
+          <!-- Campos de Acceso / Red (IP, Puerto, P2P / Stream) - Solo para CCTV o Redes -->
+          <div id="vault-section-tech" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.75rem;">
             <div style="font-size:0.75rem; font-weight:700; color:#475569; margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05em;">
-              ⚙️ Parámetros de Red / Enlace
+              ⚙️ Parámetros de Red / Enlace Técnico
             </div>
             <div style="display:grid; grid-template-columns:2fr 1fr 1.5fr; gap:0.5rem;">
               <div>
@@ -4084,6 +4103,12 @@ CLABE: 722969010514249300</textarea>
                 <input type="text" id="vault-item-p2p" class="form-input" placeholder="D12345678 / Clave Verif" style="width:100%; font-family:monospace; font-size:0.83rem;">
               </div>
             </div>
+          </div>
+
+          <!-- Enlace Web / URL para plataformas web (cuando no son CCTV/Redes) -->
+          <div id="vault-section-weburl" style="display:none;">
+            <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">🌐 Enlace / Sitio Web de Inicio de Sesión:</label>
+            <input type="text" id="vault-item-weburl" class="form-input" placeholder="https://www.netflix.com, https://totalplay.com.mx, etc." style="width:100%; font-family:monospace; font-size:0.83rem;">
           </div>
 
           <!-- Credenciales: Usuario y Contraseña -->
@@ -9749,44 +9774,49 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         return matchesCat && matchesClient && matchesText;
       });
 
+      const groupedCont = document.getElementById("vault-view-grouped-container");
+
       if (filtered.length === 0) {
         tbody.innerHTML = "";
+        if (groupedCont) groupedCont.innerHTML = "";
         if (emptyState) emptyState.style.display = "block";
         return;
       }
 
       if (emptyState) emptyState.style.display = "none";
-      let html = "";
 
+      const categoryLabels = {
+        streaming: "🎬 Streaming",
+        servicios: "📡 Servicios",
+        pagos: "💳 Pagos",
+        apps: "📱 Apps & SaaS",
+        cctv_dvr: "📹 CCTV / DVR",
+        redes_wifi: "🌐 Redes / WiFi",
+        correos: "✉️ Correos & Hosting",
+        proveedores: "🏢 Proveedores",
+        sat_bancos: "🏦 SAT / Bancos",
+        general: "📌 General"
+      };
+
+      const catIconMap = {
+        streaming: '🎬',
+        servicios: '📡',
+        pagos: '💳',
+        apps: '📱',
+        cctv_dvr: '📹',
+        redes_wifi: '🌐',
+        correos: '✉️',
+        proveedores: '🏢',
+        sat_bancos: '🏦',
+        general: '🔑'
+      };
+
+      // 1. Render de Tabla Tradicional
+      let html = "";
       for (let i = 0; i < filtered.length; i++) {
         const it = filtered[i];
-        const categoryLabels = {
-          streaming: "🎬 Streaming",
-          servicios: "📡 Servicios",
-          pagos: "💳 Pagos",
-          apps: "📱 Apps / Software",
-          cctv_dvr: "📹 CCTV / DVR",
-          redes_wifi: "🌐 Redes / WiFi",
-          correos: "✉️ Correos & Hosting",
-          proveedores: "🏢 Proveedores",
-          sat_bancos: "🏦 SAT / Bancos",
-          general: "📌 General"
-        };
         const catBadge = categoryLabels[it.category] || "📌 " + (it.category || "General");
         const clientLabel = it.client_name ? `👤 ${escapeHtml(it.client_name)}` : "🔒 Interno";
-
-        const catIconMap = {
-          streaming: '🎬',
-          servicios: '📡',
-          pagos: '💳',
-          apps: '📱',
-          cctv_dvr: '📹',
-          redes_wifi: '🌐',
-          correos: '✉️',
-          proveedores: '🏢',
-          sat_bancos: '🏦',
-          general: '🔑'
-        };
         const catIcon = catIconMap[it.category] || '🔑';
 
         html += `
@@ -9836,6 +9866,114 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         `;
       }
       tbody.innerHTML = html;
+
+      // 2. Render de Vista Agrupada por Cliente
+      if (groupedCont) {
+        const groups = {};
+        filtered.forEach(it => {
+          const key = it.client_name ? it.client_name : "🔒 Uso Interno Propio";
+          if (!groups[key]) groups[key] = [];
+          groups[key].push(it);
+        });
+
+        let gHtml = "";
+        const groupKeys = Object.keys(groups).sort((a, b) => {
+          if (a.includes("Interno")) return -1;
+          if (b.includes("Interno")) return 1;
+          return a.localeCompare(b);
+        });
+
+        groupKeys.forEach(grpName => {
+          const items = groups[grpName];
+          const isInternal = grpName.includes("Interno");
+          const grpIcon = isInternal ? "🔒" : "👤";
+          const grpBg = isInternal ? "#f8fafc" : "#f0f9ff";
+          const grpBorder = isInternal ? "#cbd5e1" : "#bae6fd";
+          const grpColor = isInternal ? "#334155" : "#0369a1";
+
+          gHtml += `
+            <div style="background:#fff; border:1px solid ${grpBorder}; border-radius:10px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              <div style="background:${grpBg}; padding:0.75rem 1rem; border-bottom:1px solid ${grpBorder}; display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span style="font-size:1.2rem;">${grpIcon}</span>
+                  <div>
+                    <h4 style="margin:0; font-size:0.95rem; font-weight:800; color:${grpColor};">${escapeHtml(grpName)}</h4>
+                    <span style="font-size:0.72rem; color:#64748b;">${items.length} cuenta${items.length === 1 ? '' : 's'} guardada${items.length === 1 ? '' : 's'}</span>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline" onclick="vaultOpenItemModalWithClient('${escapeHtml(items[0]?.client_id || '')}', '${escapeHtml(grpName)}')" style="font-size:0.75rem; background:#fff;">
+                  + Agregar contraseña a este cliente
+                </button>
+              </div>
+
+              <div style="padding:0.5rem 1rem;">
+                <table style="width:100%; font-size:0.83rem; border-collapse:collapse;">
+                  <thead>
+                    <tr style="border-bottom:1px solid #e2e8f0; color:#64748b; font-size:0.72rem; text-transform:uppercase;">
+                      <th style="padding:0.4rem 0.5rem; text-align:left;">Servicio / Cuenta</th>
+                      <th style="padding:0.4rem 0.5rem; text-align:left;">Categoría</th>
+                      <th style="padding:0.4rem 0.5rem; text-align:left;">Usuario</th>
+                      <th style="padding:0.4rem 0.5rem; text-align:left;">Contraseña</th>
+                      <th style="padding:0.4rem 0.5rem; text-align:left;">Enlace</th>
+                      <th style="padding:0.4rem 0.5rem; text-align:right;">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+          `;
+
+          items.forEach(it => {
+            const catBadge = categoryLabels[it.category] || "📌 " + (it.category || "General");
+            const catIcon = catIconMap[it.category] || '🔑';
+
+            gHtml += `
+              <tr style="border-bottom:1px solid #f1f5f9;">
+                <td style="padding:0.55rem 0.5rem; font-weight:700; color:#1e293b;">
+                  <div style="display:flex; align-items:center; gap:0.35rem;">
+                    <span>${catIcon}</span>
+                    <span>${escapeHtml(it.title)}</span>
+                    ${it.port ? `<span style="font-size:0.7rem; color:#64748b; font-weight:normal;">(:${escapeHtml(it.port)})</span>` : ""}
+                  </div>
+                </td>
+                <td style="padding:0.55rem 0.5rem;">
+                  <span style="font-size:0.72rem; background:#f1f5f9; padding:0.1rem 0.35rem; border-radius:4px; border:1px solid #cbd5e1;">${catBadge}</span>
+                </td>
+                <td style="padding:0.55rem 0.5rem; font-family:monospace; color:#334155;">
+                  <div style="display:flex; align-items:center; gap:0.25rem;">
+                    <span>${escapeHtml(it.username || "—")}</span>
+                    ${it.username ? `<button type="button" class="btn btn-outline btn-sm" onclick="vaultCopy('${it.id}', 'user')" style="padding:0.05rem 0.25rem; font-size:0.68rem;" title="Copiar">📋</button>` : ""}
+                  </div>
+                </td>
+                <td style="padding:0.55rem 0.5rem;">
+                  <div style="display:flex; align-items:center; gap:0.25rem;">
+                    <span id="vault-pass-grp-${it.id}" style="font-family:monospace; font-weight:600; letter-spacing:0.08em; color:#0f172a;">••••••••••••</span>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="vaultToggleSecretGrp('${it.id}')" style="padding:0.05rem 0.25rem; font-size:0.7rem;">👁️</button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="vaultCopy('${it.id}', 'pass')" style="padding:0.05rem 0.25rem; font-size:0.7rem;">📋</button>
+                  </div>
+                </td>
+                <td style="padding:0.55rem 0.5rem;">
+                  ${it.url ? (it.url.startsWith("http") ? `<a href="${escapeHtml(it.url)}" target="_blank" rel="noopener noreferrer" style="color:#0284c7; text-decoration:none; font-size:0.78rem;">Abrir ↗</a>` : `<span style="font-family:monospace; font-size:0.74rem;">${escapeHtml(it.url)}</span>`) : "—"}
+                </td>
+                <td style="padding:0.55rem 0.5rem; text-align:right;">
+                  <div style="display:inline-flex; gap:0.2rem;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="vaultOpenHandover('${it.id}')" style="padding:0.15rem 0.35rem; font-size:0.72rem; color:#0284c7;" title="Ficha">📄</button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="vaultEditItem('${it.id}')" style="padding:0.15rem 0.35rem; font-size:0.72rem;" title="Editar">✏️</button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="vaultDeleteItem('${it.id}')" style="padding:0.15rem 0.35rem; font-size:0.72rem; color:#dc2626;" title="Eliminar">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          });
+
+          gHtml += `
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        });
+
+        groupedCont.innerHTML = gHtml;
+      }
     }
 
     function vaultSetCategory(cat) {
@@ -9887,12 +10025,163 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
     }
 
-    function vaultOnCategoryChange() {
-      const cat = document.getElementById("vault-item-category")?.value;
-      const techSec = document.getElementById("vault-section-tech");
-      if (techSec) {
-        techSec.style.display = (cat === "sat_bancos" || cat === "correos") ? "none" : "block";
+    // Vista actual: "table" o "grouped"
+    let vaultCurrentView = "table";
+
+    function vaultSwitchView(viewMode) {
+      vaultCurrentView = viewMode;
+      const btnTable = document.getElementById("vault-view-btn-table");
+      const btnGrouped = document.getElementById("vault-view-btn-grouped");
+      const tableCont = document.getElementById("vault-view-table-container");
+      const groupedCont = document.getElementById("vault-view-grouped-container");
+
+      if (viewMode === "table") {
+        if (btnTable) { btnTable.style.background = "#0284c7"; btnTable.style.color = "#fff"; btnTable.classList.remove("btn-outline"); }
+        if (btnGrouped) { btnGrouped.style.background = "transparent"; btnGrouped.style.color = "var(--gray-700)"; btnGrouped.classList.add("btn-outline"); }
+        if (tableCont) tableCont.style.display = "block";
+        if (groupedCont) groupedCont.style.display = "none";
+      } else {
+        if (btnGrouped) { btnGrouped.style.background = "#0284c7"; btnGrouped.style.color = "#fff"; btnGrouped.classList.remove("btn-outline"); }
+        if (btnTable) { btnTable.style.background = "transparent"; btnTable.style.color = "var(--gray-700)"; btnTable.classList.add("btn-outline"); }
+        if (tableCont) tableCont.style.display = "none";
+        if (groupedCont) groupedCont.style.display = "flex";
       }
+      vaultFilterRender();
+    }
+
+    // Catálogo de plataformas predefinidas por categoría
+    const VAULT_PRESETS = {
+      streaming: [
+        { name: "Netflix", url: "https://www.netflix.com/login" },
+        { name: "Amazon Prime Video", url: "https://www.primevideo.com" },
+        { name: "Disney+", url: "https://www.disneyplus.com/login" },
+        { name: "HBO Max / Max", url: "https://www.max.com" },
+        { name: "Spotify", url: "https://accounts.spotify.com/login" },
+        { name: "YouTube Premium", url: "https://accounts.google.com" },
+        { name: "Apple TV+ / Apple ID", url: "https://appleid.apple.com" },
+        { name: "Paramount+", url: "https://www.paramountplus.com" },
+        { name: "Crunchyroll", url: "https://www.crunchyroll.com/login" },
+        { name: "Star+", url: "https://www.starplus.com" }
+      ],
+      servicios: [
+        { name: "Totalplay Mi Cuenta", url: "https://micuenta.totalplay.com.mx" },
+        { name: "Telmex Mi Telmex", url: "https://mitelmex.telmex.com" },
+        { name: "CFE Contigo", url: "https://app.cfe.mx/Aplicaciones/CCFE/SolicitudesCFE/Login.aspx" },
+        { name: "Izzi Telecom", url: "https://www.izzi.mx/mi-cuenta" },
+        { name: "Megacable", url: "https://serviciosenlinea.megacable.com.mx" },
+        { name: "Sky México", url: "https://serviciosenlinea.sky.com.mx" },
+        { name: "Telcel Mi Telcel", url: "https://mitelcel.com" },
+        { name: "AT&T Mi AT&T", url: "https://miatt.att.com.mx" }
+      ],
+      pagos: [
+        { name: "Mercado Libre / Mercado Pago", url: "https://www.mercadolibre.com.mx" },
+        { name: "PayPal", url: "https://www.paypal.com/signin" },
+        { name: "Stripe Dashboard", url: "https://dashboard.stripe.com/login" },
+        { name: "Clip", url: "https://dashboard.clip.mx" },
+        { name: "Openpay (BBVA)", url: "https://dashboard.openpay.mx" },
+        { name: "Kueski Pay", url: "https://kueskipay.com" },
+        { name: "Conekta", url: "https://admin.conekta.com" }
+      ],
+      apps: [
+        { name: "Canva", url: "https://www.canva.com/login" },
+        { name: "Adobe Creative Cloud", url: "https://account.adobe.com" },
+        { name: "Microsoft 365 / Office", url: "https://login.microsoftonline.com" },
+        { name: "Google Workspace / Gmail", url: "https://accounts.google.com" },
+        { name: "Zoom", url: "https://zoom.us/signin" },
+        { name: "ChatGPT / OpenAI", url: "https://chatgpt.com" },
+        { name: "GitHub", url: "https://github.com/login" },
+        { name: "Cloudflare", url: "https://dash.cloudflare.com/login" },
+        { name: "AWS Console", url: "https://aws.amazon.com/console/" }
+      ],
+      correos: [
+        { name: "cPanel Webmail", url: "https://webmail.tudominio.com:2096" },
+        { name: "Panel Hosting / cPanel", url: "https://cpanel.tudominio.com:2083" },
+        { name: "Hostinger", url: "https://hpanel.hostinger.com" },
+        { name: "GoDaddy", url: "https://sso.godaddy.com" },
+        { name: "Namecheap", url: "https://www.namecheap.com/myaccount/login/" }
+      ],
+      proveedores: [
+        { name: "Syscom", url: "https://www.syscom.mx" },
+        { name: "Tecnosinergia", url: "https://tecnosinergia.com" },
+        { name: "CT Internacional", url: "https://ctonline.mx" },
+        { name: "CVA Mayorista", url: "https://www.grupocva.com" },
+        { name: "Ingram Micro", url: "https://mx.ingrammicro.com" }
+      ],
+      sat_bancos: [
+        { name: "SAT Portal Trámites / CIEC", url: "https://www.sat.gob.mx/tramites" },
+        { name: "SAT Factura Fácil / CFDI 4.0", url: "https://portalcfdi.facturaelectronica.sat.gob.mx" },
+        { name: "BBVA Bancomer Net Cash", url: "https://www.bbvanetcash.mx" },
+        { name: "Santander Enlace / Supernet", url: "https://www.santander.com.mx" },
+        { name: "Banorte Enlace", url: "https://www.banorte.com" },
+        { name: "Citibanamex Bancanet", url: "https://www.bancanetempresarial.banamex.com.mx" },
+        { name: "Hey Banco / Banregio", url: "https://www.banregio.com" }
+      ],
+      cctv_dvr: [
+        { name: "Hikvision DVR / NVR (Hik-Connect)", url: "https://www.hik-connect.com" },
+        { name: "Dahua XVR / NVR (DMSS)", url: "https://www.dahuasecurity.com" },
+        { name: "Provision ISR (Cam2)", url: "https://provision-isr.com" },
+        { name: "Uniview UNV (EZView)", url: "https://ezcloud.uniview.com" },
+        { name: "Axis Communications", url: "https://www.axis.com" }
+      ],
+      redes_wifi: [
+        { name: "Ubiquiti UniFi OS", url: "https://unifi.ui.com" },
+        { name: "TP-Link Omada SDN", url: "https://omada.tplinkcloud.com" },
+        { name: "MikroTik RouterOS", url: "http://192.168.88.1" },
+        { name: "Ruijie Reyee Cloud", url: "https://cloud-as.ruijienetworks.com" },
+        { name: "Router Principal Fibra", url: "http://192.168.1.1" }
+      ]
+    };
+
+    function vaultPopulatePresets() {
+      const cat = document.getElementById("vault-item-category")?.value || "general";
+      const presetSelect = document.getElementById("vault-preset-select");
+      if (!presetSelect) return;
+
+      const list = VAULT_PRESETS[cat] || [];
+      let opts = `<option value="">✨ Elegir plataforma sugerida...</option>`;
+      list.forEach(p => {
+        opts += `<option value="${escapeHtml(p.name)}" data-url="${escapeHtml(p.url || '')}">${escapeHtml(p.name)}</option>`;
+      });
+      opts += `<option value="__custom__">➕ Otra plataforma (Escribir nombre)</option>`;
+      presetSelect.innerHTML = opts;
+    }
+
+    function vaultApplyPreset() {
+      const presetSelect = document.getElementById("vault-preset-select");
+      const titleInput = document.getElementById("vault-item-title");
+      const webUrlInput = document.getElementById("vault-item-weburl");
+      const techUrlInput = document.getElementById("vault-item-url");
+      if (!presetSelect || !titleInput) return;
+
+      const selVal = presetSelect.value;
+      if (selVal === "__custom__") {
+        titleInput.value = "";
+        titleInput.focus();
+        return;
+      }
+
+      if (selVal) {
+        titleInput.value = selVal;
+        const opt = presetSelect.options[presetSelect.selectedIndex];
+        const defaultUrl = opt ? opt.getAttribute("data-url") : "";
+        if (defaultUrl) {
+          if (webUrlInput) webUrlInput.value = defaultUrl;
+          if (techUrlInput && !techUrlInput.value) techUrlInput.value = defaultUrl;
+        }
+      }
+    }
+
+    function vaultOnCategoryChange() {
+      const cat = document.getElementById("vault-item-category")?.value || "general";
+      const techSec = document.getElementById("vault-section-tech");
+      const webSec = document.getElementById("vault-section-weburl");
+
+      // Solo CCTV y Redes requieren parámetros técnicos de red (IP, Puertos, P2P/Serial)
+      const isTech = (cat === "cctv_dvr" || cat === "redes_wifi");
+      if (techSec) techSec.style.display = isTech ? "block" : "none";
+      if (webSec) webSec.style.display = isTech ? "none" : "block";
+
+      vaultPopulatePresets();
     }
 
     async function vaultToggleSecret(id) {
@@ -9925,6 +10214,30 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
     }
 
+    async function vaultToggleSecretGrp(id) {
+      const it = vaultItems.find(x => x.id === id);
+      if (!it || !vaultDecryptedKey) return;
+      const el = document.getElementById("vault-pass-grp-" + id);
+      if (!el) return;
+
+      if (el.dataset.revealed === "true") {
+        el.textContent = "••••••••••••";
+        el.dataset.revealed = "false";
+      } else {
+        const plain = await vaultDecryptText(it.password_encrypted, vaultDecryptedKey);
+        el.textContent = plain;
+        el.dataset.revealed = "true";
+      }
+    }
+
+    function vaultOpenItemModalWithClient(clientId, clientName) {
+      vaultOpenItemModal();
+      const sel = document.getElementById("vault-item-client-id");
+      if (sel && clientId) {
+        sel.value = clientId;
+      }
+    }
+
     function vaultOpenItemModal(item = null) {
       vaultPopulateClientFilters();
 
@@ -9933,6 +10246,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       document.getElementById("vault-item-category").value = item ? (item.category || "cctv_dvr") : "cctv_dvr";
       document.getElementById("vault-item-client-id").value = item ? (item.client_id || "") : "";
       document.getElementById("vault-item-url").value = item ? (item.url || "") : "";
+      const webUrlEl = document.getElementById("vault-item-weburl");
+      if (webUrlEl) webUrlEl.value = item ? (item.url || "") : "";
+
       document.getElementById("vault-item-port").value = item ? (item.port || "") : "";
       document.getElementById("vault-item-p2p").value = item ? (item.p2p || "") : "";
       document.getElementById("vault-item-user").value = item ? (item.username || "") : "";
@@ -9971,9 +10287,17 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const clientSelect = document.getElementById("vault-item-client-id");
       const clientName = (clientSelect && clientSelect.selectedIndex > 0) ? clientSelect.options[clientSelect.selectedIndex].text.replace(/^👤\s*/, "") : "";
 
-      const url = document.getElementById("vault-item-url").value.trim();
-      const port = document.getElementById("vault-item-port").value.trim();
-      const p2p = document.getElementById("vault-item-p2p").value.trim();
+      const isTech = (category === "cctv_dvr" || category === "redes_wifi");
+      let url = "";
+      if (isTech) {
+        url = document.getElementById("vault-item-url").value.trim();
+      } else {
+        const webUrlEl = document.getElementById("vault-item-weburl");
+        url = webUrlEl ? webUrlEl.value.trim() : "";
+      }
+
+      const port = isTech ? document.getElementById("vault-item-port").value.trim() : "";
+      const p2p = isTech ? document.getElementById("vault-item-p2p").value.trim() : "";
       const username = document.getElementById("vault-item-user").value.trim();
       const pass = document.getElementById("vault-item-pass").value;
       const ed = document.getElementById("vault-rich-editor");
