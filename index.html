@@ -9645,12 +9645,16 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       // Guardar secreto permanentemente en localStorage y en D1
       safeStorage.setItem("gaso_vault_totp_secret", vaultPendingTotpSecret);
       try {
-        await fetch("/vault", {
+        const respSave = await fetch("/vault", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "same-origin",
           body: JSON.stringify({ action: "save_totp", secret: vaultPendingTotpSecret })
         });
+        const resData = await respSave.json().catch(() => ({}));
+        if (!respSave.ok || !resData.ok) {
+          showToast("⚠️ Advertencia: No se pudo respaldar en la base de datos (" + (resData.message || respSave.status) + ")");
+        }
       } catch(err) {
         console.warn("Error respaldando TOTP en D1:", err);
       }
