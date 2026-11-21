@@ -3985,10 +3985,13 @@ CLABE: 722969010514249300</textarea>
             </div>
             <div style="display:flex; gap:0.35rem; flex-wrap:wrap;" id="vault-category-pills">
               <button class="btn btn-sm btn-primary vault-pill active" onclick="vaultSetCategory('all')">Todos</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('streaming')">🎬 Streaming (Netflix...)</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('servicios')">📡 Servicios (Totalplay, CFE...)</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('pagos')">💳 Pagos (PayPal, MeLi...)</button>
               <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('cctv_dvr')">📹 CCTV / DVR</button>
               <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('redes_wifi')">🌐 Redes / WiFi</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('correos')">✉️ Correos</button>
-              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('proveedores')">🏢 Proveedores</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('correos')">✉️ Correos & Hosting</button>
+              <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('proveedores')">🏢 Proveedores (Syscom...)</button>
               <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('sat_bancos')">🏦 SAT / Bancos</button>
               <button class="btn btn-sm btn-outline vault-pill" onclick="vaultSetCategory('general')">📌 Otros</button>
             </div>
@@ -4041,13 +4044,17 @@ CLABE: 722969010514249300</textarea>
               </select>
             </div>
             <div>
-              <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">🏷️ Tipo de Activo / Categoría:</label>
+              <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">🏷️ Tipo de Cuenta / Categoría:</label>
               <select id="vault-item-category" class="form-select" onchange="vaultOnCategoryChange()" style="width:100%;">
+                <option value="streaming">🎬 Streaming (Netflix, Prime, Disney, Spotify...)</option>
+                <option value="servicios">📡 Servicios (Totalplay, Telmex, CFE, Izzi...)</option>
+                <option value="pagos">💳 Plataformas de Pago (PayPal, Mercado Libre, Stripe...)</option>
                 <option value="cctv_dvr">📹 CCTV / DVR / NVR / Cámaras</option>
-                <option value="redes_wifi">🌐 Redes / WiFi / Routers</option>
-                <option value="correos">✉️ Correos & Hosting</option>
-                <option value="proveedores">🏢 Proveedores (Syscom, Tecnosinergia...)</option>
-                <option value="sat_bancos">🏦 SAT / Bancos</option>
+                <option value="redes_wifi">🌐 Redes / WiFi / Routers / APs</option>
+                <option value="correos">✉️ Correos & Hosting (cPanel, Webmail, Gmail...)</option>
+                <option value="proveedores">🏢 Proveedores (Syscom, Tecnosinergia, CT...)</option>
+                <option value="sat_bancos">🏦 SAT / Bancos / Cuentas Fiscales</option>
+                <option value="apps">📱 Apps & Software (Adobe, Microsoft 365, Canva...)</option>
                 <option value="general">📌 General / Otro</option>
               </select>
             </div>
@@ -9521,7 +9528,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }, 10 * 60 * 1000);
     }
 
-    function vaultInit() {
+    async function vaultInit() {
       const lockedScreen = document.getElementById("vault-locked-screen");
       const unlockedScreen = document.getElementById("vault-unlocked-screen");
       const loginView = document.getElementById("vault-totp-login-view");
@@ -9536,7 +9543,23 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         if (lockedScreen) lockedScreen.style.display = "block";
         if (unlockedScreen) unlockedScreen.style.display = "none";
 
-        const savedSecret = safeStorage.getItem("gaso_vault_totp_secret");
+        let savedSecret = safeStorage.getItem("gaso_vault_totp_secret");
+        if (!savedSecret) {
+          // Consultar a D1 si ya existe el secreto persistente en la nube
+          try {
+            const respTotp = await fetch("/vault?action=get_totp", { credentials: "same-origin" });
+            if (respTotp.ok) {
+              const d = await respTotp.json();
+              if (d && d.ok && d.secret) {
+                savedSecret = d.secret;
+                safeStorage.setItem("gaso_vault_totp_secret", savedSecret);
+              }
+            }
+          } catch(e) {
+            console.warn("No se pudo verificar TOTP remoto:", e);
+          }
+        }
+
         if (!savedSecret) {
           // No está configurado: mostrar pantalla de vinculación QR
           vaultShowTotpSetup(false);
@@ -9594,8 +9617,18 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         return;
       }
 
-      // Guardar secreto permanentemente
+      // Guardar secreto permanentemente en localStorage y en D1
       safeStorage.setItem("gaso_vault_totp_secret", vaultPendingTotpSecret);
+      try {
+        await fetch("/vault", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ action: "save_totp", secret: vaultPendingTotpSecret })
+        });
+      } catch(err) {
+        console.warn("Error respaldando TOTP en D1:", err);
+      }
       vaultDecryptedKey = await vaultDeriveKeyFromSecret(vaultPendingTotpSecret);
       vaultPendingTotpSecret = null;
       vaultResetLockTimer();
@@ -9728,21 +9761,39 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       for (let i = 0; i < filtered.length; i++) {
         const it = filtered[i];
         const categoryLabels = {
+          streaming: "🎬 Streaming",
+          servicios: "📡 Servicios",
+          pagos: "💳 Pagos",
+          apps: "📱 Apps / Software",
           cctv_dvr: "📹 CCTV / DVR",
           redes_wifi: "🌐 Redes / WiFi",
-          correos: "✉️ Correos",
+          correos: "✉️ Correos & Hosting",
           proveedores: "🏢 Proveedores",
-          sat_bancos: "🏦 SAT/Bancos",
+          sat_bancos: "🏦 SAT / Bancos",
           general: "📌 General"
         };
         const catBadge = categoryLabels[it.category] || "📌 " + (it.category || "General");
         const clientLabel = it.client_name ? `👤 ${escapeHtml(it.client_name)}` : "🔒 Interno";
 
+        const catIconMap = {
+          streaming: '🎬',
+          servicios: '📡',
+          pagos: '💳',
+          apps: '📱',
+          cctv_dvr: '📹',
+          redes_wifi: '🌐',
+          correos: '✉️',
+          proveedores: '🏢',
+          sat_bancos: '🏦',
+          general: '🔑'
+        };
+        const catIcon = catIconMap[it.category] || '🔑';
+
         html += `
           <tr style="border-bottom:1px solid var(--gray-100);">
             <td style="padding:0.75rem 0.85rem; font-weight:700; color:#1e293b;">
               <div style="display:flex; align-items:center; gap:0.4rem;">
-                <span style="font-size:1.1rem;">${it.category === 'cctv_dvr' ? '📹' : (it.category === 'redes_wifi' ? '🌐' : '🔑')}</span>
+                <span style="font-size:1.1rem;">${catIcon}</span>
                 <div>
                   <div>${escapeHtml(it.title)}</div>
                   <div style="font-size:0.73rem; color:#64748b; font-weight:normal;">
