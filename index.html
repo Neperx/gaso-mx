@@ -3200,6 +3200,7 @@
             <button type="button" role="menuitem" id="btn-export-pdf" onclick="closeActionsMenu(); exportDirectPDF()">📥 PDF directo</button>
             <button type="button" role="menuitem" id="btn-export-annex" onclick="closeActionsMenu(); exportAnnexPDF()">📄 PDF Anexo técnico</button>
             <button type="button" role="menuitem" id="btn-share-wa" onclick="closeActionsMenu(); shareQuoteViaWhatsApp()">📲 WhatsApp</button>
+            <button type="button" role="menuitem" id="btn-cobro-mp" onclick="closeActionsMenu(); openMercadoPagoModal()" style="color:#0284c7; border-top:1px dashed #cbd5e1; margin-top:0.25rem; padding-top:0.6rem;">💳 Cobrar con Mercado Pago</button>
           </div>
         </div>
         <div class="user-chip-top" id="active-user-chip" style="display:none !important;">
@@ -4139,6 +4140,82 @@ CLABE: 722969010514249300</textarea>
       </div>
     </div>
 
+    <!-- MODAL: COBRAR CON MERCADO PAGO / LINK DE PAGO Y QR -->
+    <div class="modal-backdrop no-print" id="modal-mercadopago">
+      <div class="modal-box" style="max-width:540px; text-align:center;">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span style="font-size:1.4rem;">💳</span>
+            <h3 style="margin:0; font-size:1.15rem; color:#0284c7;">Cobro con Mercado Pago</h3>
+          </div>
+          <button class="modal-close" onclick="closeModal('modal-mercadopago')">✕</button>
+        </div>
+        <div class="modal-body" style="padding:1.5rem 1rem;">
+          <div id="mp-loading-view">
+            <div style="font-size:2rem; margin-bottom:0.5rem; animation:pulse 1.5s infinite;">⏳</div>
+            <div style="font-weight:700; color:#0f172a;">Generando Link de Pago seguro...</div>
+            <div style="font-size:0.8rem; color:#64748b; margin-top:0.3rem;">Conectando con la API de Mercado Pago</div>
+          </div>
+
+          <div id="mp-ready-view" style="display:none; text-align:left;">
+            <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:1rem; margin-bottom:1.25rem; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-size:0.75rem; text-transform:uppercase; font-weight:800; color:#0369a1;">Monto a Cobrar</div>
+                <div id="mp-modal-total" style="font-size:1.6rem; font-weight:900; color:#0284c7;">$0.00 MXN</div>
+                <div id="mp-modal-folio" style="font-size:0.78rem; color:#64748b;">Cotización: COT-000</div>
+              </div>
+              <div style="background:#0284c7; color:#fff; padding:0.4rem 0.75rem; border-radius:8px; font-size:0.8rem; font-weight:700;">
+                ✓ Activo
+              </div>
+            </div>
+
+            <!-- Código QR para cobrar en mostrador -->
+            <div style="text-align:center; margin-bottom:1.25rem;">
+              <div style="display:flex; justify-content:center; margin-bottom:0.4rem;">
+                <canvas id="mp-qr-canvas" width="160" height="160" style="border:1px solid #e2e8f0; border-radius:8px; padding:6px; background:#fff;"></canvas>
+              </div>
+              <span style="font-size:0.75rem; color:#64748b;">Escanea con la app de Mercado Pago o banco para pagar directo</span>
+            </div>
+
+            <!-- Enlace web para el cliente -->
+            <div style="margin-bottom:1.25rem;">
+              <label style="font-size:0.78rem; font-weight:700; color:#334155; display:block; margin-bottom:0.3rem;">Link de Pago Seguro (para enviar al cliente):</label>
+              <div style="display:flex; gap:0.4rem;">
+                <input type="text" id="mp-checkout-link" class="form-input" readonly style="flex:1; font-size:0.82rem; font-family:monospace; background:#f8fafc;" onclick="this.select()">
+                <button type="button" class="btn btn-outline btn-sm" onclick="copyMPLink()" style="font-weight:700; white-space:nowrap;">📋 Copiar</button>
+              </div>
+            </div>
+
+            <!-- Métodos aceptados -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.6rem 0.85rem; font-size:0.75rem; color:#475569; display:flex; align-items:center; gap:0.5rem; justify-content:center;">
+              <span>Acepta:</span>
+              <strong>💳 Tarjetas de Crédito / Débito</strong> • 
+              <strong>⚡ SPEI Transferencia</strong> • 
+              <strong>💰 Dinero en MeLi</strong>
+            </div>
+          </div>
+
+          <div id="mp-error-view" style="display:none; text-align:center; padding:1rem;">
+            <div style="font-size:2.2rem; margin-bottom:0.5rem;">⚠️</div>
+            <div style="font-weight:700; color:#dc2626; margin-bottom:0.4rem;">No se pudo generar el Link de Pago</div>
+            <div id="mp-error-msg" style="font-size:0.82rem; color:#64748b; line-height:1.4; margin-bottom:1rem;"></div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="switchTab('config'); closeModal('modal-mercadopago');">⚙️ Ir a Configurar Token</button>
+          </div>
+        </div>
+        <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn btn-outline" onclick="closeModal('modal-mercadopago')">Cerrar</button>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-outline" id="btn-mp-whatsapp" onclick="sendMPWhatsApp()" style="color:#16a34a; border-color:#86efac; font-weight:700;">
+              📲 Enviar por WhatsApp
+            </button>
+            <a id="btn-mp-open-direct" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="background:#0284c7; border-color:#0284c7; font-weight:700; text-decoration:none;">
+              Abrir Checkout ↗
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- MODAL: FICHA TÉCNICA DE ENTREGA AL CLIENTE (COMPARTIR / PDF / WHATSAPP) -->
     <div class="modal-backdrop no-print" id="modal-vault-handover">
       <div class="modal-box" style="max-width:640px;">
@@ -4281,6 +4358,23 @@ CLABE: 722969010514249300</textarea>
           <button type="button" class="btn btn-outline btn-sm" onclick="cfgLoad()">↻ Recargar estado</button>
         </div>
         <div id="cfg-result-all" style="font-size:0.8rem; line-height:1.5; margin-bottom:1rem;"></div>
+
+        <!-- 💳 PASARELA MERCADO PAGO / MELI -->
+        <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
+          <h3 style="font-size:0.95rem; margin:0 0 0.6rem; color:#0284c7;">💳 Mercado Pago & MeLi (Links de Pago y Cobro QR)</h3>
+          <p style="font-size:0.78rem; color:#64748b; margin:0 0 0.55rem;">Permite a tus clientes pagar tus cotizaciones con tarjeta (débito/crédito), transferencia SPEI o dinero en cuenta de Mercado Pago. Genera Links de Pago y QR automáticos en las cotizaciones.</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0.7rem;">
+            <label style="font-size:0.78rem; font-weight:700;">Access Token de Mercado Pago:
+              <input type="password" id="cfg-MP_ACCESS_TOKEN" class="form-input" placeholder="APP_USR-..." style="width:100%; font-family:monospace;">
+            </label>
+          </div>
+          <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="cfgSaveMPToken()" style="font-weight:700; background:#0284c7; border-color:#0284c7;">💾 Guardar Token</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="cfgTestMP()">Probar Conexión</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="cfgToggleMPVisibility()" style="color:#64748b; border:none;">👁️ Ver / Ocultar</button>
+          </div>
+          <div id="cfg-result-mp" style="font-size:0.8rem; line-height:1.5; margin-top:0.5rem;"></div>
+        </div>
 
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.95rem; margin:0 0 0.6rem;">🧠 Inteligencia Artificial (Google Gemini, gratis)</h3>
@@ -8609,6 +8703,138 @@ function updateDashboardKPIs() { renderDashboard(); }
       }
       cfgBusy(btn, false);
     }
+    // --- MERCADO PAGO / MELI INTEGRACIÓN ---
+    let currentMPPreference = null;
+
+    async function cfgSaveMPToken() {
+      const inp = document.getElementById('cfg-MP_ACCESS_TOKEN');
+      const token = inp ? inp.value.trim() : '';
+      if (!token) { showToast('Ingresa tu Access Token de Mercado Pago.'); return; }
+      const res = await cfgApi({ op: 'save', values: { MP_ACCESS_TOKEN: token } });
+      if (res && res.settings) {
+        showToast('✅ Token de Mercado Pago guardado en base de datos.');
+        cfgTestMP();
+      } else {
+        showToast('❌ Error al guardar token: ' + (res.message || ''));
+      }
+    }
+
+    async function cfgTestMP() {
+      const box = document.getElementById('cfg-result-mp');
+      if (box) box.innerHTML = '<span style="color:#0284c7;">⏳ Probando conexión con Mercado Pago...</span>';
+      try {
+        const r = await fetch('/mercadopago', { credentials: 'same-origin' });
+        const data = await r.json();
+        if (r.ok && data.ok) {
+          if (box) box.innerHTML = `<span style="color:#16a34a; font-weight:700;">✅ Conexión Exitosa con Mercado Pago</span><br>Usuario: <strong>${escapeHtml(data.user?.nickname || 'Vendedor')}</strong> (${escapeHtml(data.user?.email || '')}) • País: ${escapeHtml(data.user?.site_id || 'MLM')}`;
+          showToast('✅ Conexión con Mercado Pago confirmada.');
+        } else {
+          if (box) box.innerHTML = `<span style="color:#dc2626; font-weight:700;">❌ Error:</span> ${escapeHtml(data.message || 'Token no válido')}`;
+        }
+      } catch (err) {
+        if (box) box.innerHTML = `<span style="color:#dc2626;">❌ Error de red:</span> ${escapeHtml(err.message)}`;
+      }
+    }
+
+    function cfgToggleMPVisibility() {
+      const inp = document.getElementById('cfg-MP_ACCESS_TOKEN');
+      if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    async function openMercadoPagoModal() {
+      const qd = getQuoteData();
+      const amount = qd.total || 0;
+      if (!amount || amount <= 0) {
+        showToast('La cotización debe tener un total mayor a $0.00 MXN para generar el cobro.');
+        return;
+      }
+
+      openModal('modal-mercadopago');
+
+      const loadingView = document.getElementById('mp-loading-view');
+      const readyView = document.getElementById('mp-ready-view');
+      const errorView = document.getElementById('mp-error-view');
+
+      if (loadingView) loadingView.style.display = 'block';
+      if (readyView) readyView.style.display = 'none';
+      if (errorView) errorView.style.display = 'none';
+
+      try {
+        const payload = {
+          quoteNumber: qd.number || 'COT-01',
+          clientName: qd.client?.name || 'Cliente',
+          clientEmail: qd.client?.email || '',
+          total: amount,
+          backUrl: window.location.href.split('#')[0]
+        };
+
+        const res = await fetch('/mercadopago', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.message || 'No se pudo generar la preferencia de cobro.');
+        }
+
+        currentMPPreference = data;
+
+        if (loadingView) loadingView.style.display = 'none';
+        if (readyView) readyView.style.display = 'block';
+
+        document.getElementById('mp-modal-total').textContent = `$${amount.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
+        document.getElementById('mp-modal-folio').textContent = `Cotización: ${qd.number || 'COT-01'} • ${qd.client?.name || 'Cliente'}`;
+        document.getElementById('mp-checkout-link').value = data.checkoutUrl;
+
+        const openBtn = document.getElementById('btn-mp-open-direct');
+        if (openBtn) openBtn.href = data.checkoutUrl;
+
+        // Renderizar Código QR
+        const canvas = document.getElementById('mp-qr-canvas');
+        if (canvas && typeof window.renderQRCodeToCanvas === 'function') {
+          window.renderQRCodeToCanvas(canvas, data.checkoutUrl, 160);
+        }
+      } catch (err) {
+        if (loadingView) loadingView.style.display = 'none';
+        if (errorView) errorView.style.display = 'block';
+        const errMsg = document.getElementById('mp-error-msg');
+        if (errMsg) errMsg.textContent = err.message;
+      }
+    }
+
+    function copyMPLink() {
+      const link = document.getElementById('mp-checkout-link')?.value;
+      if (link) {
+        navigator.clipboard.writeText(link);
+        showToast('📋 Link de pago copiado al portapapeles.');
+      }
+    }
+
+    function sendMPWhatsApp() {
+      if (!currentMPPreference) return;
+      const qd = getQuoteData();
+      const phone = qd.client?.phone || '';
+      const rawDigits = phone.replace(/\D/g, '');
+      const waPhone = formatMexicanWhatsAppPhone(rawDigits);
+
+      const msg = `*GASO INGENIERÍA — Link de Pago Seguro* 💳\n\n` +
+        `Hola *${qd.client?.name || 'estimado cliente'}*,\n` +
+        `Para tu comodidad, ya puedes realizar el pago de tu cotización *${qd.number || ''}* con Tarjeta (Débito/Crédito), Transferencia SPEI o Mercado Pago:\n\n` +
+        `💰 *Monto:* $${(qd.total || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN\n` +
+        `🔗 *Pagar aquí:* ${currentMPPreference.checkoutUrl}\n\n` +
+        `_Al completar tu pago, la venta queda registrada y confirmada automáticamente._`;
+
+      const waUrl = waPhone
+        ? `https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`
+        : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+      window.open(waUrl, '_blank');
+    }
+
     async function cfgSave(names, group) {
       const values = {};
       names.forEach(n => { const el = document.getElementById('cfg-' + n); if (el && el.value.trim()) values[n] = el.value.trim(); });
