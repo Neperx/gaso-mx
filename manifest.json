@@ -1,12 +1,15 @@
 {
+  "id": "/?source=pwa",
   "name": "GASO Ingeniería",
   "short_name": "GASO MX",
   "description": "Sistema de Cotizaciones, Catálogo Syscom/Tecno/CT, CRM y Gestión de Activos para GASO Ingeniería.",
   "start_url": "/#cotizador",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0284c7",
   "orientation": "any",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
@@ -25,6 +28,22 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "GASO Cotizador y CRM Móvil"
+    },
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GASO Cotizador y CRM Escritorio"
     }
   ],
   "categories": ["business", "productivity", "utilities"]
