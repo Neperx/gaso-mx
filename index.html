@@ -2640,29 +2640,84 @@
   @media (max-width: 900px) {
     .top-bar { position: sticky; top: 0; z-index: 60; }
     .top-bar-inner { padding: 0.35rem 0.5rem !important; row-gap: 0.35rem; }
-    .top-bar-inner .nav-logo-img { height: 28px !important; }
+    .top-bar-inner .nav-logo-img { height: 26px !important; }
     .top-bar-inner .brand-section { width: auto !important; flex: 0 0 auto !important; }
-    .top-bar-inner .nav-tabs { width: 100%; order: 3; }
-    .top-bar-inner .nav-tab-btn { flex: 0 0 auto; min-height: 44px; font-size: 0.85rem !important; padding: 0.4rem 0.8rem !important; white-space: nowrap; }
-    .top-bar-inner .toolbar-actions { margin-left: auto; flex: 0 1 auto !important; width: auto !important; flex-wrap: nowrap !important; gap: 0.4rem; }
-    .top-bar-inner .toolbar-actions .btn { flex: 0 0 auto !important; }
-    .top-bar-inner .toolbar-actions .btn { min-height: 44px; font-size: 0.85rem !important; padding: 0.4rem 0.8rem !important; }
+    
+    /* Pestañas desplazables horizontalmente de forma suave en celular */
+    .top-bar-inner .nav-tabs { 
+      width: 100%; 
+      order: 3; 
+      overflow-x: auto !important; 
+      -webkit-overflow-scrolling: touch; 
+      scrollbar-width: none; 
+      display: flex !important;
+      gap: 0.35rem !important;
+      padding-bottom: 2px !important;
+    }
+    .top-bar-inner .nav-tabs::-webkit-scrollbar { display: none; }
+    .top-bar-inner .nav-tab-btn { 
+      flex: 0 0 auto; 
+      min-height: 38px; 
+      font-size: 0.78rem !important; 
+      padding: 0.3rem 0.65rem !important; 
+      white-space: nowrap; 
+      gap: 0.3rem !important;
+    }
+    .top-bar-inner .nav-tab-btn svg { width: 14px; height: 14px; }
+    
+    .top-bar-inner .toolbar-actions { margin-left: auto; flex: 0 1 auto !important; width: auto !important; flex-wrap: nowrap !important; gap: 0.35rem; }
+    .top-bar-inner .toolbar-actions .btn { flex: 0 0 auto !important; min-height: 38px; font-size: 0.8rem !important; padding: 0.35rem 0.65rem !important; }
     .actions-menu { position: static; }
     .actions-menu-list { position: fixed; left: 0.75rem; right: 0.75rem; bottom: 1rem; top: auto; min-width: 0; padding: 0.5rem; border-radius: 16px; box-shadow: 0 -10px 40px rgba(15,23,42,0.35); z-index: 400; }
     .actions-menu.open::before { content: ""; position: fixed; inset: 0; background: rgba(15,23,42,0.45); z-index: 399; }
     .actions-menu-list button { min-height: 52px; font-size: 1rem; padding: 0.75rem 1rem; }
-    /* Botones flotantes compactos: no tapan el contenido ni chocan con el aviso de Netlify */
-    #floating-ai-btn { bottom: 64px !important; right: 12px !important; width: 54px; height: 54px; padding: 0 !important; justify-content: center; border-radius: 50%; gap: 0; }
+    
+    /* Botones flotantes compactos: esquina inferior izquierda y derecha sin tapar botones centrales */
+    #floating-ai-btn { 
+      bottom: 18px !important; 
+      right: 14px !important; 
+      width: 46px !important; 
+      height: 46px !important; 
+      padding: 0 !important; 
+      justify-content: center; 
+      border-radius: 50% !important; 
+      gap: 0; 
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
+    }
     #floating-ai-btn span:last-child { display: none; }
-    #floating-ai-btn span:first-child { font-size: 1.5rem !important; }
-    .public-floating-dock { bottom: 64px !important; right: 12px !important; }
-    .pub-fab-btn { width: 54px; height: 54px; padding: 0 !important; justify-content: center; border-radius: 50%; gap: 0; }
+    #floating-ai-btn span:first-child { font-size: 1.3rem !important; }
+
+    /* Indicador flotante de nube discreto */
+    #cloud-status {
+      left: 12px !important;
+      bottom: 18px !important;
+      padding: 3px 8px !important;
+      font-size: 10px !important;
+      max-width: 130px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    /* Chip de auto-guardado en la parte superior derecha para no estorbar en el contenido */
+    .quote-autosave-chip { 
+      top: 50px !important; 
+      bottom: auto !important; 
+      right: 8px !important; 
+      max-width: 50vw; 
+      font-size: 0.72rem !important;
+      padding: 0.2rem 0.5rem !important;
+      opacity: 0.85;
+    }
+
+    .public-floating-dock { bottom: 18px !important; right: 14px !important; }
+    .pub-fab-btn { width: 46px; height: 46px; padding: 0 !important; justify-content: center; border-radius: 50%; gap: 0; }
     .pub-fab-btn span:last-child { display: none; }
-    .pub-fab-btn span:first-child { font-size: 1.5rem; }
+    .pub-fab-btn span:first-child { font-size: 1.3rem; }
     body.menu-open #floating-ai-btn { display: none !important; }
     .user-chip-top { display: none !important; }
-    body.app-authenticated { padding-bottom: 130px; }
-    #public-landing-page { padding-bottom: 130px; }
+    body.app-authenticated { padding-bottom: 80px; }
+    #public-landing-page { padding-bottom: 80px; }
     .btn-exec-wa, .btn-exec-secondary { min-height: 48px; }
   }
 
