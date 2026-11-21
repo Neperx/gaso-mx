@@ -4149,7 +4149,7 @@ CLABE: 722969010514249300</textarea>
                 <option value="">✨ Elegir plataforma...</option>
                 <!-- Opciones dinámicas según categoría elegida -->
               </select>
-              <input type="text" id="vault-item-title" class="form-input" placeholder="Nombre específico (ej. Netflix Plan Familiar)" style="flex:1; font-weight:600;" required>
+              <input type="text" id="vault-item-title" class="form-input no-uppercase" placeholder="Nombre específico (ej. Netflix Plan Familiar)" style="flex:1; font-weight:600; text-transform:none !important;" required>
             </div>
           </div>
 
@@ -4161,15 +4161,15 @@ CLABE: 722969010514249300</textarea>
             <div style="display:grid; grid-template-columns:2fr 1fr 1.5fr; gap:0.5rem;">
               <div>
                 <label style="font-size:0.75rem; color:#64748b; display:block; margin-bottom:0.2rem;">IP Local / Dominio / URL:</label>
-                <input type="text" id="vault-item-url" class="form-input" placeholder="192.168.1.100 ó https://..." style="width:100%; font-family:monospace; font-size:0.83rem;">
+                <input type="text" id="vault-item-url" class="form-input no-uppercase" placeholder="192.168.1.100 ó https://..." style="width:100%; font-family:monospace; font-size:0.83rem; text-transform:none !important;" autocomplete="off" autocapitalize="none">
               </div>
               <div>
                 <label style="font-size:0.75rem; color:#64748b; display:block; margin-bottom:0.2rem;">Puerto(s):</label>
-                <input type="text" id="vault-item-port" class="form-input" placeholder="8000 / 554" style="width:100%; font-family:monospace; font-size:0.83rem;">
+                <input type="text" id="vault-item-port" class="form-input no-uppercase" placeholder="8000 / 554" style="width:100%; font-family:monospace; font-size:0.83rem; text-transform:none !important;" autocomplete="off" autocapitalize="none">
               </div>
               <div>
                 <label style="font-size:0.75rem; color:#64748b; display:block; margin-bottom:0.2rem;">Serial / P2P / Stream Key:</label>
-                <input type="text" id="vault-item-p2p" class="form-input" placeholder="D12345678 / Clave Verif" style="width:100%; font-family:monospace; font-size:0.83rem;">
+                <input type="text" id="vault-item-p2p" class="form-input no-uppercase" placeholder="D12345678 / Clave Verif" style="width:100%; font-family:monospace; font-size:0.83rem; text-transform:none !important;" autocomplete="off" autocapitalize="none">
               </div>
             </div>
           </div>
@@ -4177,14 +4177,14 @@ CLABE: 722969010514249300</textarea>
           <!-- Enlace Web / URL para plataformas web (cuando no son CCTV/Redes) -->
           <div id="vault-section-weburl" style="display:none;">
             <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">🌐 Enlace / Sitio Web de Inicio de Sesión:</label>
-            <input type="text" id="vault-item-weburl" class="form-input" placeholder="https://www.netflix.com, https://totalplay.com.mx, etc." style="width:100%; font-family:monospace; font-size:0.83rem;">
+            <input type="text" id="vault-item-weburl" class="form-input no-uppercase" placeholder="https://www.netflix.com, https://totalplay.com.mx, etc." style="width:100%; font-family:monospace; font-size:0.83rem; text-transform:none !important;" autocomplete="off" autocapitalize="none">
           </div>
 
           <!-- Credenciales: Usuario y Contraseña -->
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
             <div>
               <label style="font-size:0.8rem; font-weight:700; display:block; margin-bottom:0.25rem;">Usuario / Cuenta:</label>
-              <input type="text" id="vault-item-user" class="form-input" placeholder="admin / usuario@empresa.com" style="width:100%;">
+              <input type="text" id="vault-item-user" class="form-input no-uppercase" placeholder="admin / usuario@empresa.com" style="width:100%; text-transform:none !important;" autocomplete="off" autocapitalize="none" spellcheck="false">
             </div>
             <div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
@@ -4194,7 +4194,7 @@ CLABE: 722969010514249300</textarea>
                 </button>
               </div>
               <div style="position:relative;">
-                <input type="text" id="vault-item-pass" class="form-input" placeholder="••••••••••••" style="width:100%; font-family:monospace; padding-right:2.5rem;" required>
+                <input type="text" id="vault-item-pass" class="form-input no-uppercase" placeholder="••••••••••••" style="width:100%; font-family:monospace; padding-right:2.5rem; text-transform:none !important;" autocomplete="new-password" autocapitalize="none" spellcheck="false" required>
                 <button type="button" onclick="vaultCopyModalPass()" title="Copiar" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#64748b;">📋</button>
               </div>
             </div>
