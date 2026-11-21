@@ -4846,6 +4846,31 @@ CLABE: 722969010514249300</textarea>
     // Los catálogos de Syscom/CT ya NO viajan en el HTML: se piden al servidor por partes y requieren sesión.
     // Caché local diaria (CDMX) para no saturar el plan gratis de Cloudflare en cada login.
     const CAT_CACHE_KEY = 'gaso_cat_cache_v1';
+    const TECNO_CACHE_KEY = 'gaso_tecno_cache_v1';
+
+    function readTecnoDayCache() {
+      try {
+        const raw = safeStorage.getItem(TECNO_CACHE_KEY);
+        if (!raw) return null;
+        const d = JSON.parse(raw);
+        if (!d || d.day !== catalogCacheDayKey()) return null;
+        if (!Array.isArray(d.items) || !d.items.length) return null;
+        return d.items;
+      } catch (e) { return null; }
+    }
+
+    function writeTecnoDayCache(items) {
+      try {
+        if (!items || !items.length) return;
+        safeStorage.setItem(TECNO_CACHE_KEY, JSON.stringify({
+          day: catalogCacheDayKey(),
+          at: new Date().toISOString(),
+          items: items
+        }));
+      } catch (e) {
+        try { safeStorage.removeItem(TECNO_CACHE_KEY); } catch (e2) {}
+      }
+    }
     function catalogCacheDayKey() {
       try {
         return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Mexico_City' });
@@ -10820,12 +10845,21 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         indicator.textContent = `✅ Tecnosinergia (${n.toLocaleString("es-MX")} prod.)`;
       };
 
-      // Login automático: si ya hay copia local, no pegarle a Cloudflare/API.
+      // Login automático: si ya hay copia en memoria o en caché local del día, usarla de inmediato SIN petición de red.
       if (!isManualClick) {
         const localCount = storeProducts.filter(p => p.store === "Tecnosinergia").length;
         if (localCount > 0) {
           paintOk(localCount);
           return;
+        }
+        const cachedItems = readTecnoDayCache();
+        if (cachedItems && cachedItems.length) {
+          parseAndImportStoreJSON({ status: true, items: cachedItems }, 'Tecnosinergia');
+          const countTec = storeProducts.filter(p => p.store === "Tecnosinergia").length;
+          if (countTec > 0) {
+            paintOk(countTec);
+            return;
+          }
         }
       }
 
@@ -10852,7 +10886,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           if (st.state === 'ok' && st.chunks) {
             let all = [];
             for (let i = 0; i < st.chunks; i++) all = all.concat((await tecnoCatalogApi('?chunk=' + i)).items || []);
-            if (all.length) { parseAndImportStoreJSON({ status: true, items: all }, 'Tecnosinergia'); }
+            if (all.length) {
+              parseAndImportStoreJSON({ status: true, items: all }, 'Tecnosinergia');
+              writeTecnoDayCache(all);
+            }
           }
         }
         const countTec = storeProducts.filter(p => p.store === "Tecnosinergia").length;
