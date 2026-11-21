@@ -2633,6 +2633,7 @@
   .row-adv-toggle { display: none; }
 
   /* ====== Menú Acciones y barra superior ====== */
+  .bottom-nav-dock, .mobile-more-backdrop, .mobile-more-sheet { display: none; }
   .top-bar-inner .nav-tabs { flex-wrap: nowrap !important; overflow: visible !important; }
   .exec-hero-split > *, .exec-hero > * { min-width: 0; }
   #public-landing-page { overflow-x: hidden; }
@@ -2643,27 +2644,10 @@
     .top-bar-inner .nav-logo-img { height: 26px !important; }
     .top-bar-inner .brand-section { width: auto !important; flex: 0 0 auto !important; }
     
-    /* Pestañas desplazables horizontalmente de forma suave en celular */
+    /* Ocultar la barra de pestañas horizontal superior en celular; se reemplaza por el Bottom Nav Dock nativo */
     .top-bar-inner .nav-tabs { 
-      width: 100%; 
-      order: 3; 
-      overflow-x: auto !important; 
-      -webkit-overflow-scrolling: touch; 
-      scrollbar-width: none; 
-      display: flex !important;
-      gap: 0.35rem !important;
-      padding-bottom: 2px !important;
+      display: none !important;
     }
-    .top-bar-inner .nav-tabs::-webkit-scrollbar { display: none; }
-    .top-bar-inner .nav-tab-btn { 
-      flex: 0 0 auto; 
-      min-height: 38px; 
-      font-size: 0.78rem !important; 
-      padding: 0.3rem 0.65rem !important; 
-      white-space: nowrap; 
-      gap: 0.3rem !important;
-    }
-    .top-bar-inner .nav-tab-btn svg { width: 14px; height: 14px; }
     
     .top-bar-inner .toolbar-actions { margin-left: auto; flex: 0 1 auto !important; width: auto !important; flex-wrap: nowrap !important; gap: 0.35rem; }
     .top-bar-inner .toolbar-actions .btn { flex: 0 0 auto !important; min-height: 38px; font-size: 0.8rem !important; padding: 0.35rem 0.65rem !important; }
@@ -2672,17 +2656,108 @@
     .actions-menu.open::before { content: ""; position: fixed; inset: 0; background: rgba(15,23,42,0.45); z-index: 399; }
     .actions-menu-list button { min-height: 52px; font-size: 1rem; padding: 0.75rem 1rem; }
     
+    /* Bottom Navigation Dock Nativo */
+    .bottom-nav-dock {
+      display: flex !important;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #0f172a;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.35);
+      z-index: 100;
+      padding: 0 0.35rem env(safe-area-inset-bottom, 0);
+      align-items: center;
+      justify-content: space-around;
+    }
+    .bottom-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      padding: 0.35rem 0.1rem;
+      gap: 3px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 0.15s ease;
+      min-width: 0;
+    }
+    .bottom-nav-item svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
+    }
+    .bottom-nav-item.active {
+      color: #38bdf8 !important;
+    }
+    .bottom-nav-item.active svg {
+      stroke: #38bdf8 !important;
+    }
+    
+    /* Menú emergente Más en celular */
+    .mobile-more-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 250;
+      display: none;
+    }
+    .mobile-more-backdrop.open { display: block !important; }
+    .mobile-more-sheet {
+      position: fixed;
+      left: 0.75rem;
+      right: 0.75rem;
+      bottom: 72px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 0.85rem 1rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      z-index: 251;
+      display: none;
+      border: 1px solid #cbd5e1;
+    }
+    .mobile-more-sheet.open { display: block !important; animation: slideUpSheet 0.2s ease-out; }
+    @keyframes slideUpSheet {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .mobile-more-btn {
+      width: 100%;
+      text-align: left;
+      padding: 0.7rem 0.85rem;
+      border: none;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .mobile-more-btn:active { background: #e2e8f0; }
+
     /* Botones flotantes compactos: esquina inferior izquierda y derecha sin tapar botones centrales */
     #floating-ai-btn { 
-      bottom: 18px !important; 
+      bottom: 72px !important; 
       right: 14px !important; 
-      width: 46px !important; 
-      height: 46px !important; 
+      width: 44px !important; 
+      height: 44px !important; 
       padding: 0 !important; 
       justify-content: center; 
       border-radius: 50% !important; 
       gap: 0; 
       box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
+      z-index: 95 !important;
     }
     #floating-ai-btn span:last-child { display: none; }
     #floating-ai-btn span:first-child { font-size: 1.3rem !important; }
@@ -2690,13 +2765,14 @@
     /* Indicador flotante de nube discreto */
     #cloud-status {
       left: 12px !important;
-      bottom: 18px !important;
+      bottom: 72px !important;
       padding: 3px 8px !important;
       font-size: 10px !important;
       max-width: 130px !important;
       white-space: nowrap !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
+      z-index: 95 !important;
     }
 
     /* Chip de auto-guardado en la parte superior derecha para no estorbar en el contenido */
@@ -3618,18 +3694,21 @@
           </div>
 
           <div class="table-toolbar no-print">
-            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-              <button class="btn btn-primary btn-sm" onclick="switchTab('stores')" style="background:#0284c7; border-color:#0284c7; font-weight:700;">
-                🔍 Agregar de Catálogo CT / Syscom / Tecnosinergia
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; width:100%; align-items:center;">
+              <button type="button" class="btn btn-primary" onclick="openCatalogSearchModal()" style="background:linear-gradient(135deg, #0284c7, #0369a1); border:none; font-weight:800; font-size:0.86rem; padding:0.55rem 0.95rem; box-shadow:0 2px 6px rgba(2,132,199,0.35); flex:1; min-width:220px; justify-content:center;">
+                🔍 Buscar y Agregar Producto de Catálogo
               </button>
-              <button class="btn btn-outline btn-sm" onclick="addNewRow()">
-                + Agregar Concepto Manual
+              <button type="button" class="btn btn-outline" onclick="addNewRow()" style="font-weight:700; font-size:0.84rem; padding:0.55rem 0.85rem; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; justify-content:center;">
+                ➕ Concepto Manual
               </button>
-              <button class="btn btn-danger btn-sm" onclick="clearAllQuoteRows()" title="Eliminar todas las partidas y dejar la tabla en blanco">
-                🗑️ Eliminar Todo
+              <button type="button" class="btn btn-outline btn-sm" onclick="switchTab('stores')" style="font-size:0.76rem; color:#475569; padding:0.4rem 0.65rem;" title="Ver tabla completa de Tiendas Mayoristas">
+                🏪 Tienda Completa ↗
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" onclick="clearAllQuoteRows()" title="Eliminar todas las partidas y dejar la tabla en blanco" style="margin-left:auto;">
+                🗑️ Limpiar
               </button>
             </div>
-            <span style="font-size: 0.72rem; color: var(--gray-500);">Diseño ejecutivo compacto: 1 a 12 conceptos en 1 sola hoja tamaño Carta.</span>
+            <span style="font-size: 0.72rem; color: var(--gray-500); margin-top:0.35rem; display:block;">💡 Busca por modelo, marca o descripción entre más de 20,000 productos oficiales de CT, Syscom y Tecnosinergia.</span>
           </div>
         </section>
 
@@ -4317,6 +4396,60 @@ CLABE: 722969010514249300</textarea>
       </div>
     </div>
 
+    <!-- MODAL: BÚSQUEDA RÁPIDA DE CATÁLOGO DESDE COTIZADOR (OPTIMIZADO PARA MÓVIL) -->
+    <div class="modal-backdrop no-print" id="modal-catalog-search">
+      <div class="modal-box" style="max-width:760px; height:88vh; max-height:88vh; display:flex; flex-direction:column; padding:0;">
+        <div class="modal-header" style="background:#0f172a; color:#ffffff; padding:0.85rem 1.1rem; border-radius:12px 12px 0 0;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span style="font-size:1.3rem;">🔍</span>
+            <div>
+              <h3 style="margin:0; font-size:1.05rem; color:#ffffff; font-weight:800;">Catálogo CT · Syscom · Tecno</h3>
+              <p style="margin:0; font-size:0.72rem; color:#94a3b8;">Busca y agrega directamente a tu cotización sin cambiar de pantalla</p>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeModal('modal-catalog-search')" style="color:#cbd5e1; font-size:1.3rem;">✕</button>
+        </div>
+
+        <!-- Filtros y buscador del modal -->
+        <div style="padding:0.75rem 1rem; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; flex-direction:column; gap:0.5rem;">
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <input type="text" id="modal-cat-search-input" class="form-input" placeholder="Buscar por SKU, Marca o Modelo (ej. Dahua, Kingston, Router)..." style="flex:1; font-size:0.92rem; padding:0.55rem 0.8rem; border:2px solid #0284c7; border-radius:8px;" oninput="debounceModalCatSearch()">
+            <button type="button" class="btn btn-primary" onclick="executeModalCatSearch()" style="background:#0284c7; border:none; font-weight:700; padding:0.55rem 0.9rem;">
+              Buscar
+            </button>
+          </div>
+
+          <div style="display:flex; gap:0.4rem; overflow-x:auto; padding-bottom:2px; align-items:center;">
+            <span style="font-size:0.74rem; font-weight:800; color:#475569; text-transform:uppercase;">Tienda:</span>
+            <button type="button" class="btn btn-sm modal-store-pill active" id="modal-pill-all" onclick="setModalStoreFilter('ALL')" style="font-size:0.74rem; padding:0.25rem 0.55rem; border-radius:14px;">Todas</button>
+            <button type="button" class="btn btn-sm modal-store-pill" id="modal-pill-ct" onclick="setModalStoreFilter('CT Internacional')" style="font-size:0.74rem; padding:0.25rem 0.55rem; border-radius:14px; background:#f1f5f9; color:#334155;">🏢 CT</button>
+            <button type="button" class="btn btn-sm modal-store-pill" id="modal-pill-syscom" onclick="setModalStoreFilter('Syscom')" style="font-size:0.74rem; padding:0.25rem 0.55rem; border-radius:14px; background:#f1f5f9; color:#334155;">📡 Syscom</button>
+            <button type="button" class="btn btn-sm modal-store-pill" id="modal-pill-tecno" onclick="setModalStoreFilter('Tecnosinergia')" style="font-size:0.74rem; padding:0.25rem 0.55rem; border-radius:14px; background:#f1f5f9; color:#334155;">🔒 Tecno</button>
+            
+            <div style="margin-left:auto; display:flex; align-items:center; gap:0.25rem;">
+              <span style="font-size:0.72rem; color:#64748b;">Margen:</span>
+              <input type="number" id="modal-cat-markup" class="form-input" value="30" min="0" max="200" style="width:52px; font-size:0.76rem; padding:0.18rem; text-align:center; font-weight:800; color:#0369a1;" oninput="executeModalCatSearch()">
+              <span style="font-size:0.72rem; font-weight:800; color:#0369a1;">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de resultados scrolleable -->
+        <div class="modal-body" id="modal-cat-results" style="flex:1; overflow-y:auto; padding:0.75rem 1rem; background:#ffffff;">
+          <div style="text-align:center; padding:2rem 1rem; color:#64748b;">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">🔍</div>
+            <div style="font-weight:700; color:#0f172a; margin-bottom:0.25rem;">Escribe una palabra clave para buscar productos</div>
+            <div style="font-size:0.8rem;">Busca entre más de 16,000 productos de CT Internacional y 4,700 de Syscom.</div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="background:#f8fafc; border-top:1px solid #e2e8f0; padding:0.6rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+          <span id="modal-cat-count-info" style="font-size:0.76rem; font-weight:700; color:#475569;"></span>
+          <button type="button" class="btn btn-outline btn-sm" onclick="closeModal('modal-catalog-search')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
     <!-- MODAL: FICHA TÉCNICA DE ENTREGA AL CLIENTE (COMPARTIR / PDF / WHATSAPP) -->
     <div class="modal-backdrop no-print" id="modal-vault-handover">
       <div class="modal-box" style="max-width:640px;">
@@ -4540,8 +4673,68 @@ CLABE: 722969010514249300</textarea>
         </div>
       </div>
     </div>
+  </main>
 
-    <!-- MODAL: CREAR / EDITAR USUARIO DE ACCESO -->
+  <!-- BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAV DOCK) PARA MÓVIL (PWA / SMARTPHONE) -->
+  <nav class="bottom-nav-dock no-print" id="bottom-nav-dock" aria-label="Navegación móvil principal">
+    <button type="button" class="bottom-nav-item active" id="bnav-btn-cotizador" onclick="switchTab('cotizador')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>Cotizador</span>
+    </button>
+
+    <button type="button" class="bottom-nav-item" id="bnav-btn-stores" onclick="switchTab('stores')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span>Tiendas</span>
+    </button>
+
+    <button type="button" class="bottom-nav-item" id="bnav-btn-crm" onclick="switchTab('crm')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>CRM</span>
+    </button>
+
+    <button type="button" class="bottom-nav-item" id="bnav-btn-dashboard" onclick="switchTab('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      <span>Dashboard</span>
+    </button>
+
+    <button type="button" class="bottom-nav-item" id="bnav-btn-vault" onclick="switchTab('vault')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
+      <span>Caja Fuerte</span>
+    </button>
+
+    <button type="button" class="bottom-nav-item" id="bnav-btn-more" onclick="toggleMobileMoreMenu(event)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1.5"/><circle cx="6" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg>
+      <span>Más</span>
+    </button>
+  </nav>
+
+  <!-- Menú desplegable para opciones secundarias en móvil ("Más") -->
+  <div class="mobile-more-backdrop no-print" id="mobile-more-backdrop" onclick="closeMobileMoreMenu()"></div>
+  <div class="mobile-more-sheet no-print" id="mobile-more-sheet">
+    <div style="font-weight:800; font-size:0.85rem; color:#0f172a; padding:0.4rem 0.5rem 0.75rem; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+      <span>⚙️ Opciones del Sistema</span>
+      <button type="button" onclick="closeMobileMoreMenu()" style="border:none; background:none; font-size:1.2rem; color:#64748b;">✕</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:0.35rem; padding-top:0.6rem;">
+      <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); switchTab('users')">
+        🛡️ Seguridad y Usuarios
+      </button>
+      <button type="button" class="mobile-more-btn" id="bnav-more-config" onclick="closeMobileMoreMenu(); switchTab('config')">
+        🔌 Configuración y APIs
+      </button>
+      <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); openCatalogSearchModal()">
+        🔍 Catálogo de Productos
+      </button>
+      <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); openAIModal()">
+        ✨ Asistente IA (Chat)
+      </button>
+      <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); logoutSession()" style="color:#dc2626; border-top:1px dashed #e2e8f0; margin-top:0.25rem; padding-top:0.65rem;">
+        🔒 Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR / EDITAR USUARIO DE ACCESO -->
     <div class="modal-backdrop no-print" id="modal-user-admin">
       <div class="modal-box" style="max-width:540px; background:#ffffff;">
         <div class="modal-header" style="background:#0f172a; color:#ffffff;">
@@ -4979,7 +5172,44 @@ CLABE: 722969010514249300</textarea>
         return new Date().toISOString().slice(0, 10);
       }
     }
-    function readCatalogDayCache() {
+    // Base de datos IndexedDB para cachés de gran tamaño (resuelve el límite de 5MB de localStorage en móvil)
+    const IDB_CAT_DB = 'gaso_cache_db';
+    const IDB_CAT_STORE = 'catalogs';
+    function _openCatDB() {
+      return new Promise((resolve) => {
+        try {
+          if (!window.indexedDB) return resolve(null);
+          const req = indexedDB.open(IDB_CAT_DB, 1);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_CAT_STORE)) {
+              db.createObjectStore(IDB_CAT_STORE);
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve(null);
+        } catch (err) { resolve(null); }
+      });
+    }
+    async function readCatalogDayCache() {
+      // 1. Probar IndexedDB
+      try {
+        const db = await _openCatDB();
+        if (db) {
+          const val = await new Promise((res) => {
+            const tx = db.transaction(IDB_CAT_STORE, 'readonly');
+            const st = tx.objectStore(IDB_CAT_STORE);
+            const r = st.get('cat_day');
+            r.onsuccess = () => res(r.result);
+            r.onerror = () => res(null);
+          });
+          if (val && val.day === catalogCacheDayKey() && Array.isArray(val.syscom) && Array.isArray(val.ct)) {
+            return val;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fallback localStorage
       try {
         const raw = safeStorage.getItem(CAT_CACHE_KEY);
         if (!raw) return null;
@@ -4989,17 +5219,43 @@ CLABE: 722969010514249300</textarea>
         return d;
       } catch (e) { return null; }
     }
-    function writeCatalogDayCache(syscom, ct) {
+    async function writeCatalogDayCache(syscom, ct) {
+      const payload = {
+        day: catalogCacheDayKey(),
+        at: new Date().toISOString(),
+        syscom: syscom || [],
+        ct: ct || []
+      };
+      // 1. Guardar en IndexedDB
       try {
-        safeStorage.setItem(CAT_CACHE_KEY, JSON.stringify({
-          day: catalogCacheDayKey(),
-          at: new Date().toISOString(),
-          syscom: syscom || [],
-          ct: ct || []
-        }));
+        const db = await _openCatDB();
+        if (db) {
+          await new Promise((res) => {
+            const tx = db.transaction(IDB_CAT_STORE, 'readwrite');
+            const st = tx.objectStore(IDB_CAT_STORE);
+            st.put(payload, 'cat_day');
+            tx.oncomplete = () => res(true);
+            tx.onerror = () => res(false);
+          });
+        }
+      } catch (e) {}
+
+      // 2. Intentar localStorage solo si es pequeño (o ignorar si excede)
+      try {
+        safeStorage.setItem(CAT_CACHE_KEY, JSON.stringify(payload));
       } catch (e) {
-        try { safeStorage.removeItem(CAT_CACHE_KEY); } catch (e2) { /* quota */ }
+        try { safeStorage.removeItem(CAT_CACHE_KEY); } catch (e2) {}
       }
+    }
+    async function clearCatalogDayCache() {
+      try { safeStorage.removeItem(CAT_CACHE_KEY); } catch (e) {}
+      try {
+        const db = await _openCatDB();
+        if (db) {
+          const tx = db.transaction(IDB_CAT_STORE, 'readwrite');
+          tx.objectStore(IDB_CAT_STORE).delete('cat_day');
+        }
+      } catch (e) {}
     }
     let _catalogError = '';
     function _setCatalogBanner(kind, msg) {
@@ -5017,13 +5273,43 @@ CLABE: 722969010514249300</textarea>
       el.innerHTML = escapeHtml(msg) + (bad ? ' <button type="button" class="btn btn-outline btn-sm" onclick="retryCatalogs()" style="margin-left:0.5rem;">🔄 Reintentar</button>' : '');
     }
     async function _fetchCatalog(name) {
+      // Intento 1: Descarga directa ultrarrápida (todo en 1 petición comprimida gzip/brotli)
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          _setCatalogBanner('info', '⏳ Descargando catálogo ' + (name === 'ct' ? 'CT Internacional' : 'Syscom') + (attempt > 1 ? ' (reintento)…' : '…'));
+          const r = await fetch('/catalog?name=' + name + '&all=1', { credentials: 'same-origin' });
+          if (r.ok) {
+            const d = await r.json();
+            if (d && Array.isArray(d.rows)) {
+              return d.rows;
+            }
+          }
+        } catch (errFast) {
+          console.warn('Fallo descarga directa all=1 de ' + name + ', reintento:', errFast);
+        }
+      }
+
+      // Fallback a partes con reintentos automáticos
       let rows = [], part = 0, parts = 1;
       while (part < parts) {
-        const r = await fetch('/catalog?name=' + name + '&part=' + part, { credentials: 'same-origin' });
-        if (!r.ok) throw new Error(name + ': HTTP ' + r.status);
-        const d = await r.json();
-        rows = rows.concat(d.rows || []); parts = d.parts || 1; part++;
-        _setCatalogBanner('info', '⏳ Cargando catálogo ' + (name === 'ct' ? 'CT' : 'Syscom') + '… ' + rows.length.toLocaleString('es-MX') + ' / ' + (d.total || 0).toLocaleString('es-MX'));
+        let ok = false;
+        for (let retry = 0; retry < 3; retry++) {
+          try {
+            const r = await fetch('/catalog?name=' + name + '&part=' + part, { credentials: 'same-origin' });
+            if (!r.ok) throw new Error(name + ': HTTP ' + r.status);
+            const d = await r.json();
+            rows = rows.concat(d.rows || []);
+            parts = d.parts || 1;
+            part++;
+            ok = true;
+            _setCatalogBanner('info', '⏳ Cargando catálogo ' + (name === 'ct' ? 'CT' : 'Syscom') + '… ' + rows.length.toLocaleString('es-MX') + ' / ' + (d.total || 0).toLocaleString('es-MX'));
+            break;
+          } catch (partErr) {
+            if (retry === 2) throw partErr;
+            await new Promise(res => setTimeout(res, 500 * (retry + 1)));
+          }
+        }
+        if (!ok) break;
       }
       return rows;
     }
@@ -5032,25 +5318,25 @@ CLABE: 722969010514249300</textarea>
       const errors = [];
       let sys = [];
       let ct = [];
-      const cached = readCatalogDayCache();
-      if (cached) {
+      const cached = await readCatalogDayCache();
+      if (cached && Array.isArray(cached.syscom) && Array.isArray(cached.ct) && (cached.syscom.length || cached.ct.length)) {
         sys = cached.syscom;
         ct = cached.ct;
         _setCatalogBanner('', '');
       } else {
         try {
-          _setCatalogBanner('info', '⏳ Cargando catálogo Syscom (1× al día)…');
           sys = await _fetchCatalog('syscom');
         } catch (e) {
-          errors.push(String(e && e.message || e));
+          errors.push('Syscom: ' + (e && e.message || e));
         }
         try {
-          _setCatalogBanner('info', '⏳ Cargando catálogo CT (1× al día)…');
           ct = await _fetchCatalog('ct');
         } catch (e) {
-          errors.push(String(e && e.message || e));
+          errors.push('CT: ' + (e && e.message || e));
         }
-        if (sys.length || ct.length) writeCatalogDayCache(sys, ct);
+        if (sys.length || ct.length) {
+          await writeCatalogDayCache(sys, ct);
+        }
       }
       // Evitar duplicados si se reintenta tras carga parcial
       storeProducts = storeProducts.filter(function (p) {
@@ -5116,8 +5402,8 @@ CLABE: 722969010514249300</textarea>
       // (eso lo hace el cron de las 3:00 p.m. CDMX o el botón manual en Configuración).
       try { await quickSyncTecnosinergia(false); } catch (e) {}
     }
-    function retryCatalogs() {
-      try { safeStorage.removeItem(CAT_CACHE_KEY); } catch (e) {}
+    async function retryCatalogs() {
+      await clearCatalogDayCache();
       _bootstrapped = false;
       _catalogsLoaded = false;
       _postLoginBootstrap();
@@ -5300,12 +5586,15 @@ CLABE: 722969010514249300</textarea>
         return;
       }
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
 
       const activeBtn = document.getElementById('tab-btn-' + tabName);
+      const activeBnav = document.getElementById('bnav-btn-' + tabName);
       const activePane = document.getElementById('pane-' + tabName);
 
       if (activeBtn) activeBtn.classList.add('active');
+      if (activeBnav) activeBnav.classList.add('active');
       if (activePane) activePane.classList.add('active');
 
       if (tabName === 'crm' || tabName === 'dashboard') {
@@ -5323,6 +5612,32 @@ CLABE: 722969010514249300</textarea>
       if (tabName === 'vault') {
         vaultInit();
       }
+    }
+
+    function toggleMobileMoreMenu(e) {
+      if (e) e.stopPropagation();
+      const sheet = document.getElementById('mobile-more-sheet');
+      const backdrop = document.getElementById('mobile-more-backdrop');
+      if (!sheet) return;
+      const isOpen = sheet.classList.contains('open');
+      if (isOpen) {
+        closeMobileMoreMenu();
+      } else {
+        sheet.classList.add('open');
+        if (backdrop) backdrop.classList.add('open');
+        // Ocultar opciones según permisos
+        const moreConfig = document.getElementById('bnav-more-config');
+        if (moreConfig) {
+          moreConfig.style.display = (currentAuthUser && currentAuthUser.role === 'SUPERADMIN') ? 'block' : 'none';
+        }
+      }
+    }
+
+    function closeMobileMoreMenu() {
+      const sheet = document.getElementById('mobile-more-sheet');
+      const backdrop = document.getElementById('mobile-more-backdrop');
+      if (sheet) sheet.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('open');
     }
 
     /* Storage Helpers */
@@ -7259,6 +7574,174 @@ function updateDashboardKPIs() { renderDashboard(); }
       }
 
       tbody.appendChild(fragment);
+    }
+
+    // --- MODAL DE BÚSQUEDA RÁPIDA DE CATÁLOGO DESDE COTIZADOR ---
+    let _modalCatStoreFilter = 'ALL';
+    let _modalCatDebounceTimer = null;
+
+    function openCatalogSearchModal() {
+      // Si aún no están cargados los catálogos en memoria, activar carga
+      if (!_catalogsLoaded) {
+        loadProtectedCatalogs().then(() => {
+          executeModalCatSearch();
+        });
+      }
+      const storeMarkup = document.getElementById('store-markup-pct');
+      const modalMarkup = document.getElementById('modal-cat-markup');
+      if (storeMarkup && modalMarkup) {
+        modalMarkup.value = storeMarkup.value || 30;
+      }
+      openModal('modal-catalog-search');
+      setTimeout(() => {
+        const input = document.getElementById('modal-cat-search-input');
+        if (input) {
+          input.focus();
+          if (input.value.trim().length > 1) {
+            executeModalCatSearch();
+          }
+        }
+      }, 150);
+    }
+
+    function setModalStoreFilter(storeName) {
+      _modalCatStoreFilter = storeName;
+      document.querySelectorAll('.modal-store-pill').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '#f1f5f9';
+        btn.style.color = '#334155';
+      });
+      const idMap = {
+        'ALL': 'modal-pill-all',
+        'CT Internacional': 'modal-pill-ct',
+        'Syscom': 'modal-pill-syscom',
+        'Tecnosinergia': 'modal-pill-tecno'
+      };
+      const activeBtn = document.getElementById(idMap[storeName]);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = '#0284c7';
+        activeBtn.style.color = '#ffffff';
+      }
+      executeModalCatSearch();
+    }
+
+    function debounceModalCatSearch() {
+      if (_modalCatDebounceTimer) clearTimeout(_modalCatDebounceTimer);
+      _modalCatDebounceTimer = setTimeout(executeModalCatSearch, 220);
+    }
+
+    function executeModalCatSearch() {
+      const input = document.getElementById('modal-cat-search-input');
+      const term = input ? input.value.trim().toLowerCase() : '';
+      const container = document.getElementById('modal-cat-results');
+      const countInfo = document.getElementById('modal-cat-count-info');
+      if (!container) return;
+
+      if (!term && _modalCatStoreFilter === 'ALL') {
+        container.innerHTML = `
+          <div style="text-align:center; padding:2.5rem 1rem; color:#64748b;">
+            <div style="font-size:2.2rem; margin-bottom:0.5rem;">🔍</div>
+            <div style="font-weight:700; color:#0f172a; margin-bottom:0.3rem;">Escribe una palabra clave para buscar</div>
+            <div style="font-size:0.8rem;">Busca por modelo, código, descripción o marca (ej. Dahua, SSD, Memoria, Cable, Bobina).</div>
+          </div>
+        `;
+        if (countInfo) countInfo.textContent = 'Total cargado: ' + storeProducts.length.toLocaleString('es-MX') + ' productos';
+        return;
+      }
+
+      const markupPct = parseFloat(document.getElementById('modal-cat-markup') ? document.getElementById('modal-cat-markup').value : 30) || 30;
+
+      let matched = storeProducts.filter(p => {
+        if (!p) return false;
+        if (_modalCatStoreFilter !== 'ALL' && p.store !== _modalCatStoreFilter) return false;
+        if (!term) return true;
+        const sSku = (p.sku || '').toLowerCase();
+        const sBrand = (p.brand || '').toLowerCase();
+        const sDesc = (p.desc || '').toLowerCase();
+        return sSku.includes(term) || sBrand.includes(term) || sDesc.includes(term);
+      });
+
+      if (countInfo) {
+        countInfo.textContent = 'Encontrados: ' + matched.length.toLocaleString('es-MX') + ' productos';
+      }
+
+      if (matched.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:2.5rem 1rem; color:#64748b;">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">📦</div>
+            <div style="font-weight:700; color:#0f172a; margin-bottom:0.3rem;">No se encontraron productos coincidentes</div>
+            <div style="font-size:0.8rem;">Prueba con otra palabra clave o selecciona "Todas" las tiendas.</div>
+          </div>
+        `;
+        return;
+      }
+
+      const displayList = matched.slice(0, 100);
+      let html = '<div style="display:flex; flex-direction:column; gap:0.6rem;">';
+
+      displayList.forEach(p => {
+        const isUsd = p.currency === 'USD';
+        const costMxn = isUsd ? (p.rawPrice * exchangeRate) : p.rawPrice;
+        const salePriceMxn = calcPriceByMarginFormula(costMxn, markupPct);
+        const storeBadgeColor = p.store === 'CT Internacional' ? '#d97706' : (p.store === 'Syscom' ? '#2563eb' : '#059669');
+
+        html += `
+          <div style="border:1px solid #e2e8f0; border-radius:10px; padding:0.75rem 0.9rem; background:#ffffff; box-shadow:0 1px 3px rgba(0,0,0,0.04); display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            <div style="flex:1; min-width:200px;">
+              <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem; flex-wrap:wrap;">
+                <span style="font-size:0.68rem; font-weight:800; padding:2px 6px; border-radius:4px; background:${storeBadgeColor}15; color:${storeBadgeColor}; border:1px solid ${storeBadgeColor}40;">
+                  ${escapeHtml(p.store)}
+                </span>
+                <span style="font-family:monospace; font-weight:800; font-size:0.8rem; color:#0f172a; background:#f1f5f9; padding:1px 6px; border-radius:4px;">
+                  ${escapeHtml(p.sku)}
+                </span>
+                <span style="font-size:0.72rem; font-weight:700; color:#64748b;">
+                  ${escapeHtml(p.brand || '')}
+                </span>
+              </div>
+              <div style="font-size:0.82rem; font-weight:600; color:#1e293b; line-height:1.35; margin-bottom:0.25rem;">
+                ${escapeHtml(p.desc)}
+              </div>
+              <div style="font-size:0.72rem; color:#64748b; display:flex; gap:0.6rem; flex-wrap:wrap;">
+                <span>Costo: <strong>${p.currency} $${Number(p.rawPrice).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2})}</strong></span>
+                <span>Margen: <strong>${markupPct}%</strong></span>
+              </div>
+            </div>
+
+            <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:0.35rem; min-width:130px;">
+              <div>
+                <span style="font-size:0.66rem; text-transform:uppercase; font-weight:700; color:#64748b; display:block;">Precio Cotizado (MXN):</span>
+                <span style="font-size:1.15rem; font-weight:900; color:#0284c7;">$${salePriceMxn.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2})}</span>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="modalAddProductToQuote('${escapeHtml(p.sku)}')" style="background:#0284c7; border:none; font-weight:800; font-size:0.78rem; padding:0.4rem 0.8rem; border-radius:6px; box-shadow:0 1px 3px rgba(2,132,199,0.3);">
+                ➕ Agregar
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      if (matched.length > 100) {
+        html += `
+          <div style="text-align:center; padding:0.75rem; font-size:0.76rem; color:#64748b; background:#f8fafc; border-radius:8px;">
+            Mostrando los primeros 100 resultados de <strong>${matched.length.toLocaleString('es-MX')}</strong>. Sé más específico en tu búsqueda para afinar.
+          </div>
+        `;
+      }
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    function modalAddProductToQuote(sku) {
+      const modalMarkup = parseFloat(document.getElementById('modal-cat-markup') ? document.getElementById('modal-cat-markup').value : 30) || 30;
+      const storeMarkup = document.getElementById('store-markup-pct');
+      if (storeMarkup) storeMarkup.value = modalMarkup;
+      
+      insertStoreProductToQuote(sku);
+      showToast('✅ Producto ' + sku + ' agregado a la cotización.');
+      closeModal('modal-catalog-search');
     }
 
     function insertStoreProductToQuote(sku, priceMxn) {
