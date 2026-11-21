@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "dev.pages.gaso_mx.twa",
+    "sha256_cert_fingerprints": [
+      "1C:4B:30:F9:5A:0F:D2:8E:6E:E8:7D:5F:6E:AB:D7:0B:59:59:08:A5:C1:15:65:9B:1E:3E:15:E7:13:3B:6D:B6"
+    ]
+  }
+}]
