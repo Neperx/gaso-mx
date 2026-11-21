@@ -4347,8 +4347,8 @@ CLABE: 722969010514249300</textarea>
                 <div id="mp-modal-total" style="font-size:1.6rem; font-weight:900; color:#0284c7;">$0.00 MXN</div>
                 <div id="mp-modal-folio" style="font-size:0.78rem; color:#64748b;">Cotización: COT-000</div>
               </div>
-              <div style="background:#0284c7; color:#fff; padding:0.4rem 0.75rem; border-radius:8px; font-size:0.8rem; font-weight:700;">
-                ✓ Activo
+              <div id="mp-mode-badge" style="background:#15803d; color:#fff; padding:0.4rem 0.75rem; border-radius:8px; font-size:0.8rem; font-weight:700;">
+                ✓ Producción Real
               </div>
             </div>
 
@@ -4600,8 +4600,11 @@ CLABE: 722969010514249300</textarea>
         <div class="cfg-card" style="background:#fff; border:1px solid var(--gray-200); border-radius:10px; padding:1rem; margin-bottom:1rem;">
           <h3 style="font-size:0.95rem; margin:0 0 0.6rem; color:#0284c7;">💳 Mercado Pago & MeLi (Links de Pago y Cobro QR)</h3>
           <p style="font-size:0.78rem; color:#64748b; margin:0 0 0.55rem;">Permite a tus clientes pagar tus cotizaciones con tarjeta (débito/crédito), transferencia SPEI o dinero en cuenta de Mercado Pago. Genera Links de Pago y QR automáticos en las cotizaciones.</p>
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:0.6rem 0.8rem; margin-bottom:0.75rem; font-size:0.78rem; color:#1e40af;">
+            📌 <strong>Modo Real de Producción:</strong> Ingresa tu <strong>Access Token de Producción</strong> (inicia con <code>APP_USR-...</code>, NO el de prueba que inicia con <code>TEST-...</code>). Puedes obtenerlo en tu cuenta de <a href="https://www.mercadopago.com.mx/developers/panel/app" target="_blank" rel="noopener noreferrer" style="color:#0284c7; font-weight:700; text-decoration:underline;">Mercado Pago Developers → Credenciales de Producción</a>.
+          </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0.7rem;">
-            <label style="font-size:0.78rem; font-weight:700;">Access Token de Mercado Pago:
+            <label style="font-size:0.78rem; font-weight:700;">Access Token de Producción Mercado Pago:
               <input type="password" id="cfg-MP_ACCESS_TOKEN" class="form-input" placeholder="APP_USR-..." style="width:100%; font-family:monospace;">
             </label>
           </div>
@@ -9401,6 +9404,17 @@ function updateDashboardKPIs() { renderDashboard(); }
         document.getElementById('mp-modal-total').textContent = `$${amount.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
         document.getElementById('mp-modal-folio').textContent = `Cotización: ${qd.number || 'COT-01'} • ${qd.client?.name || 'Cliente'}`;
         document.getElementById('mp-checkout-link').value = data.checkoutUrl;
+
+        const modeBadge = document.getElementById('mp-mode-badge');
+        if (modeBadge) {
+          if (data.isProduction) {
+            modeBadge.style.background = '#15803d';
+            modeBadge.textContent = '✓ Cobro Real (Producción)';
+          } else {
+            modeBadge.style.background = '#d97706';
+            modeBadge.textContent = '⚠️ Modo Pruebas (Sandbox)';
+          }
+        }
 
         const openBtn = document.getElementById('btn-mp-open-direct');
         if (openBtn) openBtn.href = data.checkoutUrl;
