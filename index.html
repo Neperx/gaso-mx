@@ -640,6 +640,21 @@
       justify-content: space-between;
       align-items: center;
       margin-top: 0.5rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .table-toolbar-buttons {
+      display: flex;
+      gap: 0.4rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .table-toolbar-buttons .btn {
+      padding: 0.35rem 0.65rem !important;
+      font-size: 0.76rem !important;
+      font-weight: 700 !important;
+      width: auto !important;
+      flex: 0 0 auto !important;
     }
 
     /* CFDI 4.0 Bottom Section: Left (Amount in words + Payment Metadata + Terms/Bank) | Right (Totals) */
@@ -1657,7 +1672,15 @@
     /* ========================================================= */
     html, body {
       max-width: 100vw;
-      overflow-x: hidden;
+      overflow-x: clip;
+    }
+    .top-bar {
+      position: -webkit-sticky !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1000 !important;
+      width: 100% !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
     }
     .items-table-scroll-wrap {
       width: 100%;
@@ -2642,7 +2665,7 @@
   #public-landing-page { overflow-x: hidden; }
 
   @media (max-width: 900px) {
-    .top-bar { position: sticky; top: 0; z-index: 60; }
+    .top-bar { position: -webkit-sticky !important; position: sticky !important; top: 0 !important; z-index: 1000 !important; }
     .top-bar-inner { padding: 0.35rem 0.5rem !important; row-gap: 0.35rem; }
     .top-bar-inner .nav-logo-img { height: 26px !important; }
     .top-bar-inner .brand-section { width: auto !important; flex: 0 0 auto !important; }
@@ -2839,8 +2862,8 @@
     .seal-title *, .seal-hash, .seal-legal, .doc-footer { overflow-wrap: anywhere; word-break: break-word; white-space: normal !important; }
     .seal-hash, .seal-legal, .doc-footer { font-size: 0.72rem !important; }
     .table-toolbar { display: grid !important; gap: 0.5rem; }
-    .table-toolbar > div { display: grid !important; grid-template-columns: 1fr; gap: 0.5rem; }
-    .table-toolbar .btn { width: 100%; justify-content: center; min-height: 48px; }
+    .table-toolbar .table-toolbar-buttons { display: grid !important; grid-template-columns: 1fr; gap: 0.5rem; width: 100% !important; }
+    .table-toolbar .table-toolbar-buttons .btn { width: 100% !important; justify-content: center !important; min-height: 46px !important; font-size: 0.86rem !important; }
     .table-toolbar > span { display: none; }
 
     /* Partidas: cada una es una tarjeta */
@@ -3464,6 +3487,13 @@
             <input type="number" id="stamp-advance-amount" class="form-input" placeholder="Monto $" min="0" step="100" value="0" style="font-size:0.74rem; padding:0.15rem 0.35rem; width:88px; font-weight:800;" oninput="updateSalesNoteStamps()">
             <input type="date" id="stamp-advance-date" class="form-input" style="font-size:0.72rem; padding:0.15rem 0.35rem; width:122px;" onchange="updateSalesNoteStamps()">
           </div>
+
+          <!-- Sello 4: COBRO MERCADO PAGO / QR EN DOCUMENTO -->
+          <div class="stamp-Check-pill" style="border-color:#38bdf8; background:#f0f9ff;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="openMercadoPagoModal()" style="font-size:0.72rem; padding:0.2rem 0.6rem; background:#0284c7; border:none; color:#ffffff; font-weight:700; display:inline-flex; align-items:center; gap:4px; cursor:pointer;" title="Generar preferencia oficial de Mercado Pago y estampar el QR de cobro directamente en este documento">
+              💳 Generar QR Mercado Pago
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3697,21 +3727,21 @@
           </div>
 
           <div class="table-toolbar no-print">
-            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; width:100%; align-items:center;">
-              <button type="button" class="btn btn-primary" onclick="openCatalogSearchModal()" style="background:linear-gradient(135deg, #0284c7, #0369a1); border:none; font-weight:800; font-size:0.86rem; padding:0.55rem 0.95rem; box-shadow:0 2px 6px rgba(2,132,199,0.35); flex:1; min-width:220px; justify-content:center;">
-                🔍 Buscar y Agregar Producto de Catálogo
+            <div class="table-toolbar-buttons">
+              <button type="button" class="btn btn-primary btn-sm" onclick="openCatalogSearchModal()" style="background:#0284c7; border-color:#0284c7; font-weight:700;">
+                🔍 Catálogo CT · Syscom · Tecno
               </button>
-              <button type="button" class="btn btn-outline" onclick="addNewRow()" style="font-weight:700; font-size:0.84rem; padding:0.55rem 0.85rem; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; justify-content:center;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="addNewRow()" style="font-weight:700; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a;">
                 ➕ Concepto Manual
               </button>
-              <button type="button" class="btn btn-outline btn-sm" onclick="switchTab('stores')" style="font-size:0.76rem; color:#475569; padding:0.4rem 0.65rem;" title="Ver tabla completa de Tiendas Mayoristas">
-                🏪 Tienda Completa ↗
+              <button type="button" class="btn btn-outline btn-sm" onclick="switchTab('stores')" style="font-size:0.76rem; color:#475569;" title="Ver tabla completa de Tiendas Mayoristas">
+                🏪 Tienda Mayorista ↗
               </button>
-              <button type="button" class="btn btn-danger btn-sm" onclick="clearAllQuoteRows()" title="Eliminar todas las partidas y dejar la tabla en blanco" style="margin-left:auto;">
+              <button type="button" class="btn btn-danger btn-sm" onclick="clearAllQuoteRows()" title="Eliminar todas las partidas y dejar la tabla en blanco">
                 🗑️ Limpiar
               </button>
             </div>
-            <span style="font-size: 0.72rem; color: var(--gray-500); margin-top:0.35rem; display:block;">💡 Busca por modelo, marca o descripción entre más de 20,000 productos oficiales de CT, Syscom y Tecnosinergia.</span>
+            <span style="font-size: 0.72rem; color: var(--gray-500);">💡 Busca por modelo, marca o descripción entre más de 20,000 productos oficiales de CT, Syscom y Tecnosinergia.</span>
           </div>
         </section>
 
@@ -3840,18 +3870,23 @@ CLABE: 722969010514249300</textarea>
             <div class="qr-box">
               <canvas id="qr-code-canvas"></canvas>
             </div>
-            <div class="qr-label">QR VALIDACIÓN</div>
+            <div class="qr-label" id="qr-stamp-label">QR VALIDACIÓN</div>
           </div>
 
           <div class="digital-seal-info">
             <div class="seal-title">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px; height:13px; color:var(--success);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Código de Verificación de Cotización (informativo, no es CFDI) — Emisor: GASO INGENIERÍA (Folio: <span id="seal-folio">COT-2026-001</span> | Vence: <span id="seal-expiry-text">-</span>)
+              <span id="seal-title-label">Código de Verificación de Cotización (informativo, no es CFDI)</span> — Emisor: GASO INGENIERÍA (Folio: <span id="seal-folio">COT-2026-001</span> | Vence: <span id="seal-expiry-text">-</span>)
             </div>
             <div class="seal-hash" id="seal-hash-string">
               ||GASO|COT-2026-001|2026-10-13|GATM851209T92|RESICO-626|TOTAL|$0.00||
             </div>
-            <div class="seal-legal">
+            <div id="doc-payment-banner" style="display:none; margin:3px 0; padding:4px 8px; background:#ecfdf5; border:1px solid #86efac; border-radius:4px; font-size:0.72rem; color:#15803d;">
+              💳 <strong>Cobro en Línea Activo (Mercado Pago / SPEI / Tarjetas):</strong> 
+              <a id="doc-payment-link-anchor" href="#" target="_blank" style="color:#0284c7; text-decoration:underline; font-weight:700;">Abrir Enlace de Pago</a>
+              <span class="no-print" style="margin-left:8px; cursor:pointer; color:#0369a1; text-decoration:underline; font-weight:700;" onclick="copyMPLink()">[Copiar Link]</span>
+            </div>
+            <div class="seal-legal" id="seal-legal-text">
               Propuesta económica sujeta a vigencia indicada. En operaciones con Persona Moral aplica retención del 1.25% de ISR (Art. 113-J LISR - RESICO).
             </div>
           </div>
@@ -5548,15 +5583,31 @@ CLABE: 722969010514249300</textarea>
 
       // Digital Hash / Authenticity String
       const rawString = `||GASO|RESICO|${folio}|${emision}|${vencimiento}|EMISOR:${rfcEmisor}|RECEPTOR:${rfcCliente}|TOTAL:${totalStr}||`;
-      document.getElementById('seal-folio').textContent = folio;
-      document.getElementById('seal-expiry-text').textContent = vencimiento || '15 días';
-      document.getElementById('seal-hash-string').textContent = rawString;
+      const sealFolio = document.getElementById('seal-folio');
+      if (sealFolio) sealFolio.textContent = folio;
+      const sealExpiry = document.getElementById('seal-expiry-text');
+      if (sealExpiry) sealExpiry.textContent = vencimiento || '15 días';
+      const sealHash = document.getElementById('seal-hash-string');
+      if (sealHash) sealHash.textContent = rawString;
 
-      // URL or Payload for QR code
-      const qrPayload = `https://gasoingenieria.com/valida?folio=${encodeURIComponent(folio)}&emisor=${encodeURIComponent(rfcEmisor)}&cliente=${encodeURIComponent(rfcCliente)}&vence=${vencimiento}&total=${encodeURIComponent(totalStr)}`;
-
-      // Draw QR Code
-      window.renderQRCodeToCanvas(canvas, qrPayload, 115);
+      const label = document.getElementById('qr-stamp-label');
+      if (window.currentDocPaymentUrl) {
+        window.renderQRCodeToCanvas(canvas, window.currentDocPaymentUrl, 115);
+        if (label) {
+          label.textContent = 'QR PAGO MERCADO PAGO / SPEI';
+          label.style.color = '#0284c7';
+          label.style.fontWeight = '800';
+        }
+      } else {
+        // URL or Payload for QR code
+        const qrPayload = `https://gasoingenieria.com/valida?folio=${encodeURIComponent(folio)}&emisor=${encodeURIComponent(rfcEmisor)}&cliente=${encodeURIComponent(rfcCliente)}&vence=${vencimiento}&total=${encodeURIComponent(totalStr)}`;
+        window.renderQRCodeToCanvas(canvas, qrPayload, 115);
+        if (label) {
+          label.textContent = 'QR VALIDACIÓN';
+          label.style.color = '';
+          label.style.fontWeight = '';
+        }
+      }
     }
 
     /* Tab Switching */
@@ -8577,6 +8628,11 @@ function updateDashboardKPIs() { renderDashboard(); }
       });
       const advAmtEl = document.getElementById('stamp-advance-amount');
       if (advAmtEl) advAmtEl.value = 0;
+      window.currentDocPaymentUrl = null;
+      currentMPPreference = null;
+      const paymentBanner = document.getElementById('doc-payment-banner');
+      if (paymentBanner) paymentBanner.style.display = 'none';
+
       handleStatusChange();
       document.getElementById('discount-pct').value = 0;
 
@@ -8863,6 +8919,8 @@ function updateDashboardKPIs() { renderDashboard(); }
           advanceDate: document.getElementById('stamp-advance-date') ? document.getElementById('stamp-advance-date').value : ''
         },
         totalAmount: totalAmt,
+        total: totalAmt,
+        mercadopagoUrl: window.currentDocPaymentUrl || '',
         client: normalizeClientRecord({
           name: document.getElementById('client-name').value,
           rfc: document.getElementById('client-rfc').value,
@@ -8944,6 +9002,16 @@ function updateDashboardKPIs() { renderDashboard(); }
         if (document.getElementById('stamp-advance-chk')) document.getElementById('stamp-advance-chk').checked = Boolean(q.stamps.advance);
         if (q.stamps.advanceAmount !== undefined && document.getElementById('stamp-advance-amount')) document.getElementById('stamp-advance-amount').value = q.stamps.advanceAmount;
         if (q.stamps.advanceDate && document.getElementById('stamp-advance-date')) document.getElementById('stamp-advance-date').value = q.stamps.advanceDate;
+      }
+
+      if (q.mercadopagoUrl) {
+        window.currentDocPaymentUrl = q.mercadopagoUrl;
+        stampPaymentOnDocument(q.mercadopagoUrl, true);
+      } else {
+        window.currentDocPaymentUrl = null;
+        currentMPPreference = null;
+        const paymentBanner = document.getElementById('doc-payment-banner');
+        if (paymentBanner) paymentBanner.style.display = 'none';
       }
 
       handleStatusChange();
@@ -9365,11 +9433,57 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
     }
 
+    function stampPaymentOnDocument(checkoutUrl, isProduction) {
+      if (!checkoutUrl) return;
+      window.currentDocPaymentUrl = checkoutUrl;
+
+      // 1. Estampar en el canvas QR principal del documento (para pantalla, impresión y PDF)
+      const docCanvas = document.getElementById('qr-code-canvas');
+      if (docCanvas && typeof window.renderQRCodeToCanvas === 'function') {
+        window.renderQRCodeToCanvas(docCanvas, checkoutUrl, 115);
+      }
+      const label = document.getElementById('qr-stamp-label');
+      if (label) {
+        label.textContent = 'QR PAGO MERCADO PAGO / SPEI';
+        label.style.color = '#0284c7';
+        label.style.fontWeight = '800';
+      }
+
+      // 2. Banner informativo directo en el documento
+      const banner = document.getElementById('doc-payment-banner');
+      if (banner) {
+        banner.style.display = 'block';
+        const a = document.getElementById('doc-payment-link-anchor');
+        if (a) {
+          a.href = checkoutUrl;
+          a.textContent = '💳 Abrir Cobro en Línea (' + (isProduction ? 'Producción' : 'Pruebas') + ')';
+        }
+      }
+
+      // 3. Auto-guardar la cotización / nota con este link
+      try { autoSaveCurrentQuote(); } catch (e) {}
+    }
+
     async function openMercadoPagoModal() {
+      // Si el documento aún no es Nota de Venta, ofrecer convertirlo según el flujo oficial
+      const docStatusEl = document.getElementById('quote-status');
+      const docStatus = docStatusEl ? docStatusEl.value : 'draft';
+      if (docStatus !== 'sales_note') {
+        const wantsNV = confirm(
+          '💡 Mercado Pago y el código QR de cobro oficial se generan para Notas de Venta (NV).\n\n' +
+          '¿Deseas convertir este documento a NOTA DE VENTA ahora para estampar el QR de pago?'
+        );
+        if (wantsNV && docStatusEl) {
+          docStatusEl.value = 'sales_note';
+          handleStatusChange();
+        }
+      }
+
       const qd = getQuoteData();
-      const amount = qd.total || 0;
+      const domTotalStr = document.getElementById('grand-total-val') ? document.getElementById('grand-total-val').textContent.replace(/[^0-9.-]+/g, "") : "0";
+      const amount = parseFloat(qd.totalAmount || qd.total || domTotalStr) || 0;
       if (!amount || amount <= 0) {
-        showToast('La cotización debe tener un total mayor a $0.00 MXN para generar el cobro.');
+        showToast('La cotización debe tener al menos una partida con importe mayor a $0.00 MXN para generar el cobro.');
         return;
       }
 
@@ -9410,8 +9524,9 @@ function updateDashboardKPIs() { renderDashboard(); }
         if (loadingView) loadingView.style.display = 'none';
         if (readyView) readyView.style.display = 'block';
 
+        const isNV = document.getElementById('quote-status')?.value === 'sales_note';
         document.getElementById('mp-modal-total').textContent = `$${amount.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN`;
-        document.getElementById('mp-modal-folio').textContent = `Cotización: ${qd.number || 'COT-01'} • ${qd.client?.name || 'Cliente'}`;
+        document.getElementById('mp-modal-folio').textContent = `${isNV ? 'Nota de Venta' : 'Cotización'}: ${qd.number || 'COT-01'} • ${qd.client?.name || 'Cliente'}`;
         document.getElementById('mp-checkout-link').value = data.checkoutUrl;
 
         const modeBadge = document.getElementById('mp-mode-badge');
@@ -9428,11 +9543,15 @@ function updateDashboardKPIs() { renderDashboard(); }
         const openBtn = document.getElementById('btn-mp-open-direct');
         if (openBtn) openBtn.href = data.checkoutUrl;
 
-        // Renderizar Código QR
+        // Renderizar Código QR en Modal
         const canvas = document.getElementById('mp-qr-canvas');
         if (canvas && typeof window.renderQRCodeToCanvas === 'function') {
           window.renderQRCodeToCanvas(canvas, data.checkoutUrl, 160);
         }
+
+        // Estampar QR y enlace directamente en el documento de cotización / nota de venta
+        stampPaymentOnDocument(data.checkoutUrl, data.isProduction);
+
       } catch (err) {
         if (loadingView) loadingView.style.display = 'none';
         if (errorView) errorView.style.display = 'block';
@@ -12743,8 +12862,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       ctx.textAlign = "center";
       ctx.font = "800 13px -apple-system, sans-serif";
-      ctx.fillStyle = "#023e8a";
-      ctx.fillText("QR VALIDACIÓN", qrX + qrBoxSize / 2, qrY + qrBoxSize + 19);
+      const qrLabelEl = document.getElementById("qr-stamp-label");
+      const qrLabelTxt = (qrLabelEl ? qrLabelEl.textContent : (window.currentDocPaymentUrl ? "PAGO MERCADO PAGO / SPEI" : "QR VALIDACIÓN")).trim();
+      ctx.fillStyle = window.currentDocPaymentUrl ? "#0284c7" : "#023e8a";
+      ctx.fillText(qrLabelTxt, qrX + qrBoxSize / 2, qrY + qrBoxSize + 19);
       ctx.textAlign = "left";
 
       const sigBoxW = 350;
@@ -12752,16 +12873,28 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const sealW = contentW - (qrBoxSize + 44) - sigBoxW - 36;
       ctx.font = "800 16.5px -apple-system, sans-serif";
       ctx.fillStyle = "#0f172a";
-      ctx.fillText(`Código de Verificación de ${isSalesNote ? "Nota de Venta" : "Cotización"} — Emisor: GASO INGENIERÍA`, sealX, curY + 36);
+      const docHeaderTitle = window.currentDocPaymentUrl
+        ? `Cobro en Línea Mercado Pago — ${isSalesNote ? "Nota de Venta" : "Cotización"} GASO`
+        : `Código de Verificación de ${isSalesNote ? "Nota de Venta" : "Cotización"} — Emisor: GASO INGENIERÍA`;
+      ctx.fillText(docHeaderTitle, sealX, curY + 36);
       ctx.font = "700 15.5px -apple-system, sans-serif";
       ctx.fillStyle = "#023e8a";
       ctx.fillText(`Folio: ${qFolio}   |   Fecha: ${qDate}`, sealX, curY + 60);
       const rawHash = (document.getElementById("seal-hash-string").textContent || "").trim();
       roundRect(sealX, curY + 74, sealW, 56, 6, "#ffffff", "#cbd5e1", 1.2);
-      ctx.font = "600 13.5px monospace";
-      ctx.fillStyle = "#334155";
-      ctx.fillText(rawHash.substring(0, 68), sealX + 12, curY + 98);
-      if (rawHash.length > 68) ctx.fillText(rawHash.substring(68, 136), sealX + 12, curY + 118);
+      if (window.currentDocPaymentUrl) {
+        ctx.font = "700 13px -apple-system, sans-serif";
+        ctx.fillStyle = "#15803d";
+        ctx.fillText("💳 PAGO EN LÍNEA: Escanea el QR para pagar con Tarjetas o Transferencia SPEI", sealX + 12, curY + 97);
+        ctx.font = "600 11px monospace";
+        ctx.fillStyle = "#0284c7";
+        ctx.fillText(window.currentDocPaymentUrl.substring(0, 68), sealX + 12, curY + 117);
+      } else {
+        ctx.font = "600 13.5px monospace";
+        ctx.fillStyle = "#334155";
+        ctx.fillText(rawHash.substring(0, 68), sealX + 12, curY + 98);
+        if (rawHash.length > 68) ctx.fillText(rawHash.substring(68, 136), sealX + 12, curY + 118);
+      }
       ctx.font = "500 14px -apple-system, sans-serif";
       ctx.fillStyle = "#64748b";
       const legalTxt = isSalesNote
