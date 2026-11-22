@@ -4603,15 +4603,19 @@ CLABE: 722969010514249300</textarea>
           <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:0.6rem 0.8rem; margin-bottom:0.75rem; font-size:0.78rem; color:#1e40af;">
             📌 <strong>Modo Real de Producción:</strong> Ingresa tu <strong>Access Token de Producción</strong> (inicia con <code>APP_USR-...</code>, NO el de prueba que inicia con <code>TEST-...</code>). Puedes obtenerlo en tu cuenta de <a href="https://www.mercadopago.com.mx/developers/panel/app" target="_blank" rel="noopener noreferrer" style="color:#0284c7; font-weight:700; text-decoration:underline;">Mercado Pago Developers → Credenciales de Producción</a>.
           </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0.7rem;">
-            <label style="font-size:0.78rem; font-weight:700;">Access Token de Producción Mercado Pago:
-              <input type="password" id="cfg-MP_ACCESS_TOKEN" class="form-input" placeholder="APP_USR-..." style="width:100%; font-family:monospace;">
-            </label>
-          </div>
+          <div style="font-size:0.78rem; margin-bottom:0.6rem;">Estado del token: <strong id="cfg-st-MP_ACCESS_TOKEN"></strong><br><span style="color:#64748b;">Secret <code>MP_ACCESS_TOKEN</code> en Cloudflare Pages</span></div>
           <div style="display:flex; gap:0.5rem; margin-top:0.75rem; flex-wrap:wrap; align-items:center;">
-            <button type="button" class="btn btn-primary btn-sm" onclick="cfgSaveMPToken()" style="font-weight:700; background:#0284c7; border-color:#0284c7;">💾 Guardar Token</button>
-            <button type="button" class="btn btn-outline btn-sm" onclick="cfgTestMP()">Probar Conexión</button>
-            <button type="button" class="btn btn-outline btn-sm" onclick="cfgToggleMPVisibility()" style="color:#64748b; border:none;">👁️ Ver / Ocultar</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="cfgTestMP()" style="font-weight:700; background:#0284c7; border-color:#0284c7;">⚡ Probar Conexión con Mercado Pago</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="cfgToggleMPManual()">⚙️ Cambiar Token Manual</button>
+          </div>
+          <div id="cfg-mp-manual-input-box" style="display:none; margin-top:0.8rem; padding:0.75rem; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px;">
+            <label style="font-size:0.78rem; font-weight:700; display:block; margin-bottom:0.3rem;">Sobrescribir Access Token de Producción:
+              <input type="password" id="cfg-MP_ACCESS_TOKEN" class="form-input" placeholder="APP_USR-..." style="width:100%; font-family:monospace; margin-top:0.25rem;">
+            </label>
+            <div style="display:flex; gap:0.4rem; margin-top:0.4rem;">
+              <button type="button" class="btn btn-primary btn-sm" onclick="cfgSaveMPToken()">💾 Guardar</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="cfgToggleMPVisibility()">👁️ Ver</button>
+            </div>
           </div>
           <div id="cfg-result-mp" style="font-size:0.8rem; line-height:1.5; margin-top:0.5rem;"></div>
         </div>
@@ -9106,7 +9110,7 @@ function updateDashboardKPIs() { renderDashboard(); }
       }
     }
 
-    const CFG_NAMES = ['AI_PROVIDER', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'ANTHROPIC_API_KEY', 'AI_MODEL', 'TECNO_API_TOKEN', 'SYSCOM_CSV_URL'];
+    const CFG_NAMES = ['AI_PROVIDER', 'GEMINI_API_KEY', 'GEMINI_MODEL', 'ANTHROPIC_API_KEY', 'AI_MODEL', 'TECNO_API_TOKEN', 'SYSCOM_CSV_URL', 'MP_ACCESS_TOKEN'];
     const CFG_SRC = { panel: 'guardada en el panel', env: 'definida en Cloudflare', none: 'sin configurar' };
     async function cfgApi(body) {
       const res = await fetch('/config', {
@@ -9354,6 +9358,11 @@ function updateDashboardKPIs() { renderDashboard(); }
     function cfgToggleMPVisibility() {
       const inp = document.getElementById('cfg-MP_ACCESS_TOKEN');
       if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function cfgToggleMPManual() {
+      const box = document.getElementById('cfg-mp-manual-input-box');
+      if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
     }
 
     async function openMercadoPagoModal() {
