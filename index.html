@@ -12,9 +12,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="GASO MX">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <!-- jsPDF + html2canvas: PDF vectorial con texto seleccionable -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -3371,8 +3368,7 @@
           <div class="actions-menu-list" id="actions-menu-list" role="menu">
             <button type="button" role="menuitem" onclick="closeActionsMenu(); startNewQuote()">➕ Nueva cotización</button>
             <button type="button" role="menuitem" onclick="closeActionsMenu(); saveCurrentQuote()">💾 Guardar</button>
-            <button type="button" role="menuitem" id="btn-export-pdf" onclick="closeActionsMenu(); exportDirectPDF()">📥 PDF directo</button>
-            <button type="button" role="menuitem" id="btn-export-pdf-vector" onclick="closeActionsMenu(); exportVectorPDF()" style="color:#15803d; font-weight:700;">📋 PDF texto seleccionable ↓</button>
+            <button type="button" role="menuitem" id="btn-export-pdf" onclick="closeActionsMenu(); exportDirectPDF()">📥 Descargar PDF (con texto y QR)</button>
             <button type="button" role="menuitem" id="btn-export-annex" onclick="closeActionsMenu(); exportAnnexPDF()">📄 PDF Anexo técnico</button>
             <button type="button" role="menuitem" id="btn-share-wa" onclick="closeActionsMenu(); shareQuoteViaWhatsApp()">📲 WhatsApp</button>
             <button type="button" role="menuitem" id="btn-cobro-mp" onclick="closeActionsMenu(); openMercadoPagoModal()" style="color:#0284c7; border-top:1px dashed #cbd5e1; margin-top:0.25rem; padding-top:0.6rem;">💳 Cobrar con Mercado Pago</button>
@@ -5595,22 +5591,13 @@ CLABE: 722969010514249300</textarea>
       if (sealHash) sealHash.textContent = rawString;
 
       const label = document.getElementById('qr-stamp-label');
-      if (window.currentDocPaymentUrl) {
-        window.renderQRCodeToCanvas(canvas, window.currentDocPaymentUrl, 115);
-        if (label) {
-          label.textContent = 'QR PAGO MERCADO PAGO / SPEI';
-          label.style.color = '#0284c7';
-          label.style.fontWeight = '800';
-        }
-      } else {
-        // URL or Payload for QR code
-        const qrPayload = `https://gasoingenieria.com/valida?folio=${encodeURIComponent(folio)}&emisor=${encodeURIComponent(rfcEmisor)}&cliente=${encodeURIComponent(rfcCliente)}&vence=${vencimiento}&total=${encodeURIComponent(totalStr)}`;
-        window.renderQRCodeToCanvas(canvas, qrPayload, 115);
-        if (label) {
-          label.textContent = 'QR VALIDACIÓN';
-          label.style.color = '';
-          label.style.fontWeight = '';
-        }
+      // El QR de validación fiscal del pie de página siempre mantiene su payload oficial
+      const qrPayload = `https://gasoingenieria.com/valida?folio=${encodeURIComponent(folio)}&emisor=${encodeURIComponent(rfcEmisor)}&cliente=${encodeURIComponent(rfcCliente)}&vence=${vencimiento}&total=${encodeURIComponent(totalStr)}`;
+      window.renderQRCodeToCanvas(canvas, qrPayload, 115);
+      if (label) {
+        label.textContent = 'QR VALIDACIÓN';
+        label.style.color = '';
+        label.style.fontWeight = '';
       }
     }
 
@@ -8836,11 +8823,29 @@ function updateDashboardKPIs() { renderDashboard(); }
           </div>
         `;
       }
+      if (window.currentDocPaymentUrl) {
+        htmlBadges += `
+          <div class="rubber-stamp-badge rubber-stamp-mp" style="border-color:#0284c7; color:#0284c7; transform:rotate(-4deg); display:inline-flex; flex-direction:column; align-items:center; gap:4px; padding:6px 14px; cursor:pointer; background:rgba(255,255,255,0.96); box-shadow:0 2px 8px rgba(2,132,199,0.15);" onclick="window.open('${escapeHtml(window.currentDocPaymentUrl)}', '_blank')" title="Clic para pagar o escanear">
+            <div style="font-size:0.85rem; font-weight:900; color:#0284c7;">💳 PAGO EN LÍNEA</div>
+            <canvas id="qr-stamp-mp-canvas" width="80" height="80" style="background:#fff; border-radius:4px; border:1px solid #cbd5e1;"></canvas>
+            <div style="font-size:0.64rem; font-weight:800; color:#0284c7;">MERCADO PAGO / SPEI</div>
+            <div style="font-size:0.58rem; color:#64748b;">🔗 Toca aquí para pagar</div>
+          </div>
+        `;
+      }
 
       if (visContainer) {
         if (htmlBadges) {
           visContainer.innerHTML = htmlBadges;
           visContainer.classList.add('active-stamps');
+          if (window.currentDocPaymentUrl) {
+            setTimeout(() => {
+              const c = document.getElementById('qr-stamp-mp-canvas');
+              if (c && window.currentDocPaymentUrl && typeof window.renderQRCodeToCanvas === 'function') {
+                window.renderQRCodeToCanvas(c, window.currentDocPaymentUrl, 80);
+              }
+            }, 40);
+          }
         } else {
           visContainer.innerHTML = '';
           visContainer.classList.remove('active-stamps');
@@ -9028,12 +9033,7 @@ function updateDashboardKPIs() { renderDashboard(); }
     }
 
     function printQuote() {
-      switchTab('cotizador');
-      syncPrintMirrors();
-      updateQRStamp();
-      setTimeout(() => {
-        window.print();
-      }, 150);
+      exportDirectPDF();
     }
 
     function handleLogoUpload(event) {
@@ -9441,19 +9441,13 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (!checkoutUrl) return;
       window.currentDocPaymentUrl = checkoutUrl;
 
-      // 1. Estampar en el canvas QR principal del documento (para pantalla, impresión y PDF)
-      const docCanvas = document.getElementById('qr-code-canvas');
-      if (docCanvas && typeof window.renderQRCodeToCanvas === 'function') {
-        window.renderQRCodeToCanvas(docCanvas, checkoutUrl, 115);
-      }
-      const label = document.getElementById('qr-stamp-label');
-      if (label) {
-        label.textContent = 'QR PAGO MERCADO PAGO / SPEI';
-        label.style.color = '#0284c7';
-        label.style.fontWeight = '800';
-      }
+      // 1. Estampar en la zona de sellos de la Nota de Venta como Sello Oficial con QR activo
+      updateSalesNoteStamps();
 
-      // 2. Banner informativo directo en el documento
+      // 2. Mantener la estructura original: el QR de validación fiscal del pie permanece intacto
+      updateQRStamp();
+
+      // 3. Banner informativo directo en el documento
       const banner = document.getElementById('doc-payment-banner');
       if (banner) {
         banner.style.display = 'block';
@@ -9464,7 +9458,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         }
       }
 
-      // 3. Auto-guardar la cotización / nota con este link
+      // 4. Auto-guardar la cotización / nota con este link
       try { autoSaveCurrentQuote(); } catch (e) {}
     }
 
@@ -12029,35 +12023,106 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       function pushBytes(b) { chunks.push(b); currentOffset += b.length; }
       function startObj() { offsets.push(currentOffset); }
 
+      function escapePDFStr(str) {
+        if (!str) return "";
+        return String(str)
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/\\/g, "\\\\")
+          .replace(/\(/g, "\\(")
+          .replace(/\)/g, "\\)")
+          .replace(/[\r\n\t]/g, " ");
+      }
+
       const pageRecords = list.map((pg) => {
         const base64Data = pg.jpegDataUrl.split(",")[1];
         const binaryStr = atob(base64Data);
         const imgBytes = new Uint8Array(binaryStr.length);
         for (let j = 0; j < binaryStr.length; j++) imgBytes[j] = binaryStr.charCodeAt(j);
-        return { imgBytes, w: pg.width || 1700, h: pg.height || 2200 };
+        return {
+          imgBytes,
+          w: pg.width || 1700,
+          h: pg.height || 2200,
+          texts: pg.texts || [],
+          links: pg.links || []
+        };
       });
-      const pageObjNums = pageRecords.map((_, i) => 3 + i * 3);
+
+      const fontObjId = 3;
+      let nextObjId = 4;
+      pageRecords.forEach((rec) => {
+        rec.pageObjId = nextObjId++;
+        rec.imgObjId = nextObjId++;
+        rec.contentObjId = nextObjId++;
+        rec.annotObjIds = (rec.links || []).map(() => nextObjId++);
+      });
 
       pushStr("%PDF-1.4\n%\xFF\xFF\xFF\xFF\n");
+
+      // 1: Catalog
       startObj();
       pushStr("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+
+      // 2: Pages
       startObj();
-      pushStr("2 0 obj\n<< /Type /Pages /Kids [" + pageObjNums.map(n => n + " 0 R").join(" ") + "] /Count " + pageRecords.length + " >>\nendobj\n");
+      pushStr("2 0 obj\n<< /Type /Pages /Kids [" + pageRecords.map(r => r.pageObjId + " 0 R").join(" ") + "] /Count " + pageRecords.length + " >>\nendobj\n");
+
+      // 3: Font Helvetica con WinAnsiEncoding
+      startObj();
+      pushStr(fontObjId + " 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n");
 
       pageRecords.forEach((rec, i) => {
-        const pageObj = 3 + i * 3;
-        const imgObj = pageObj + 1;
-        const contentObj = pageObj + 2;
+        // Objeto Página
         startObj();
-        pushStr(pageObj + " 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + pageW + " " + pageH + "] /Resources << /XObject << /Im" + i + " " + imgObj + " 0 R >> >> /Contents " + contentObj + " 0 R >>\nendobj\n");
+        let pageDict = rec.pageObjId + " 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 " + pageW + " " + pageH + "] /Resources << /Font << /F1 " + fontObjId + " 0 R >> /XObject << /Im" + i + " " + rec.imgObjId + " 0 R >> >> /Contents " + rec.contentObjId + " 0 R";
+        if (rec.annotObjIds && rec.annotObjIds.length) {
+          pageDict += " /Annots [" + rec.annotObjIds.map(id => id + " 0 R").join(" ") + "]";
+        }
+        pageDict += " >>\nendobj\n";
+        pushStr(pageDict);
+
+        // Objeto Imagen JPEG de alta resolución
         startObj();
-        pushStr(imgObj + " 0 obj\n<< /Type /XObject /Subtype /Image /Width " + rec.w + " /Height " + rec.h + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + rec.imgBytes.length + " >>\nstream\n");
+        pushStr(rec.imgObjId + " 0 obj\n<< /Type /XObject /Subtype /Image /Width " + rec.w + " /Height " + rec.h + " /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length " + rec.imgBytes.length + " >>\nstream\n");
         pushBytes(rec.imgBytes);
         pushStr("\nendstream\nendobj\n");
-        const contentStream = "q\n" + pageW + " 0 0 " + pageH + " 0 0 cm\n/Im" + i + " Do\nQ\n";
+
+        // Objeto Stream de Contenido: Imagen de fondo + Texto real invisible (3 Tr) seleccionable
+        let contentStream = "q\n" + pageW + " 0 0 " + pageH + " 0 0 cm\n/Im" + i + " Do\nQ\n";
+        if (rec.texts && rec.texts.length) {
+          const scaleX = pageW / rec.w;
+          const scaleY = pageH / rec.h;
+          contentStream += "BT\n3 Tr\n";
+          rec.texts.forEach((t) => {
+            if (!t.text) return;
+            const pdfX = (t.x * scaleX).toFixed(2);
+            const pdfY = ((rec.h - t.y) * scaleY).toFixed(2);
+            const pdfSize = Math.max(5, (t.size * scaleY * 0.95)).toFixed(2);
+            const escaped = escapePDFStr(t.text);
+            if (escaped) {
+              contentStream += `/F1 ${pdfSize} Tf\n1 0 0 1 ${pdfX} ${pdfY} Tm\n(${escaped}) Tj\n`;
+            }
+          });
+          contentStream += "ET\n";
+        }
         const contentBytes = enc.encode(contentStream);
         startObj();
-        pushStr(contentObj + " 0 obj\n<< /Length " + contentBytes.length + " >>\nstream\n" + contentStream + "endstream\nendobj\n");
+        pushStr(rec.contentObjId + " 0 obj\n<< /Length " + contentBytes.length + " >>\nstream\n" + contentStream + "endstream\nendobj\n");
+
+        // Enlaces interactivos clickeables en el PDF (p. ej. Código QR de Mercado Pago)
+        if (rec.links && rec.links.length) {
+          const scaleX = pageW / rec.w;
+          const scaleY = pageH / rec.h;
+          rec.links.forEach((link, k) => {
+            const annotId = rec.annotObjIds[k];
+            const x1 = (link.x * scaleX).toFixed(2);
+            const x2 = ((link.x + link.w) * scaleX).toFixed(2);
+            const y1 = ((rec.h - (link.y + link.h)) * scaleY).toFixed(2);
+            const y2 = ((rec.h - link.y) * scaleY).toFixed(2);
+            const safeUrl = String(link.url || "").replace(/[()\\]/g, "");
+            startObj();
+            pushStr(annotId + " 0 obj\n<< /Type /Annot /Subtype /Link /Rect [" + x1 + " " + y1 + " " + x2 + " " + y2 + "] /Border [0 0 0] /A << /S /URI /URI (" + safeUrl + ") >> >>\nendobj\n");
+          });
+        }
       });
 
       const xrefOffset = currentOffset;
@@ -12088,6 +12153,24 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const pdfPages = [];
       const pageBuffers = []; // canvases intermedios; al final se numera "1 de N"
 
+      let currentPageTexts = [];
+      let currentPageLinks = [];
+      const pageTextsList = [];
+      const pageLinksList = [];
+
+      const origFillText = ctx.fillText.bind(ctx);
+      ctx.fillText = function(text, x, y, maxW) {
+        origFillText(text, x, y, maxW);
+        if (text !== undefined && text !== null) {
+          const s = String(text).trim();
+          if (s) {
+            const m = String(ctx.font).match(/(\d+(?:\.\d+)?)\s*px/);
+            const size = m ? parseFloat(m[1]) : 14;
+            currentPageTexts.push({ text: s, x, y, size });
+          }
+        }
+      };
+
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, W, H);
 
@@ -12101,6 +12184,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         snap.height = H;
         snap.getContext("2d").drawImage(canvas, 0, 0);
         pageBuffers.push(snap);
+        pageTextsList.push(currentPageTexts.slice());
+        pageLinksList.push(currentPageLinks.slice());
+        currentPageTexts = [];
+        currentPageLinks = [];
       }
       function clearCanvasWhite() {
         ctx.fillStyle = "#ffffff";
@@ -12125,7 +12212,13 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             sctx.fillText("← Continúa", M + 10, H - 16);
           }
           sctx.textAlign = "left";
-          pdfPages.push({ jpegDataUrl: snap.toDataURL("image/jpeg", 0.95), width: W, height: H });
+          pdfPages.push({
+            jpegDataUrl: snap.toDataURL("image/jpeg", 0.98),
+            width: W,
+            height: H,
+            texts: pageTextsList[i] || [],
+            links: pageLinksList[i] || []
+          });
         });
       }
 
@@ -12740,68 +12833,96 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       if (isSalesNote) {
         const stampCenterY = Math.min(footerTop - 70, Math.max(itemsEndY + 70, footerTop - 160));
         const activeStamps = [];
-        if (isPaid) activeStamps.push({ color: "#15803d", angle: -8, l1: "PAGADO", l2: `FECHA: ${paidDate}`, l3: "LIQUIDADO AL 100%" });
-        if (isAdvance && advAmt > 0) activeStamps.push({ color: "#b45309", angle: -6, l1: "ANTICIPO RECIBIDO", l2: `${formatCurrency(advAmt)} (${advDate})`, l3: `RESTA: ${formatCurrency(remainingBalance)}` });
-        if (isDelivered) activeStamps.push({ color: "#1d4ed8", angle: -5, l1: "ENTREGADO", l2: `FECHA: ${delivDate}`, l3: "RECIBIDO DE CONFORMIDAD" });
-        if (activeStamps.length === 1) {
-          drawRubberStamp(W / 2, stampCenterY, activeStamps[0].angle, activeStamps[0].color, activeStamps[0].l1, activeStamps[0].l2, activeStamps[0].l3);
-        } else if (activeStamps.length === 2) {
-          drawRubberStamp(W / 2 - 230, stampCenterY, activeStamps[0].angle, activeStamps[0].color, activeStamps[0].l1, activeStamps[0].l2, activeStamps[0].l3);
-          drawRubberStamp(W / 2 + 230, stampCenterY + 10, activeStamps[1].angle, activeStamps[1].color, activeStamps[1].l1, activeStamps[1].l2, activeStamps[1].l3);
-        } else if (activeStamps.length === 3) {
-          drawRubberStamp(W / 2 - 410, stampCenterY, activeStamps[0].angle, activeStamps[0].color, activeStamps[0].l1, activeStamps[0].l2, activeStamps[0].l3);
-          drawRubberStamp(W / 2, stampCenterY + 8, activeStamps[1].angle, activeStamps[1].color, activeStamps[1].l1, activeStamps[1].l2, activeStamps[1].l3);
-          drawRubberStamp(W / 2 + 410, stampCenterY, activeStamps[2].angle, activeStamps[2].color, activeStamps[2].l1, activeStamps[2].l2, activeStamps[2].l3);
+        if (isPaid) activeStamps.push({ type: 'paid', color: "#15803d", angle: -8, l1: "PAGADO", l2: `FECHA: ${paidDate}`, l3: "LIQUIDADO AL 100%" });
+        if (isAdvance && advAmt > 0) activeStamps.push({ type: 'advance', color: "#b45309", angle: -6, l1: "ANTICIPO RECIBIDO", l2: `${formatCurrency(advAmt)} (${advDate})`, l3: `RESTA: ${formatCurrency(remainingBalance)}` });
+        if (isDelivered) activeStamps.push({ type: 'delivered', color: "#1d4ed8", angle: -5, l1: "ENTREGADO", l2: `FECHA: ${delivDate}`, l3: "RECIBIDO DE CONFORMIDAD" });
+        if (window.currentDocPaymentUrl) {
+          activeStamps.push({ type: 'mp', color: "#0284c7", angle: -4, l1: "PAGO EN LÍNEA", l2: "MERCADO PAGO / SPEI", url: window.currentDocPaymentUrl });
         }
 
-        // ── QR de pago como sello junto a los sellos de estado ──────────────
-        const qrCanvasEl = document.getElementById("qr-code-canvas");
-        if (window.currentDocPaymentUrl && qrCanvasEl && qrCanvasEl.width > 0) {
-          const qrSz = 150;
-          // Si hay sellos a la izquierda, poner el QR a la derecha; si no hay, centrar
-          const qrCX = activeStamps.length > 0 ? W - M - qrSz / 2 - 10 : W / 2;
-          const qrCY = stampCenterY;
-          ctx.save();
-          ctx.translate(qrCX, qrCY);
-          ctx.rotate(-0.07); // leve inclinación tipo sello
-          // Marco exterior tipo sello
-          roundRect(-qrSz / 2, -qrSz / 2, qrSz, qrSz, 12, "rgba(255,255,255,0.95)", "#0284c7", 5);
-          roundRect(-qrSz / 2 + 7, -qrSz / 2 + 7, qrSz - 14, qrSz - 14, 8, null, "#0284c7", 1.5);
-          // QR dentro del sello
-          ctx.drawImage(qrCanvasEl, -qrSz / 2 + 12, -qrSz / 2 + 12, qrSz - 24, qrSz - 24);
-          // Etiqueta inferior del sello
-          ctx.textAlign = "center";
-          ctx.font = "900 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
-          ctx.fillStyle = "#0284c7";
-          ctx.fillText("PAGAR EN LÍNEA", 0, qrSz / 2 + 22);
-          ctx.font = "700 11px -apple-system, sans-serif";
-          ctx.fillStyle = "#64748b";
-          ctx.fillText("MERCADO PAGO / SPEI", 0, qrSz / 2 + 38);
-          ctx.textAlign = "left";
-          ctx.restore();
+        const totalStamps = activeStamps.length;
+        if (totalStamps > 0) {
+          const spacing = totalStamps > 3 ? 360 : (totalStamps === 3 ? 390 : 420);
+          const startX = (W / 2) - ((totalStamps - 1) * spacing) / 2;
+          activeStamps.forEach((st, idx) => {
+            const cx = startX + idx * spacing;
+            const cy = stampCenterY + (idx % 2 === 1 ? 8 : 0);
+            if (st.type === 'mp') {
+              // Sello Oficial de Pago con QR activo para Mercado Pago
+              const sw = 220, sh = 175;
+              ctx.save();
+              ctx.translate(cx, cy);
+              ctx.rotate((st.angle * Math.PI) / 180);
+              roundRect(-sw / 2, -sh / 2, sw, sh, 12, "rgba(255, 255, 255, 0.96)", st.color, 4);
+              roundRect(-sw / 2 + 6, -sh / 2 + 6, sw - 12, sh - 12, 8, null, st.color, 1.5);
+              ctx.textAlign = "center";
+              ctx.fillStyle = st.color;
+              ctx.font = "900 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+              ctx.fillText("💳 " + st.l1, 0, -sh / 2 + 26);
+
+              const qCanvas = document.createElement("canvas");
+              if (typeof window.renderQRCodeToCanvas === "function") {
+                window.renderQRCodeToCanvas(qCanvas, st.url, 160);
+                ctx.drawImage(qCanvas, -45, -sh / 2 + 34, 90, 90);
+              }
+
+              ctx.font = "800 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+              ctx.fillStyle = st.color;
+              ctx.fillText(st.l2, 0, sh / 2 - 20);
+              ctx.font = "600 10.5px -apple-system, sans-serif";
+              ctx.fillStyle = "#64748b";
+              ctx.fillText("🔗 Toca el QR para pagar", 0, sh / 2 - 7);
+              ctx.restore();
+
+              // Enlace interactivo directamente en el PDF
+              currentPageLinks.push({
+                x: cx - sw / 2,
+                y: cy - sh / 2,
+                w: sw,
+                h: sh,
+                url: st.url
+              });
+            } else {
+              drawRubberStamp(cx, cy, st.angle, st.color, st.l1, st.l2, st.l3);
+            }
+          });
         }
       } else if (window.currentDocPaymentUrl) {
-        // En cotización normal (no nota de venta) también mostrar QR como sello
+        // En cotización normal (no nota de venta), estampar el sello de pago centrado
         const stampCenterY = Math.min(footerTop - 70, Math.max(itemsEndY + 70, footerTop - 160));
-        const qrCanvasEl = document.getElementById("qr-code-canvas");
-        if (qrCanvasEl && qrCanvasEl.width > 0) {
-          const qrSz = 150;
-          ctx.save();
-          ctx.translate(W / 2, stampCenterY);
-          ctx.rotate(-0.07);
-          roundRect(-qrSz / 2, -qrSz / 2, qrSz, qrSz, 12, "rgba(255,255,255,0.95)", "#0284c7", 5);
-          roundRect(-qrSz / 2 + 7, -qrSz / 2 + 7, qrSz - 14, qrSz - 14, 8, null, "#0284c7", 1.5);
-          ctx.drawImage(qrCanvasEl, -qrSz / 2 + 12, -qrSz / 2 + 12, qrSz - 24, qrSz - 24);
-          ctx.textAlign = "center";
-          ctx.font = "900 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
-          ctx.fillStyle = "#0284c7";
-          ctx.fillText("PAGAR EN LÍNEA", 0, qrSz / 2 + 22);
-          ctx.font = "700 11px -apple-system, sans-serif";
-          ctx.fillStyle = "#64748b";
-          ctx.fillText("MERCADO PAGO / SPEI", 0, qrSz / 2 + 38);
-          ctx.textAlign = "left";
-          ctx.restore();
+        const cx = W / 2, cy = stampCenterY;
+        const sw = 220, sh = 175;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(-0.06);
+        roundRect(-sw / 2, -sh / 2, sw, sh, 12, "rgba(255, 255, 255, 0.96)", "#0284c7", 4);
+        roundRect(-sw / 2 + 6, -sh / 2 + 6, sw - 12, sh - 12, 8, null, "#0284c7", 1.5);
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#0284c7";
+        ctx.font = "900 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+        ctx.fillText("💳 PAGO EN LÍNEA", 0, -sh / 2 + 26);
+
+        const qCanvas = document.createElement("canvas");
+        if (typeof window.renderQRCodeToCanvas === "function") {
+          window.renderQRCodeToCanvas(qCanvas, window.currentDocPaymentUrl, 160);
+          ctx.drawImage(qCanvas, -45, -sh / 2 + 34, 90, 90);
         }
+
+        ctx.font = "800 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif";
+        ctx.fillStyle = "#0284c7";
+        ctx.fillText("MERCADO PAGO / SPEI", 0, sh / 2 - 20);
+        ctx.font = "600 10.5px -apple-system, sans-serif";
+        ctx.fillStyle = "#64748b";
+        ctx.fillText("🔗 Toca el QR para pagar", 0, sh / 2 - 7);
+        ctx.restore();
+
+        currentPageLinks.push({
+          x: cx - sw / 2,
+          y: cy - sh / 2,
+          w: sw,
+          h: sh,
+          url: window.currentDocPaymentUrl
+        });
       }
 
       // Bloque fijo inferior (última página)
@@ -12904,6 +13025,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       curY = footerTop + midBlockH + 22;
 
+      // =========================================================================
+      // SECCIÓN INFERIOR: Timbre CFDI 4.0 / QR Validación y Firma de Conformidad
+      // (Estructura fija original preservada al 100%)
+      // =========================================================================
       roundRect(M, curY, contentW, stampH, 10, "#f8fafc", "#cbd5e1", 2);
       const qrBoxSize = 140;
       const qrX = M + 20;
@@ -12915,10 +13040,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       ctx.textAlign = "center";
       ctx.font = "800 13px -apple-system, sans-serif";
-      const qrLabelEl = document.getElementById("qr-stamp-label");
-      const qrLabelTxt = (qrLabelEl ? qrLabelEl.textContent : (window.currentDocPaymentUrl ? "PAGO MERCADO PAGO / SPEI" : "QR VALIDACIÓN")).trim();
-      ctx.fillStyle = window.currentDocPaymentUrl ? "#0284c7" : "#023e8a";
-      ctx.fillText(qrLabelTxt, qrX + qrBoxSize / 2, qrY + qrBoxSize + 19);
+      ctx.fillStyle = "#023e8a";
+      ctx.fillText("QR VALIDACIÓN", qrX + qrBoxSize / 2, qrY + qrBoxSize + 19);
       ctx.textAlign = "left";
 
       const sigBoxW = 350;
@@ -12926,28 +13049,17 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const sealW = contentW - (qrBoxSize + 44) - sigBoxW - 36;
       ctx.font = "800 16.5px -apple-system, sans-serif";
       ctx.fillStyle = "#0f172a";
-      const docHeaderTitle = window.currentDocPaymentUrl
-        ? `Cobro en Línea Mercado Pago — ${isSalesNote ? "Nota de Venta" : "Cotización"} GASO`
-        : `Código de Verificación de ${isSalesNote ? "Nota de Venta" : "Cotización"} — Emisor: GASO INGENIERÍA`;
+      const docHeaderTitle = `Código de Verificación de ${isSalesNote ? "Nota de Venta" : "Cotización"} — Emisor: GASO INGENIERÍA`;
       ctx.fillText(docHeaderTitle, sealX, curY + 36);
       ctx.font = "700 15.5px -apple-system, sans-serif";
       ctx.fillStyle = "#023e8a";
       ctx.fillText(`Folio: ${qFolio}   |   Fecha: ${qDate}`, sealX, curY + 60);
       const rawHash = (document.getElementById("seal-hash-string").textContent || "").trim();
       roundRect(sealX, curY + 74, sealW, 56, 6, "#ffffff", "#cbd5e1", 1.2);
-      if (window.currentDocPaymentUrl) {
-        ctx.font = "700 13px -apple-system, sans-serif";
-        ctx.fillStyle = "#15803d";
-        ctx.fillText("💳 PAGO EN LÍNEA: Escanea el QR para pagar con Tarjetas o Transferencia SPEI", sealX + 12, curY + 97);
-        ctx.font = "600 11px monospace";
-        ctx.fillStyle = "#0284c7";
-        ctx.fillText(window.currentDocPaymentUrl.substring(0, 68), sealX + 12, curY + 117);
-      } else {
-        ctx.font = "600 13.5px monospace";
-        ctx.fillStyle = "#334155";
-        ctx.fillText(rawHash.substring(0, 68), sealX + 12, curY + 98);
-        if (rawHash.length > 68) ctx.fillText(rawHash.substring(68, 136), sealX + 12, curY + 118);
-      }
+      ctx.font = "600 13.5px monospace";
+      ctx.fillStyle = "#334155";
+      ctx.fillText(rawHash.substring(0, 68), sealX + 12, curY + 98);
+      if (rawHash.length > 68) ctx.fillText(rawHash.substring(68, 136), sealX + 12, curY + 118);
       ctx.font = "500 14px -apple-system, sans-serif";
       ctx.fillStyle = "#64748b";
       const legalTxt = isSalesNote
@@ -13309,8 +13421,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           setTimeout(() => URL.revokeObjectURL(url), 6000);
           showToast(`✅ Archivo PDF descargado directamente: ${res.filename}`);
         } else {
-          showToast("⚠️ Generando vista PDF directa...");
-          window.print();
+          showToast("⚠️ No se pudo generar el archivo PDF.");
         }
       } catch (err) {
         console.error("Error generando PDF directo:", err);
@@ -13318,7 +13429,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "📥 PDF Directo";
+          btn.textContent = "📥 Descargar PDF";
         }
       }
     }
@@ -13555,136 +13666,6 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       document.getElementById("pub-reg-success").style.display = "none";
       document.getElementById("pub-ai-lead-gate").style.display = "flex";
       document.getElementById("pub-ai-subtitle").textContent = "Déjanos tus datos y un asesor te contacta";
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // exportVectorPDF — PDF con TEXTO SELECCIONABLE, descarga directa sin diálogo
-    // Usa html2canvas para capturar el HTML exacto y jsPDF para generar el PDF.
-    // El texto de todos los campos es seleccionable. El QR lleva enlace clickeable.
-    // ─────────────────────────────────────────────────────────────────────────
-    async function exportVectorPDF() {
-      const btn = document.getElementById("btn-export-pdf-vector");
-      const origTxt = btn ? btn.textContent : "";
-      if (btn) { btn.disabled = true; btn.textContent = "⏳ Generando PDF..."; }
-
-      try {
-        // Verificar que las librerías estén disponibles
-        if (typeof html2canvas === "undefined" || typeof window.jspdf === "undefined") {
-          showToast("⚠️ Las librerías PDF aún se están cargando. Espera un momento e intenta de nuevo.");
-          return;
-        }
-
-        // Sincronizar mirrors antes de capturar
-        if (typeof syncPrintMirrors === "function") syncPrintMirrors();
-
-        const paper = document.querySelector(".quote-paper");
-        if (!paper) throw new Error("No se encontró el documento");
-
-        const paperRect = paper.getBoundingClientRect();
-
-        // Capturar el HTML exacto con html2canvas
-        const capturedCanvas = await html2canvas(paper, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: "#ffffff",
-          logging: false,
-          onclone: function(clonedDoc) {
-            // Ocultar controles internos en la captura
-            clonedDoc.querySelectorAll(".no-print, .internal-control-th, .internal-control-td, .td-action, .th-action, .table-toolbar, .expiry-badge").forEach(el => {
-              el.style.display = "none";
-            });
-          }
-        });
-
-        // Crear PDF A4 con jsPDF
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
-        const pdfW = pdf.internal.pageSize.getWidth();   // 595.28 pt
-        const pdfH = pdf.internal.pageSize.getHeight();  // 841.89 pt
-
-        // Calcular cuántas páginas necesitamos
-        const imgAspect = capturedCanvas.height / capturedCanvas.width;
-        const pageImgH = pdfW * imgAspect;
-        const totalPages = Math.ceil(pageImgH / pdfH);
-
-        const imgData = capturedCanvas.toDataURL("image/jpeg", 0.92);
-
-        for (let page = 0; page < totalPages; page++) {
-          if (page > 0) pdf.addPage();
-          const srcY = -(page * pdfH);
-          pdf.addImage(imgData, "JPEG", 0, srcY, pdfW, pageImgH);
-        }
-
-        // ── Overlay de texto seleccionable ──────────────────────────────────
-        // Mapear coordenadas DOM → PDF
-        const mapX = (domX) => ((domX - paperRect.left) / paperRect.width) * pdfW;
-        const mapY = (domY) => ((domY - paperRect.top) / paperRect.height) * pageImgH;
-
-        // Texto de color blanco con opacity 0 → invisible pero seleccionable
-        pdf.setGState(new pdf.GState({ opacity: 0.001 }));
-        pdf.setTextColor(0, 0, 0);
-
-        const textSelectors = [
-          "input.editable-field", "textarea.editable-field",
-          "input.form-input", "textarea.form-input",
-          "input.item-input", "textarea.item-input",
-          ".meta-value", ".company-name-input",
-          "td.col-desc", "td.col-cant", "td.col-unit-price", "td.col-total",
-          "#subtotal-val", "#tax-val", "#grand-total-val", "#amount-in-words",
-          "#quote-number", "#client-name", "#client-rfc",
-          "#client-phone", "#client-email", "#client-address"
-        ];
-
-        textSelectors.forEach(sel => {
-          paper.querySelectorAll(sel).forEach(el => {
-            const rect = el.getBoundingClientRect();
-            const text = (el.value !== undefined ? el.value : el.textContent || "").trim();
-            if (!text || rect.width < 5 || rect.height < 5) return;
-            const x = mapX(rect.left + 2);
-            const y = mapY(rect.bottom - 2);
-            if (y < 0 || y > pageImgH) return;
-            const page = Math.floor(y / pdfH);
-            const localY = y - page * pdfH;
-            const fontSize = Math.max(5, Math.min(14, (rect.height / paperRect.height) * pageImgH * 0.65));
-            pdf.setPage(page + 1);
-            pdf.setFontSize(fontSize);
-            pdf.text(text, x, localY, { maxWidth: (rect.width / paperRect.width) * pdfW });
-          });
-        });
-
-        // Restaurar opacidad normal
-        pdf.setGState(new pdf.GState({ opacity: 1 }));
-
-        // ── Enlace clickeable sobre el QR de pago ──────────────────────────
-        if (window.currentDocPaymentUrl) {
-          const qrEl = document.getElementById("qr-code-canvas");
-          if (qrEl) {
-            const qrRect = qrEl.getBoundingClientRect();
-            const qx = mapX(qrRect.left);
-            const qy = mapY(qrRect.top);
-            const qw = (qrRect.width / paperRect.width) * pdfW;
-            const qh = (qrRect.height / paperRect.height) * pageImgH;
-            const qPage = Math.floor(qy / pdfH);
-            const qLocalY = qy - qPage * pdfH;
-            pdf.setPage(qPage + 1);
-            pdf.link(qx, qLocalY, qw, qh, { url: window.currentDocPaymentUrl });
-          }
-        }
-
-        // ── Descargar directamente ──────────────────────────────────────────
-        const folio = (document.getElementById("quote-number")?.value || "COT").trim();
-        const clientName = (document.getElementById("client-name")?.value || "GASO").trim();
-        const filename = (folio + "-" + clientName + ".pdf").replace(/[\\/:*?"<>|]+/g, "_").slice(0, 90);
-        pdf.save(filename);
-        showToast("✅ PDF con texto seleccionable descargado: " + filename);
-
-      } catch (err) {
-        console.error("Error en exportVectorPDF:", err);
-        showToast("❌ Error generando PDF: " + err.message);
-      } finally {
-        if (btn) { btn.disabled = false; btn.textContent = origTxt; }
-      }
     }
 
 </script>
