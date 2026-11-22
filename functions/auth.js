@@ -1,8 +1,8 @@
 import { sign, getSession, sameOrigin, resp, clientIp } from "../lib/session.js";
 
 const attempts = new Map();
-const MAX_FAILS = 5;
-const WINDOW_MS = 15 * 60 * 1000;
+const MAX_FAILS = 10;
+const WINDOW_MS = 2 * 60 * 1000; // Reducido a 2 minutos para evitar bloqueos largos
 
 function loadUsers(env) {
   const users = [];
@@ -131,6 +131,11 @@ async function handleAuthPost(context) {
     return resp(200, { ok: true, remember: false }, { "Set-Cookie": cookie(t, 30 * 60) });
   }
 
+  if (body.action === "reset_lock") {
+    attempts.delete(ip);
+    return resp(200, { ok: true, message: "Bloqueo temporal reiniciado." });
+  }
+
   if (body.action !== "login") {
     return resp(400, { ok: false, message: "Acción inválida" });
   }
@@ -139,7 +144,7 @@ async function handleAuthPost(context) {
   const now = Date.now();
   const rec = attempts.get(ip);
   if (rec && now - rec.first < WINDOW_MS && rec.count >= MAX_FAILS) {
-    return resp(429, { ok: false, message: "Demasiados intentos. Espera 15 minutos e inténtalo de nuevo." });
+    return resp(429, { ok: false, message: "Demasiados intentos. Espera 2 minutos e inténtalo de nuevo." });
   }
 
   let users;
