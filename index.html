@@ -3353,21 +3353,24 @@
         <div id="login-error-box" style="display:none; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:0.6rem 0.8rem; border-radius:6px; font-size:0.78rem; font-weight:600; margin-bottom:1rem;"></div>
 
         <!-- Acceso Biométrico por Huella Digital -->
-        <div id="login-bio-area" style="display:none; background:#f0f9ff; border:2px solid #0284c7; border-radius:10px; padding:1.1rem; margin-bottom:1.2rem; text-align:center;">
-          <div style="font-size:2.2rem; margin-bottom:0.3rem;">👆</div>
-          <div style="font-size:1rem; font-weight:800; color:#0369a1; margin-bottom:0.25rem;">Acceso Rápido con Huella</div>
-          <div style="font-size:0.75rem; color:#64748b; margin-bottom:0.85rem;">Toca el sensor de tu teléfono para entrar directamente</div>
-          <button type="button" class="btn btn-primary" onclick="appLoginWithBiometrics()" style="width:100%; background:#0284c7; border-color:#0284c7; font-weight:800; font-size:0.95rem; padding:0.65rem; display:flex; align-items:center; justify-content:center; gap:0.4rem; box-shadow:0 3px 10px rgba(2,132,199,0.25);">
+        <div id="login-bio-area" style="display:none; background:#f0f9ff; border:2px solid #0284c7; border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; text-align:center;">
+          <div style="font-size:2.6rem; margin-bottom:0.35rem;">👆</div>
+          <div style="font-size:1.05rem; font-weight:800; color:#0369a1; margin-bottom:0.25rem;">Acceso Rápido con Huella</div>
+          <div style="font-size:0.78rem; color:#64748b; margin-bottom:1rem;">Toca el botón o tu sensor de huella para ingresar</div>
+          <button type="button" class="btn btn-primary" onclick="appLoginWithBiometrics()" style="width:100%; background:#0284c7; border-color:#0284c7; font-weight:800; font-size:1rem; padding:0.75rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow:0 4px 12px rgba(2,132,199,0.3);">
             👆 Desbloquear con Huella Digital
           </button>
-          <div style="display:flex; align-items:center; margin:0.85rem 0 0; color:#94a3b8; font-size:0.72rem;">
-            <span style="flex:1; border-bottom:1px solid #e2e8f0;"></span>
-            <span style="padding:0 0.5rem;">o escribe tu usuario y contraseña</span>
-            <span style="flex:1; border-bottom:1px solid #e2e8f0;"></span>
+          <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;">
+            <a href="javascript:void(0)" onclick="toggleManualLoginForm(true)" style="color:#0284c7; text-decoration:underline; font-weight:700;">
+              Usar contraseña manual
+            </a>
+            <a href="javascript:void(0)" onclick="appUnlinkBiometrics()" style="color:#dc2626; text-decoration:none;">
+              Desvincular huella
+            </a>
           </div>
         </div>
 
-        <form onsubmit="handleLoginSubmit(event)" autocomplete="off">
+        <form id="login-manual-form" onsubmit="handleLoginSubmit(event)" autocomplete="off">
           <div style="margin-bottom:0.9rem;">
             <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">
               👤 Usuario o Correo Electrónico:
@@ -3385,13 +3388,19 @@
             </div>
           </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.15rem; font-size:0.78rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; font-size:0.78rem;">
             <label style="display:flex; align-items:center; gap:0.35rem; cursor:pointer; color:#475569; font-weight:600;">
-              <input type="checkbox" id="login-remember"> Mantener sesión iniciada
+              <input type="checkbox" id="login-remember" checked> Mantener sesión iniciada
             </label>
             <a href="javascript:void(0)" onclick="toggleRecoveryBox()" style="color:#2563eb; text-decoration:none; font-weight:600;">
               ¿Olvidaste tu clave?
             </a>
+          </div>
+
+          <div style="margin-bottom:1.15rem; font-size:0.78rem;" id="login-bio-checkbox-wrapper">
+            <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; color:#0284c7; font-weight:700;">
+              <input type="checkbox" id="login-enable-bio" checked> 👆 Guardar y activar Huella Digital en este teléfono
+            </label>
           </div>
 
           <button type="submit" class="btn btn-primary" style="width:100%; padding:0.7rem; font-size:0.92rem; font-weight:800; justify-content:center; background:linear-gradient(135deg, #1e3a8a, #0284c7); border:none;">
@@ -3407,7 +3416,7 @@
           <div style="font-size:0.78rem; color:#065f46; font-weight:700; margin-bottom:0.4rem;">
             💡 ¿Quieres entrar con tu huella digital en este teléfono?
           </div>
-          <button type="button" class="btn btn-sm btn-primary" onclick="appEnrollBiometrics()" style="background:#10b981; border-color:#059669; font-size:0.8rem; font-weight:700; padding:0.35rem 0.8rem;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="openBioSetupModal()" style="background:#10b981; border-color:#059669; font-size:0.8rem; font-weight:700; padding:0.35rem 0.8rem;">
             👆 Activar Huella Digital en este Dispositivo
           </button>
         </div>
@@ -4884,7 +4893,7 @@ CLABE: 722969010514249300</textarea>
       <button type="button" onclick="closeMobileMoreMenu()" style="border:none; background:none; font-size:1.2rem; color:#64748b;">✕</button>
     </div>
     <div style="display:flex; flex-direction:column; gap:0.35rem; padding-top:0.6rem;">
-      <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); appEnrollBiometrics()" style="color:#0284c7; font-weight:700;">
+      <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); openBioSetupModal()" style="color:#0284c7; font-weight:700;">
         👆 Configurar Huella Digital (Teléfono)
       </button>
       <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); switchTab('users')">
@@ -4902,6 +4911,63 @@ CLABE: 722969010514249300</textarea>
       <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); logoutSession()" style="color:#dc2626; border-top:1px dashed #e2e8f0; margin-top:0.25rem; padding-top:0.65rem;">
         🔒 Cerrar Sesión
       </button>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIGURAR HUELLA DIGITAL (SIN PROMPTS QUE BLOQUEEN EL SENSOR) -->
+  <div class="modal-backdrop no-print" id="modal-bio-setup" style="display:none;">
+    <div class="modal-box" style="max-width:440px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
+      <div class="modal-header" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; padding:1rem 1.25rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.5rem;">👆</span>
+          <div>
+            <h3 style="color:#ffffff; margin:0; font-size:1.05rem; font-weight:800;">Activar Huella Digital</h3>
+            <div style="font-size:0.75rem; color:#e0f2fe;">Acceso rápido seguro con el sensor de tu teléfono</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-bio-setup')" style="color:#ffffff; font-size:1.2rem; background:none; border:none; cursor:pointer;">✕</button>
+      </div>
+      <form id="bio-setup-form" onsubmit="handleBioModalSubmit(event)" style="margin:0;">
+        <div class="modal-body" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.9rem;">
+          <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:0.75rem; font-size:0.78rem; color:#0369a1; line-height:1.4;">
+            🛡️ Tus credenciales se guardarán <strong>encriptadas localmente en este dispositivo</strong> con hardware biométrico. Nadie más podrá acceder sin tu huella.
+          </div>
+          <div>
+            <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Usuario:</label>
+            <input type="text" id="bio-modal-user" class="form-input" style="width:100%; font-weight:600;" placeholder="ej. admin" required autocomplete="username">
+          </div>
+          <div>
+            <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Contraseña del Sistema:</label>
+            <div style="position:relative;">
+              <input type="password" id="bio-modal-pass" class="form-input" style="width:100%; padding-right:2.5rem;" placeholder="Tu contraseña actual" required autocomplete="current-password">
+              <button type="button" onclick="toggleBioModalPassword()" style="position:absolute; right:0.5rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1rem; color:#64748b;" title="Ver/Ocultar">👁️</button>
+            </div>
+            <div style="font-size:0.72rem; color:#64748b; margin-top:0.25rem;">Se validará y protegerá con el sensor de huella.</div>
+          </div>
+          <div id="bio-modal-error" style="display:none; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:0.5rem 0.75rem; border-radius:6px; font-size:0.78rem; font-weight:600;"></div>
+        </div>
+        <div class="modal-footer" style="padding:0.9rem 1.25rem; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:0.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-bio-setup')">Cancelar</button>
+          <button type="submit" id="bio-modal-submit-btn" class="btn btn-primary" style="background:#0284c7; border-color:#0284c7; font-weight:800; display:flex; align-items:center; gap:0.4rem;">
+            👆 Registrar Huella Digital
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BANNER FLOTANTE POST-LOGIN PARA ACTIVAR HUELLA SIN PERDER ACTIVACIÓN DEL GESTO -->
+  <div id="bio-enroll-prompt-banner" class="no-print" style="display:none; position:fixed; bottom:75px; left:50%; transform:translateX(-50%); background:#0f172a; color:#ffffff; padding:0.85rem 1.15rem; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:99999; max-width:92vw; width:440px; border:1px solid #334155;">
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <span style="font-size:1.7rem;">👆</span>
+      <div style="flex:1;">
+        <div style="font-size:0.85rem; font-weight:800; color:#38bdf8;">¿Activar Huella Digital en este teléfono?</div>
+        <div style="font-size:0.72rem; color:#cbd5e1; margin-top:0.15rem;">Entra la próxima vez tocando el sensor con 1 solo toque.</div>
+      </div>
+      <button type="button" onclick="triggerBioEnrollFromBanner()" class="btn btn-sm" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:0.78rem; padding:0.45rem 0.8rem; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
+        Activar Ahora
+      </button>
+      <button type="button" onclick="closeBioEnrollBanner()" style="background:none; border:none; color:#94a3b8; font-size:1.15rem; cursor:pointer; margin-left:0.2rem;">✕</button>
     </div>
   </div>
 
@@ -5827,6 +5893,10 @@ CLABE: 722969010514249300</textarea>
       },
       setItem(k, v) {
         try { window.localStorage.setItem(k, v); } catch(e) { this._mem[k] = String(v); }
+      },
+      removeItem(k) {
+        try { window.localStorage.removeItem(k); } catch(e) {}
+        delete this._mem[k];
       }
     };
 
@@ -10386,6 +10456,32 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
     }
 
+    function getSafeRpId() {
+      try {
+        const host = window.location.hostname;
+        if (host && host.includes(".") && host !== "localhost") {
+          return host;
+        }
+      } catch (e) {}
+      return undefined;
+    }
+
+    function base64ToUint8(base64Str) {
+      const binStr = atob(base64Str);
+      const arr = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) arr[i] = binStr.charCodeAt(i);
+      return arr;
+    }
+
+    function uint8ToBase64(uint8Arr) {
+      let binary = '';
+      const len = uint8Arr.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(uint8Arr[i]);
+      }
+      return btoa(binary);
+    }
+
     async function getBioCryptoKey(saltStr) {
       const enc = new TextEncoder();
       const baseKey = await window.crypto.subtle.importKey(
@@ -10409,17 +10505,152 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       );
     }
 
+    // Creación de credencial biométrica con fallback en múltiples niveles (compatible Android 10-15 / Chrome)
+    async function createBiometricCredential(username) {
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      const userId = new Uint8Array(16);
+      window.crypto.getRandomValues(userId);
+
+      const cleanUser = (username || "usuario").toLowerCase().replace(/[^a-z0-9_-]/g, "") || "admin";
+      const safeRpId = getSafeRpId();
+
+      const baseRp = { name: "GASO Ingenieria" };
+      if (safeRpId) baseRp.id = safeRpId;
+
+      const userObj = {
+        id: userId,
+        name: cleanUser,
+        displayName: "GASO " + cleanUser
+      };
+
+      const pubKeyCredParams = [
+        { alg: -7, type: "public-key" },  // ES256
+        { alg: -257, type: "public-key" } // RS256
+      ];
+
+      // Intento 1: Configuración estándar recomendada para Credential Manager en Android
+      try {
+        return await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: baseRp,
+            user: userObj,
+            pubKeyCredParams,
+            authenticatorSelection: {
+              authenticatorAttachment: "platform",
+              userVerification: "required",
+              residentKey: "preferred"
+            },
+            timeout: 60000
+          }
+        });
+      } catch (err1) {
+        if (err1.name === "NotAllowedError") throw err1;
+        console.warn("createBiometricCredential tier 1 falló, intentando tier 2:", err1);
+      }
+
+      // Intento 2: Fallback con userVerification 'preferred' (evita UnknownError en Android 14)
+      try {
+        return await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: baseRp,
+            user: userObj,
+            pubKeyCredParams,
+            authenticatorSelection: {
+              authenticatorAttachment: "platform",
+              userVerification: "preferred"
+            },
+            timeout: 60000
+          }
+        });
+      } catch (err2) {
+        if (err2.name === "NotAllowedError") throw err2;
+        console.warn("createBiometricCredential tier 2 falló, intentando tier 3:", err2);
+      }
+
+      // Intento 3: Fallback general sin rp.id restrictivo
+      return await navigator.credentials.create({
+        publicKey: {
+          challenge,
+          rp: { name: "GASO Ingenieria" },
+          user: userObj,
+          pubKeyCredParams,
+          authenticatorSelection: {
+            userVerification: "preferred"
+          },
+          timeout: 60000
+        }
+      });
+    }
+
+    // Verificación de credencial biométrica con fallback
+    async function getBiometricAssertion(rawId) {
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      const safeRpId = getSafeRpId();
+
+      const allowCredentials = rawId && rawId.length > 0 ? [{
+        id: rawId,
+        type: "public-key"
+      }] : [];
+
+      // Intento 1: Con rpId y userVerification 'required'
+      try {
+        const opts1 = {
+          publicKey: {
+            challenge,
+            userVerification: "required",
+            timeout: 60000
+          }
+        };
+        if (allowCredentials.length > 0) opts1.publicKey.allowCredentials = allowCredentials;
+        if (safeRpId) opts1.publicKey.rpId = safeRpId;
+        return await navigator.credentials.get(opts1);
+      } catch (err1) {
+        if (err1.name === "NotAllowedError") throw err1;
+        console.warn("getBiometricAssertion tier 1 falló, intentando tier 2:", err1);
+      }
+
+      // Intento 2: Con userVerification 'preferred'
+      try {
+        const opts2 = {
+          publicKey: {
+            challenge,
+            userVerification: "preferred",
+            timeout: 60000
+          }
+        };
+        if (allowCredentials.length > 0) opts2.publicKey.allowCredentials = allowCredentials;
+        if (safeRpId) opts2.publicKey.rpId = safeRpId;
+        return await navigator.credentials.get(opts2);
+      } catch (err2) {
+        if (err2.name === "NotAllowedError") throw err2;
+        console.warn("getBiometricAssertion tier 2 falló, intentando tier 3:", err2);
+      }
+
+      // Intento 3: Sin rpId explícito
+      const opts3 = {
+        publicKey: {
+          challenge,
+          userVerification: "preferred",
+          timeout: 60000
+        }
+      };
+      if (allowCredentials.length > 0) opts3.publicKey.allowCredentials = allowCredentials;
+      return await navigator.credentials.get(opts3);
+    }
+
     // --- Biometría para Caja Fuerte (Vault) ---
     async function vaultToggleBiometrics() {
       const isEnabled = safeStorage.getItem("gaso_vault_bio_enabled") === "true";
       if (isEnabled) {
-        if (confirm("¿Deseas desvincular la huella digital de la Caja Fuerte? Seguirás pudiendo entrar con Google Authenticator.")) {
-          safeStorage.removeItem("gaso_vault_bio_cred_id");
-          safeStorage.removeItem("gaso_vault_bio_encrypted_secret");
-          safeStorage.removeItem("gaso_vault_bio_enabled");
-          showToast("Huella digital desvinculada de la Caja Fuerte.");
-          updateVaultBiometricUI();
-        }
+        safeStorage.removeItem("gaso_vault_bio_cred_id");
+        safeStorage.removeItem("gaso_vault_bio_encrypted_secret");
+        safeStorage.removeItem("gaso_vault_bio_enabled");
+        showToast("Huella digital desvinculada de la Caja Fuerte.");
+        updateVaultBiometricUI();
       } else {
         await vaultEnrollBiometrics();
       }
@@ -10438,32 +10669,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           return;
         }
 
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-        const userId = new Uint8Array(16);
-        window.crypto.getRandomValues(userId);
-
         showToast("👆 Coloca tu dedo en el sensor de huella...");
-        const cred = await navigator.credentials.create({
-          publicKey: {
-            challenge,
-            rp: { name: "GASO Ingeniería", id: window.location.hostname },
-            user: { id: userId, name: "gaso-vault-user", displayName: "GASO Vault User" },
-            pubKeyCredParams: [
-              { alg: -7, type: "public-key" },
-              { alg: -257, type: "public-key" }
-            ],
-            authenticatorSelection: {
-              authenticatorAttachment: "platform",
-              userVerification: "required",
-              residentKey: "preferred"
-            },
-            timeout: 60000
-          }
-        });
+        const cred = await createBiometricCredential("gaso-vault-user");
 
         if (cred && cred.rawId) {
-          const credIdBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId)));
+          const credIdBase64 = uint8ToBase64(new Uint8Array(cred.rawId));
           const encKey = await getBioCryptoKey(credIdBase64);
           const encSecret = await vaultEncryptText(savedSecret, encKey);
 
@@ -10492,25 +10702,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           return;
         }
 
-        const binStr = atob(credIdBase64);
-        const rawId = new Uint8Array(binStr.length);
-        for (let i = 0; i < binStr.length; i++) rawId[i] = binStr.charCodeAt(i);
-
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-
-        const assertion = await navigator.credentials.get({
-          publicKey: {
-            challenge,
-            rpId: window.location.hostname,
-            allowCredentials: [{
-              id: rawId,
-              type: "public-key"
-            }],
-            userVerification: "required",
-            timeout: 60000
-          }
-        });
+        const rawId = base64ToUint8(credIdBase64);
+        showToast("👆 Coloca tu dedo en el sensor...");
+        const assertion = await getBiometricAssertion(rawId);
 
         if (assertion) {
           const encKey = await getBioCryptoKey(credIdBase64);
@@ -10554,56 +10748,63 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     // --- Biometría para Inicio de Sesión de la Plataforma (App Login) ---
-    async function appEnrollBiometrics() {
-      try {
-        const supported = await isBiometricSupported();
-        if (!supported) {
-          showToast("❌ Este dispositivo no cuenta con sensor biométrico compatible.");
-          return;
-        }
-
-        const username = prompt("Confirma tu usuario para enlazar la huella (ej. admin):", (currentAuthUser && currentAuthUser.username) || "admin");
-        if (!username) return;
-        const password = prompt("Ingresa tu contraseña para protegerla con la huella:");
-        if (!password) return;
-
-        await appEnrollBiometricsWithCreds(username, password);
-      } catch (err) {
-        showToast("❌ Error: " + (err.message || err));
+    function openBioSetupModal() {
+      const modal = document.getElementById("modal-bio-setup");
+      if (!modal) return;
+      const userInput = document.getElementById("bio-modal-user");
+      const passInput = document.getElementById("bio-modal-pass");
+      const errBox = document.getElementById("bio-modal-error");
+      if (errBox) errBox.style.display = "none";
+      if (passInput) passInput.value = "";
+      if (userInput) {
+        userInput.value = (currentAuthUser && currentAuthUser.username) || safeStorage.getItem("gaso_app_bio_user") || "admin";
       }
+      openModal("modal-bio-setup");
+    }
+
+    function toggleBioModalPassword() {
+      const passInput = document.getElementById("bio-modal-pass");
+      if (!passInput) return;
+      passInput.type = (passInput.type === "password") ? "text" : "password";
+    }
+
+    async function handleBioModalSubmit(e) {
+      if (e) e.preventDefault();
+      const user = (document.getElementById("bio-modal-user")?.value || "").trim();
+      const pass = (document.getElementById("bio-modal-pass")?.value || "").trim();
+      const errBox = document.getElementById("bio-modal-error");
+      const submitBtn = document.getElementById("bio-modal-submit-btn");
+
+      if (!user || !pass) {
+        if (errBox) { errBox.style.display = "block"; errBox.textContent = "Ingresa usuario y contraseña."; }
+        return;
+      }
+      if (errBox) errBox.style.display = "none";
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "⏳ Validando..."; }
+
+      // Disparar navigator.credentials.create de inmediato dentro del evento click/submit
+      closeModal("modal-bio-setup");
+      const ok = await appEnrollBiometricsWithCreds(user, pass);
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = "👆 Registrar Huella Digital"; }
+    }
+
+    async function appEnrollBiometrics() {
+      openBioSetupModal();
     }
 
     async function appEnrollBiometricsWithCreds(username, password) {
       try {
         const supported = await isBiometricSupported();
-        if (!supported) return;
-
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-        const userId = new Uint8Array(16);
-        window.crypto.getRandomValues(userId);
+        if (!supported) {
+          showToast("❌ Este dispositivo no cuenta con sensor biométrico compatible.");
+          return false;
+        }
 
         showToast("👆 Coloca tu dedo en el sensor de huella...");
-        const cred = await navigator.credentials.create({
-          publicKey: {
-            challenge,
-            rp: { name: "GASO Ingeniería", id: window.location.hostname },
-            user: { id: userId, name: username, displayName: "GASO " + username },
-            pubKeyCredParams: [
-              { alg: -7, type: "public-key" },
-              { alg: -257, type: "public-key" }
-            ],
-            authenticatorSelection: {
-              authenticatorAttachment: "platform",
-              userVerification: "required",
-              residentKey: "preferred"
-            },
-            timeout: 60000
-          }
-        });
+        const cred = await createBiometricCredential(username);
 
         if (cred && cred.rawId) {
-          const credIdBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId)));
+          const credIdBase64 = uint8ToBase64(new Uint8Array(cred.rawId));
           const encKey = await getBioCryptoKey(credIdBase64);
           const payload = JSON.stringify({ username: username.trim(), password });
           const encData = await vaultEncryptText(payload, encKey);
@@ -10611,44 +10812,42 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           safeStorage.setItem("gaso_app_bio_cred_id", credIdBase64);
           safeStorage.setItem("gaso_app_bio_data", encData);
           safeStorage.setItem("gaso_app_bio_enabled", "true");
+          safeStorage.setItem("gaso_app_bio_user", username.trim());
 
           showToast("🎉 ¡Huella digital registrada! Podrás entrar tocando tu sensor.");
           updateAppBiometricUI();
+
+          // Si el usuario no estaba autenticado aún, validar y entrar
+          if (!currentAuthUser) {
+            await appLoginWithBiometrics(false);
+          }
+          return true;
         }
+        return false;
       } catch (err) {
         if (err.name === "NotAllowedError") {
-          showToast("Activación de huella omitida.");
+          showToast("Activación de huella omitida o cancelada.");
         } else {
+          console.error("Error registrando huella:", err);
           showToast("❌ No se pudo registrar la huella: " + (err.message || err));
         }
+        return false;
       }
     }
 
-    async function appLoginWithBiometrics() {
+    async function appLoginWithBiometrics(isAuto = false) {
       try {
         const credIdBase64 = safeStorage.getItem("gaso_app_bio_cred_id");
         const encData = safeStorage.getItem("gaso_app_bio_data");
         if (!credIdBase64 || !encData) {
-          showToast("No hay huella registrada para inicio de sesión.");
+          if (!isAuto) showToast("No hay huella registrada para inicio de sesión.");
+          toggleManualLoginForm(true);
           return;
         }
 
-        const binStr = atob(credIdBase64);
-        const rawId = new Uint8Array(binStr.length);
-        for (let i = 0; i < binStr.length; i++) rawId[i] = binStr.charCodeAt(i);
-
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-
-        const assertion = await navigator.credentials.get({
-          publicKey: {
-            challenge,
-            rpId: window.location.hostname,
-            allowCredentials: [{ id: rawId, type: "public-key" }],
-            userVerification: "required",
-            timeout: 60000
-          }
-        });
+        const rawId = base64ToUint8(credIdBase64);
+        if (!isAuto) showToast("👆 Coloca tu dedo en el sensor...");
+        const assertion = await getBiometricAssertion(rawId);
 
         if (assertion) {
           const encKey = await getBioCryptoKey(credIdBase64);
@@ -10656,7 +10855,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           let creds = null;
           try { creds = JSON.parse(jsonStr); } catch(e) {}
           if (!creds || !creds.username || !creds.password) {
-            showToast("❌ Error leyendo credenciales protegidas. Usa usuario y contraseña.");
+            showToast("❌ No se pudieron leer las credenciales protegidas. Usa usuario y contraseña.");
+            toggleManualLoginForm(true);
             return;
           }
 
@@ -10685,13 +10885,15 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             showToast("🎉 ¡Bienvenido! Acceso verificado con tu huella digital.");
           } else {
             showToast("❌ Contraseña expirada o inválida. Ingresa manualmente.");
+            toggleManualLoginForm(true);
           }
         }
       } catch (err) {
         if (err.name === "NotAllowedError") {
-          showToast("Acceso biométrico cancelado.");
+          if (!isAuto) showToast("Acceso biométrico cancelado.");
         } else {
-          showToast("❌ Error biométrico: " + (err.message || err));
+          console.error("Error biométrico:", err);
+          if (!isAuto) showToast("❌ Error biométrico: " + (err.message || err));
         }
       }
     }
@@ -10699,14 +10901,68 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     function updateAppBiometricUI() {
       const bioEnabled = safeStorage.getItem("gaso_app_bio_enabled") === "true";
       const bioArea = document.getElementById("login-bio-area");
-      if (bioArea) bioArea.style.display = bioEnabled ? "block" : "none";
-
+      const manualForm = document.getElementById("login-manual-form");
       const enrollBanner = document.getElementById("login-enroll-bio-banner");
+
+      if (bioArea) {
+        bioArea.style.display = bioEnabled ? "block" : "none";
+      }
+      if (manualForm) {
+        manualForm.style.display = bioEnabled ? "none" : "block";
+      }
       if (enrollBanner) {
         isBiometricSupported().then(supported => {
           enrollBanner.style.display = (supported && !bioEnabled) ? "block" : "none";
         });
       }
+    }
+
+    function toggleManualLoginForm(showManual) {
+      const manualForm = document.getElementById("login-manual-form");
+      if (manualForm) {
+        manualForm.style.display = showManual ? "block" : "none";
+        if (showManual) {
+          const userInput = document.getElementById("login-username");
+          if (userInput) userInput.focus();
+        }
+      }
+    }
+
+    function appUnlinkBiometrics() {
+      safeStorage.removeItem("gaso_app_bio_cred_id");
+      safeStorage.removeItem("gaso_app_bio_data");
+      safeStorage.removeItem("gaso_app_bio_enabled");
+      safeStorage.removeItem("gaso_app_bio_user");
+      updateAppBiometricUI();
+      toggleManualLoginForm(true);
+      showToast("Huella digital desvinculada de este dispositivo.");
+    }
+
+    // --- Flujo interactivo post-login para activar huella sin romper el sensor ---
+    let _pendingBioCreds = null;
+    function showBioEnrollPostLoginBanner(user, pass) {
+      _pendingBioCreds = { user, pass };
+      const banner = document.getElementById("bio-enroll-prompt-banner");
+      if (banner) {
+        banner.style.display = "block";
+      }
+    }
+
+    function closeBioEnrollBanner() {
+      const banner = document.getElementById("bio-enroll-prompt-banner");
+      if (banner) banner.style.display = "none";
+      _pendingBioCreds = null;
+    }
+
+    async function triggerBioEnrollFromBanner() {
+      if (!_pendingBioCreds || !_pendingBioCreds.user || !_pendingBioCreds.pass) {
+        closeBioEnrollBanner();
+        openBioSetupModal();
+        return;
+      }
+      const { user, pass } = _pendingBioCreds;
+      closeBioEnrollBanner();
+      await appEnrollBiometricsWithCreds(user, pass);
     }
 
     async function vaultInit() {
@@ -11778,7 +12034,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
               openCotizadorLogin();
               // Si tiene huella activada, solicitarla con el sensor automáticamente
               if (safeStorage.getItem("gaso_app_bio_enabled") === "true") {
-                setTimeout(() => { appLoginWithBiometrics(); }, 350);
+                setTimeout(() => { appLoginWithBiometrics(true); }, 350);
               }
             }
           }
@@ -11860,11 +12116,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       if (typeof isBiometricSupported === "function") {
         isBiometricSupported().then(supported => {
           if (supported && safeStorage.getItem("gaso_app_bio_enabled") !== "true") {
-            setTimeout(() => {
-              if (confirm("📱 ¿Deseas activar el acceso rápido con la Huella Digital de tu teléfono para entrar con 1 toque sin escribir tu contraseña?")) {
-                appEnrollBiometricsWithCreds(userRaw, passRaw);
-              }
-            }, 1200);
+            const bioCheck = document.getElementById("login-enable-bio");
+            if (bioCheck && bioCheck.checked) {
+              showBioEnrollPostLoginBanner(userRaw, passRaw);
+            }
           }
         });
       }
