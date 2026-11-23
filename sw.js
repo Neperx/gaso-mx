@@ -1,5 +1,5 @@
 // Service Worker para GASO MX - PWA & Android TWA con soporte Offline robusto
-const CACHE_NAME = 'gaso-pwa-v2';
+const CACHE_NAME = 'gaso-pwa-v4';
 const STATIC_RESOURCES = [
   '/',
   '/index.html',
@@ -9,7 +9,8 @@ const STATIC_RESOURCES = [
   '/icon-512.png',
   '/icon-maskable.png',
   '/screenshot-mobile.png',
-  '/screenshot-desktop.png'
+  '/screenshot-desktop.png',
+  '/cursor-cotizador.png'
 ];
 
 self.addEventListener('install', (event) => {
