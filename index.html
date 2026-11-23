@@ -3360,8 +3360,34 @@
           <button type="button" class="btn btn-primary" onclick="appLoginWithBiometrics()" style="width:100%; background:#0284c7; border-color:#0284c7; font-weight:800; font-size:1rem; padding:0.8rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow:0 4px 14px rgba(2,132,199,0.35);">
             👆 Desbloquear con Huella Digital
           </button>
-          <div style="margin-top:1rem; text-align:center; font-size:0.8rem;">
+          <div style="margin-top:1rem; display:flex; justify-content:center; gap:1.25rem; font-size:0.8rem;">
+            <a href="javascript:void(0)" id="link-bio-to-pin" onclick="showPinLoginForm()" style="color:#15803d; text-decoration:underline; font-weight:700; display:none;">
+              🔢 Usar PIN Rápido
+            </a>
             <a href="javascript:void(0)" onclick="toggleManualLoginForm(true)" style="color:#0284c7; text-decoration:underline; font-weight:700;">
+              🔑 Usar contraseña manual
+            </a>
+          </div>
+        </div>
+
+        <!-- Acceso Rápido con PIN de 4 Dígitos -->
+        <div id="login-pin-area" style="display:none; background:#f0fdf4; border:2px solid #16a34a; border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; text-align:center;">
+          <div style="font-size:2.4rem; margin-bottom:0.35rem;">🔢</div>
+          <div style="font-size:1.05rem; font-weight:800; color:#15803d; margin-bottom:0.25rem;">Acceso Rápido con PIN</div>
+          <div style="font-size:0.76rem; color:#64748b; margin-bottom:0.9rem;">Ingresa tu código PIN de 4 dígitos para entrar al instante</div>
+          <form onsubmit="handlePinLoginSubmit(event)" style="margin:0;">
+            <div style="display:flex; justify-content:center; margin-bottom:0.9rem;">
+              <input type="password" id="login-quick-pin" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="form-input" style="width:170px; text-align:center; font-size:1.5rem; letter-spacing:8px; font-weight:900; background:#ffffff;" placeholder="••••" required autocomplete="one-time-code">
+            </div>
+            <button type="submit" id="btn-login-pin-submit" class="btn btn-primary" style="width:100%; background:#16a34a; border-color:#16a34a; font-weight:800; font-size:0.95rem; padding:0.75rem; justify-content:center; box-shadow:0 4px 12px rgba(22,163,74,0.3);">
+              🔓 Entrar con PIN Rápido
+            </button>
+          </form>
+          <div style="margin-top:1rem; display:flex; justify-content:center; gap:1.25rem; font-size:0.8rem;">
+            <a href="javascript:void(0)" id="link-pin-to-bio" onclick="showBioLoginForm()" style="color:#0284c7; text-decoration:underline; font-weight:700; display:none;">
+              👆 Usar Huella Digital
+            </a>
+            <a href="javascript:void(0)" onclick="toggleManualLoginForm(true)" style="color:#15803d; text-decoration:underline; font-weight:700;">
               🔑 Usar contraseña manual
             </a>
           </div>
@@ -4706,13 +4732,16 @@ CLABE: 722969010514249300</textarea>
         </div>
 
         <!-- Configuración de Huella Digital en este Dispositivo -->
-        <div id="cfg-biometrics-card" style="background:#ffffff; border:1px solid #bae6fd; border-radius:10px; padding:1.15rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+        <div id="cfg-biometrics-card" style="background:#ffffff; border:1px solid #bae6fd; border-radius:10px; padding:1.15rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
           <div style="display:flex; align-items:center; gap:0.85rem;">
             <div style="font-size:2.2rem; background:#f0f9ff; padding:0.4rem 0.65rem; border-radius:10px;">👆</div>
             <div>
-              <div style="font-weight:800; font-size:0.95rem; color:#0369a1;">Acceso con Huella Digital (Este Dispositivo)</div>
+              <div style="font-weight:800; font-size:0.95rem; color:#0369a1;">Acceso con Huella Digital (WebAuthn / Passkeys)</div>
               <div id="cfg-bio-status-text" style="font-size:0.78rem; color:#64748b; margin-top:0.2rem;">
                 Sensor biométrico para entrar a la plataforma sin escribir contraseñas.
+              </div>
+              <div style="font-size:0.7rem; color:#0284c7; margin-top:0.25rem;">
+                💡 En Android, para máxima compatibilidad con huella, abre gaso-mx.pages.dev en Google Chrome y selecciona "Instalar aplicación".
               </div>
             </div>
           </div>
@@ -4722,6 +4751,27 @@ CLABE: 722969010514249300</textarea>
             </button>
             <button type="button" class="btn btn-primary" id="btn-cfg-enroll-bio" onclick="openBioSetupModal()" style="background:#0284c7; border-color:#0284c7; font-weight:700; font-size:0.82rem;">
               👆 Configurar Huella
+            </button>
+          </div>
+        </div>
+
+        <!-- Configuración de PIN Rápido (4 Dígitos) en este Dispositivo -->
+        <div id="cfg-pin-card" style="background:#ffffff; border:1px solid #bbf7d0; border-radius:10px; padding:1.15rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+          <div style="display:flex; align-items:center; gap:0.85rem;">
+            <div style="font-size:2.2rem; background:#f0fdf4; padding:0.4rem 0.65rem; border-radius:10px;">🔢</div>
+            <div>
+              <div style="font-weight:800; font-size:0.95rem; color:#15803d;">Acceso Rápido con PIN de 4 Dígitos (Este Dispositivo)</div>
+              <div id="cfg-pin-status-text" style="font-size:0.78rem; color:#64748b; margin-top:0.2rem;">
+                Código de 4 números para entrar en 1 segundo offline sin escribir contraseñas largas.
+              </div>
+            </div>
+          </div>
+          <div id="cfg-pin-actions" style="display:flex; gap:0.5rem;">
+            <button type="button" class="btn btn-outline" id="btn-cfg-unlink-pin" onclick="appUnlinkQuickPin()" style="color:#dc2626; border-color:#fca5a5; font-weight:700; font-size:0.82rem; display:none;">
+              🗑️ Eliminar PIN
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-cfg-enroll-pin" onclick="openQuickPinSetupModal()" style="background:#16a34a; border-color:#16a34a; font-weight:700; font-size:0.82rem;">
+              🔢 Configurar PIN Rápido
             </button>
           </div>
         </div>
@@ -4898,6 +4948,9 @@ CLABE: 722969010514249300</textarea>
       <button type="button" class="mobile-more-btn" id="btn-mobile-more-bio" onclick="handleMobileMoreBioClick()" style="color:#0284c7; font-weight:700;">
         👆 Configurar Huella Digital (Teléfono)
       </button>
+      <button type="button" class="mobile-more-btn" id="btn-mobile-more-pin" onclick="handleMobileMorePinClick()" style="color:#15803d; font-weight:700;">
+        🔢 Configurar PIN Rápido (4 Dígitos)
+      </button>
       <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); switchTab('users')">
         🛡️ Seguridad y Usuarios
       </button>
@@ -4958,18 +5011,74 @@ CLABE: 722969010514249300</textarea>
     </div>
   </div>
 
-  <!-- BANNER FLOTANTE POST-LOGIN PARA ACTIVAR HUELLA SIN PERDER ACTIVACIÓN DEL GESTO -->
-  <div id="bio-enroll-prompt-banner" class="no-print" style="display:none; position:fixed; bottom:75px; left:50%; transform:translateX(-50%); background:#0f172a; color:#ffffff; padding:0.85rem 1.15rem; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:99999; max-width:92vw; width:440px; border:1px solid #334155;">
-    <div style="display:flex; align-items:center; gap:0.75rem;">
-      <span style="font-size:1.7rem;">👆</span>
-      <div style="flex:1;">
-        <div style="font-size:0.85rem; font-weight:800; color:#38bdf8;">¿Activar Huella Digital en este teléfono?</div>
-        <div style="font-size:0.72rem; color:#cbd5e1; margin-top:0.15rem;">Entra la próxima vez tocando el sensor con 1 solo toque.</div>
+  <!-- MODAL: CONFIGURAR PIN RÁPIDO (4 DÍGITOS) -->
+  <div class="modal-backdrop no-print" id="modal-pin-setup" style="display:none;">
+    <div class="modal-box" style="max-width:440px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
+      <div class="modal-header" style="background:linear-gradient(135deg, #15803d, #166534); color:#ffffff; padding:1rem 1.25rem;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.5rem;">🔢</span>
+          <div>
+            <h3 style="color:#ffffff; margin:0; font-size:1.05rem; font-weight:800;">Configurar PIN Rápido</h3>
+            <div style="font-size:0.75rem; color:#dcfce7;">Acceso rápido de 4 dígitos para este teléfono (100% offline)</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-pin-setup')" style="color:#ffffff; font-size:1.2rem; background:none; border:none; cursor:pointer;">✕</button>
       </div>
-      <button type="button" onclick="triggerBioEnrollFromBanner()" class="btn btn-sm" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:0.78rem; padding:0.45rem 0.8rem; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
-        Activar Ahora
-      </button>
-      <button type="button" onclick="closeBioEnrollBanner()" style="background:none; border:none; color:#94a3b8; font-size:1.15rem; cursor:pointer; margin-left:0.2rem;">✕</button>
+      <form id="pin-setup-form" onsubmit="handlePinModalSubmit(event)" style="margin:0;">
+        <div class="modal-body" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.9rem;">
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:0.75rem; font-size:0.78rem; color:#166534; line-height:1.4;">
+            🛡️ Tus credenciales se encriptan localmente con tu código PIN. Podrás entrar tecleando solo tus 4 números en 1 segundo, incluso sin internet.
+          </div>
+          <div id="pin-modal-user-row">
+            <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Usuario:</label>
+            <input type="text" id="pin-modal-user" class="form-input" style="width:100%; font-weight:600;" placeholder="ej. admin" required autocomplete="username">
+          </div>
+          <div id="pin-modal-pass-row">
+            <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Contraseña del Sistema:</label>
+            <div style="position:relative;">
+              <input type="password" id="pin-modal-pass" class="form-input" style="width:100%; padding-right:2.5rem;" placeholder="Tu contraseña actual" required autocomplete="current-password">
+              <button type="button" onclick="togglePinModalPassword()" style="position:absolute; right:0.5rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1rem; color:#64748b;" title="Ver/Ocultar">👁️</button>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div>
+              <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Nuevo PIN (4 números):</label>
+              <input type="password" id="pin-modal-new" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="form-input" style="width:100%; text-align:center; font-size:1.2rem; letter-spacing:4px; font-weight:800;" placeholder="••••" required>
+            </div>
+            <div>
+              <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Confirmar PIN:</label>
+              <input type="password" id="pin-modal-confirm" maxlength="6" inputmode="numeric" pattern="[0-9]*" class="form-input" style="width:100%; text-align:center; font-size:1.2rem; letter-spacing:4px; font-weight:800;" placeholder="••••" required>
+            </div>
+          </div>
+          <div id="pin-modal-error" style="display:none; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:0.5rem 0.75rem; border-radius:6px; font-size:0.78rem; font-weight:600;"></div>
+        </div>
+        <div class="modal-footer" style="padding:0.9rem 1.25rem; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:0.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-pin-setup')">Cancelar</button>
+          <button type="submit" id="pin-modal-submit-btn" class="btn btn-primary" style="background:#16a34a; border-color:#16a34a; font-weight:800; display:flex; align-items:center; gap:0.4rem;">
+            💾 Guardar PIN Rápido
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- BANNER FLOTANTE POST-LOGIN PARA ACTIVAR HUELLA O PIN SIN PERDER ACTIVACIÓN DEL GESTO -->
+  <div id="bio-enroll-prompt-banner" class="no-print" style="display:none; position:fixed; bottom:75px; left:50%; transform:translateX(-50%); background:#0f172a; color:#ffffff; padding:0.85rem 1.15rem; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:99999; max-width:92vw; width:460px; border:1px solid #334155;">
+    <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+      <span style="font-size:1.7rem;">⚡</span>
+      <div style="flex:1; min-width:180px;">
+        <div style="font-size:0.85rem; font-weight:800; color:#38bdf8;">¿Activar Acceso Rápido en este teléfono?</div>
+        <div style="font-size:0.72rem; color:#cbd5e1; margin-top:0.15rem;">Entra la próxima vez tocando tu sensor de huella o con un PIN de 4 números.</div>
+      </div>
+      <div style="display:flex; gap:0.4rem;">
+        <button type="button" onclick="triggerBioEnrollFromBanner()" class="btn btn-sm" style="background:#0284c7; color:#ffffff; font-weight:800; font-size:0.76rem; padding:0.45rem 0.65rem; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
+          👆 Huella
+        </button>
+        <button type="button" onclick="triggerPinEnrollFromBanner()" class="btn btn-sm" style="background:#16a34a; color:#ffffff; font-weight:800; font-size:0.76rem; padding:0.45rem 0.65rem; border:none; border-radius:6px; cursor:pointer; white-space:nowrap;">
+          🔢 PIN
+        </button>
+        <button type="button" onclick="closeBioEnrollBanner()" style="background:none; border:none; color:#94a3b8; font-size:1.15rem; cursor:pointer; margin-left:0.2rem;">✕</button>
+      </div>
     </div>
   </div>
 
@@ -8580,27 +8689,54 @@ function updateDashboardKPIs() { renderDashboard(); }
     }
 
     // Consecutivo persistente: nunca depende del campo en pantalla ni se reinicia al recargar
+    // Serie Móvil (M) para teléfonos / app offline y Serie Estándar para computadoras de oficina
     let currentLoadedQuoteNumber = null;
-    function maxFolioSeq(year) {
+    function isMobileDeviceOrApp() {
+      const isAppMode = document.documentElement.classList.contains("is-app-mode") 
+        || document.body.classList.contains("is-app-mode")
+        || safeStorage.getItem("gaso_prefer_app_mode") === "true";
+      const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+      const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+      return isAppMode || isMobileScreen || isMobileUA;
+    }
+
+    function maxFolioSeq(year, series = "") {
       let mx = 0;
       quotesHistory.forEach(q => {
         [q.number, q.refCotFolio].forEach(f => {
-          const m = String(f || '').match(/^(?:COT|NV)-(\d{4})-(\d+)$/);
-          if (m && Number(m[1]) === year) mx = Math.max(mx, parseInt(m[2], 10));
+          const m = String(f || '').match(/^(?:COT|NV)(?:-([A-Z0-9]+))?-(\d{4})-(\d+)$/);
+          if (m) {
+            const s = (m[1] || "").toUpperCase();
+            const y = Number(m[2]);
+            const n = parseInt(m[3], 10);
+            if (s === series && y === year) {
+              mx = Math.max(mx, n);
+            }
+          }
         });
       });
       return mx;
     }
-    function computeNextFolio() {
+
+    function computeNextFolio(forceSeries) {
       const y = new Date().getFullYear();
-      const stored = parseInt(safeStorage.getItem('gaso_folio_seq_' + y), 10) || 0;
-      const cloud = (window.__cloudFolioSeq && window.__cloudFolioSeq[y]) || 0;
-      return 'COT-' + y + '-' + String(Math.max(stored, cloud, maxFolioSeq(y)) + 1).padStart(3, '0');
+      const series = forceSeries !== undefined ? (forceSeries || "").toUpperCase() : (isMobileDeviceOrApp() ? "M" : "");
+      const k = series ? `gaso_folio_seq_${series}_${y}` : `gaso_folio_seq_${y}`;
+      const cloudKey = series ? `${series}_${y}` : String(y);
+      const stored = parseInt(safeStorage.getItem(k), 10) || 0;
+      const cloud = (window.__cloudFolioSeq && (window.__cloudFolioSeq[cloudKey] || (!series ? window.__cloudFolioSeq[y] : 0))) || 0;
+      const nextNum = Math.max(stored, cloud, maxFolioSeq(y, series)) + 1;
+      const prefix = series ? `COT-${series}-` : "COT-";
+      return prefix + y + '-' + String(nextNum).padStart(3, '0');
     }
+
     function bumpFolioSeq(number) {
-      const m = String(number || '').match(/^(?:COT|NV)-(\d{4})-(\d+)$/);
+      const m = String(number || '').match(/^(?:COT|NV)(?:-([A-Z0-9]+))?-(\d{4})-(\d+)$/);
       if (!m) return;
-      const k = 'gaso_folio_seq_' + m[1], n = parseInt(m[2], 10);
+      const series = (m[1] || "").toUpperCase();
+      const y = m[2];
+      const n = parseInt(m[3], 10);
+      const k = series ? `gaso_folio_seq_${series}_${y}` : `gaso_folio_seq_${y}`;
       if (n > (parseInt(safeStorage.getItem(k), 10) || 0)) safeStorage.setItem(k, String(n));
     }
 
@@ -10507,7 +10643,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       );
     }
 
-    // Creación de credencial biométrica con fallback en múltiples niveles (compatible Android 10-15 / Chrome)
+    // Creación de credencial biométrica con fallback en 4 niveles (compatible Android 10-15 / Chrome)
     async function createBiometricCredential(username) {
       const challenge = new Uint8Array(32);
       window.crypto.getRandomValues(challenge);
@@ -10531,9 +10667,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         { alg: -257, type: "public-key" } // RS256
       ];
 
-      // Intento 1: Configuración estándar recomendada para Credential Manager en Android
+      // Intento 1: Configuración estándar Passkey recomendada para Android Credential Manager
       try {
-        return await navigator.credentials.create({
+        const opts1 = {
           publicKey: {
             challenge,
             rp: baseRp,
@@ -10541,20 +10677,23 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             pubKeyCredParams,
             authenticatorSelection: {
               authenticatorAttachment: "platform",
-              userVerification: "required",
-              residentKey: "preferred"
+              residentKey: "required",
+              requireResidentKey: true,
+              userVerification: "preferred"
             },
+            attestation: "none",
             timeout: 60000
           }
-        });
+        };
+        return await navigator.credentials.create(opts1);
       } catch (err1) {
         if (err1.name === "NotAllowedError") throw err1;
-        console.warn("createBiometricCredential tier 1 falló, intentando tier 2:", err1);
+        console.warn("createBiometricCredential tier 1 falló:", err1);
       }
 
-      // Intento 2: Fallback con userVerification 'preferred' (evita UnknownError en Android 14)
+      // Intento 2: Fallback con residentKey preferred (evita 34000 en versiones intermedias de Android)
       try {
-        return await navigator.credentials.create({
+        const opts2 = {
           publicKey: {
             challenge,
             rp: baseRp,
@@ -10562,26 +10701,46 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             pubKeyCredParams,
             authenticatorSelection: {
               authenticatorAttachment: "platform",
+              residentKey: "preferred",
+              userVerification: "preferred"
+            },
+            attestation: "none",
+            timeout: 60000
+          }
+        };
+        return await navigator.credentials.create(opts2);
+      } catch (err2) {
+        if (err2.name === "NotAllowedError") throw err2;
+        console.warn("createBiometricCredential tier 2 falló:", err2);
+      }
+
+      // Intento 3: Fallback sin restricción estricta de attachment
+      try {
+        const opts3 = {
+          publicKey: {
+            challenge,
+            rp: baseRp,
+            user: userObj,
+            pubKeyCredParams,
+            authenticatorSelection: {
               userVerification: "preferred"
             },
             timeout: 60000
           }
-        });
-      } catch (err2) {
-        if (err2.name === "NotAllowedError") throw err2;
-        console.warn("createBiometricCredential tier 2 falló, intentando tier 3:", err2);
+        };
+        return await navigator.credentials.create(opts3);
+      } catch (err3) {
+        if (err3.name === "NotAllowedError") throw err3;
+        console.warn("createBiometricCredential tier 3 falló:", err3);
       }
 
-      // Intento 3: Fallback general sin rp.id restrictivo
+      // Intento 4: Fallback mínimo ligado al origen
       return await navigator.credentials.create({
         publicKey: {
           challenge,
           rp: { name: "GASO Ingenieria" },
           user: userObj,
           pubKeyCredParams,
-          authenticatorSelection: {
-            userVerification: "preferred"
-          },
           timeout: 60000
         }
       });
@@ -10655,6 +10814,61 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       };
       if (safeRpId) opts4.publicKey.rpId = safeRpId;
       return await navigator.credentials.get(opts4);
+    }
+
+    // --- Función universal de desbloqueo con credenciales descifradas (Online / Offline) ---
+    async function unlockAppWithDecryptedCredentials(creds, cachedProfileKey, welcomeMsg, loginMethod = "huella") {
+      const nowStr = new Date().toLocaleDateString("es-MX") + " " + new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+      let cachedProfile = null;
+      try { cachedProfile = JSON.parse(safeStorage.getItem(cachedProfileKey) || "null"); } catch(e) {}
+
+      let serverUser = null;
+      if (navigator.onLine) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3500);
+          const res = await fetch("/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            signal: controller.signal,
+            body: JSON.stringify({ action: "login", username: creds.username, password: creds.password, remember: true })
+          });
+          clearTimeout(timeoutId);
+          const d = await res.json().catch(() => ({}));
+          if (res.ok && d && d.ok && d.user) {
+            serverUser = {
+              id: "srv_" + d.user.username,
+              fullName: d.user.fullName,
+              username: d.user.username,
+              email: d.user.email || "",
+              role: d.user.role,
+              status: "active",
+              lastLogin: nowStr
+            };
+            safeStorage.setItem(cachedProfileKey, JSON.stringify(serverUser));
+          }
+        } catch (netErr) {
+          console.warn("Validación de nube omitida o fuera de línea:", netErr);
+        }
+      }
+
+      currentAuthUser = serverUser || cachedProfile || {
+        id: "srv_" + creds.username,
+        fullName: creds.username === "admin" ? "Superusuario — Dirección General" : ("Usuario " + creds.username),
+        username: creds.username,
+        email: "",
+        role: creds.username === "admin" ? "SUPERADMIN" : "VENTAS",
+        status: "active",
+        lastLogin: nowStr + (!navigator.onLine ? " (Offline)" : "")
+      };
+
+      _sessRemember = true;
+      const methodLabel = loginMethod === "pin" ? "🔢 PIN Rápido" : "👆 Huella Digital";
+      logSecurityEvent(currentAuthUser.username, currentAuthUser.role, `${methodLabel}` + (!navigator.onLine ? " (Offline)" : ""));
+      unlockAppForUser(currentAuthUser, true);
+      showToast(welcomeMsg || (!navigator.onLine ? `📱 ¡Bienvenido! Acceso autorizado (${methodLabel} · Modo Offline activo).` : `🎉 ¡Bienvenido! Acceso autorizado con ${methodLabel}.`));
+      return true;
     }
 
     // --- Biometría para Caja Fuerte (Vault) ---
@@ -10828,6 +11042,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const supported = await isBiometricSupported();
         if (!supported) {
           showToast("❌ Este dispositivo no cuenta con sensor biométrico compatible.");
+          setTimeout(() => openQuickPinSetupModal(username, password), 1000);
           return false;
         }
 
@@ -10861,6 +11076,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } catch (err) {
         if (err.name === "NotAllowedError") {
           showToast("Activación de huella omitida o cancelada.");
+        } else if (err.message && (err.message.includes("credential manager") || err.name === "NotReadableError")) {
+          console.error("Error de Credential Manager en Android APK:", err);
+          showToast("⚠️ Android Credential Manager bloqueó la huella en esta app empaquetada. Configura tu PIN Rápido de 4 dígitos para entrar en 1 segundo offline.");
+          setTimeout(() => openQuickPinSetupModal(username, password), 1200);
         } else {
           console.error("Error registrando huella:", err);
           showToast("❌ No se pudo registrar la huella: " + (err.message || err));
@@ -10875,7 +11094,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const encData = safeStorage.getItem("gaso_app_bio_data");
         if (!credIdBase64 || !encData) {
           if (!isAuto) showToast("No hay huella registrada para inicio de sesión.");
-          toggleManualLoginForm(true);
+          const hasPin = safeStorage.getItem("gaso_app_pin_enabled") === "true";
+          if (hasPin) showPinLoginForm(); else toggleManualLoginForm(true);
           return;
         }
 
@@ -10893,58 +11113,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             toggleManualLoginForm(true);
             return;
           }
-
-          const nowStr = new Date().toLocaleDateString("es-MX") + " " + new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
-          let cachedProfile = null;
-          try { cachedProfile = JSON.parse(safeStorage.getItem("gaso_app_bio_profile") || "null"); } catch(e) {}
-
-          let serverUser = null;
-          // Si hay conexión, intentar validar/refrescar sesión en la nube
-          if (navigator.onLine) {
-            try {
-              const controller = new AbortController();
-              const timeoutId = setTimeout(() => controller.abort(), 3500);
-              const res = await fetch("/auth", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "same-origin",
-                signal: controller.signal,
-                body: JSON.stringify({ action: "login", username: creds.username, password: creds.password, remember: true })
-              });
-              clearTimeout(timeoutId);
-              const d = await res.json().catch(() => ({}));
-              if (res.ok && d && d.ok && d.user) {
-                serverUser = {
-                  id: "srv_" + d.user.username,
-                  fullName: d.user.fullName,
-                  username: d.user.username,
-                  email: d.user.email || "",
-                  role: d.user.role,
-                  status: "active",
-                  lastLogin: nowStr
-                };
-                safeStorage.setItem("gaso_app_bio_profile", JSON.stringify(serverUser));
-              }
-            } catch (netErr) {
-              console.warn("Validación de nube omitida o fuera de línea:", netErr);
-            }
-          }
-
-          // Si el sensor biométrico del teléfono verificó la huella, PERMITIR EL INGRESO (Online u Offline)
-          currentAuthUser = serverUser || cachedProfile || {
-            id: "srv_" + creds.username,
-            fullName: creds.username === "admin" ? "Superusuario — Dirección General" : ("Usuario " + creds.username),
-            username: creds.username,
-            email: "",
-            role: creds.username === "admin" ? "SUPERADMIN" : "VENTAS",
-            status: "active",
-            lastLogin: nowStr + (!navigator.onLine ? " (Offline)" : "")
-          };
-
-          _sessRemember = true;
-          logSecurityEvent(currentAuthUser.username, currentAuthUser.role, "👆 Inicio de sesión por Huella Digital" + (!navigator.onLine ? " (Offline)" : ""));
-          unlockAppForUser(currentAuthUser, true);
-          showToast(!navigator.onLine ? "📱 ¡Bienvenido! Acceso verificado con tu huella (Modo Offline activo)." : "🎉 ¡Bienvenido! Acceso verificado con tu huella digital.");
+          await unlockAppWithDecryptedCredentials(creds, "gaso_app_bio_profile", null, "huella");
         }
       } catch (err) {
         if (err.name === "NotAllowedError") {
@@ -10956,19 +11125,257 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
     }
 
+    // --- Motor de PIN Rápido (4 dígitos) Cifrado Localmente ---
+    async function getPinCryptoKey(pinStr) {
+      const enc = new TextEncoder();
+      const baseKey = await window.crypto.subtle.importKey(
+        "raw",
+        enc.encode(pinStr + "_gaso_pin_secret_2026"),
+        { name: "PBKDF2" },
+        false,
+        ["deriveKey"]
+      );
+      return window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: enc.encode("gaso-pin-device-salt-2026"),
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        baseKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    function openQuickPinSetupModal(user, pass) {
+      const modal = document.getElementById("modal-pin-setup");
+      if (!modal) return;
+      const userInput = document.getElementById("pin-modal-user");
+      const passInput = document.getElementById("pin-modal-pass");
+      const userRow = document.getElementById("pin-modal-user-row");
+      const passRow = document.getElementById("pin-modal-pass-row");
+      const pinNew = document.getElementById("pin-modal-new");
+      const pinConf = document.getElementById("pin-modal-confirm");
+      const errBox = document.getElementById("pin-modal-error");
+      if (errBox) errBox.style.display = "none";
+      if (pinNew) pinNew.value = "";
+      if (pinConf) pinConf.value = "";
+
+      const defaultUser = user || (currentAuthUser && currentAuthUser.username) || safeStorage.getItem("gaso_app_pin_user") || safeStorage.getItem("gaso_app_bio_user") || "admin";
+      if (userInput) userInput.value = defaultUser;
+      if (passInput) passInput.value = pass || "";
+
+      if (currentAuthUser && currentAuthUser.username) {
+        if (userRow) userRow.style.display = "none";
+        if (passRow) passRow.style.display = "none";
+      } else {
+        if (userRow) userRow.style.display = "block";
+        if (passRow) passRow.style.display = "block";
+      }
+
+      openModal("modal-pin-setup");
+      setTimeout(() => { if (pinNew) pinNew.focus(); }, 120);
+    }
+
+    function togglePinModalPassword() {
+      const passInput = document.getElementById("pin-modal-pass");
+      if (!passInput) return;
+      passInput.type = (passInput.type === "password") ? "text" : "password";
+    }
+
+    async function handlePinModalSubmit(e) {
+      if (e) e.preventDefault();
+      const user = (document.getElementById("pin-modal-user")?.value || "").trim();
+      const pass = (document.getElementById("pin-modal-pass")?.value || "").trim();
+      const pinNew = (document.getElementById("pin-modal-new")?.value || "").trim();
+      const pinConf = (document.getElementById("pin-modal-confirm")?.value || "").trim();
+      const errBox = document.getElementById("pin-modal-error");
+      const submitBtn = document.getElementById("pin-modal-submit-btn");
+
+      if (!user) {
+        if (errBox) { errBox.style.display = "block"; errBox.textContent = "Ingresa tu usuario."; }
+        return;
+      }
+      if (!currentAuthUser && !pass) {
+        if (errBox) { errBox.style.display = "block"; errBox.textContent = "Ingresa tu contraseña del sistema."; }
+        return;
+      }
+      if (!pinNew || pinNew.length < 4) {
+        if (errBox) { errBox.style.display = "block"; errBox.textContent = "El PIN debe tener al menos 4 números."; }
+        return;
+      }
+      if (pinNew !== pinConf) {
+        if (errBox) { errBox.style.display = "block"; errBox.textContent = "Los dos PIN ingresados no coinciden."; }
+        return;
+      }
+      if (errBox) errBox.style.display = "none";
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "⏳ Guardando..."; }
+
+      const actualPass = pass || (window._lastInputPassword || "");
+      closeModal("modal-pin-setup");
+      const ok = await appEnrollQuickPin(user, actualPass, pinNew);
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = "💾 Guardar PIN Rápido"; }
+    }
+
+    async function appEnrollQuickPin(username, password, pin) {
+      try {
+        const cleanPin = String(pin || "").trim();
+        if (!cleanPin || cleanPin.length < 4) {
+          showToast("❌ El PIN debe ser de al menos 4 números.");
+          return false;
+        }
+        const key = await getPinCryptoKey(cleanPin);
+        const payload = JSON.stringify({ username: username.trim(), password });
+        const encData = await vaultEncryptText(payload, key);
+
+        safeStorage.setItem("gaso_app_pin_enabled", "true");
+        safeStorage.setItem("gaso_app_pin_data", encData);
+        safeStorage.setItem("gaso_app_pin_user", username.trim());
+        if (currentAuthUser) {
+          safeStorage.setItem("gaso_app_pin_profile", JSON.stringify(currentAuthUser));
+        }
+
+        showToast("🎉 ¡PIN rápido configurado con éxito! Podrás entrar tecleando tus 4 dígitos.");
+        updateAppBiometricUI();
+        if (!currentAuthUser) {
+          await appLoginWithQuickPin(cleanPin);
+        }
+        return true;
+      } catch (e) {
+        console.error("Error guardando PIN rápido:", e);
+        showToast("❌ Error configurando PIN: " + (e.message || e));
+        return false;
+      }
+    }
+
+    async function handlePinLoginSubmit(e) {
+      if (e) e.preventDefault();
+      const pin = (document.getElementById("login-quick-pin")?.value || "").trim();
+      const submitBtn = document.getElementById("btn-login-pin-submit");
+      if (!pin) {
+        showToast("Ingresa tu PIN.");
+        return;
+      }
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "⏳ Verificando..."; }
+      await appLoginWithQuickPin(pin);
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = "🔓 Entrar con PIN Rápido"; }
+    }
+
+    async function appLoginWithQuickPin(pin) {
+      try {
+        const encData = safeStorage.getItem("gaso_app_pin_data");
+        if (!encData) {
+          showToast("❌ No hay un PIN configurado en este dispositivo.");
+          toggleManualLoginForm(true);
+          return false;
+        }
+        const key = await getPinCryptoKey(String(pin).trim());
+        let jsonStr = "";
+        try {
+          jsonStr = await vaultDecryptText(encData, key);
+        } catch (decryptErr) {
+          showToast("❌ PIN incorrecto. Intenta de nuevo.");
+          const inp = document.getElementById("login-quick-pin");
+          if (inp) { inp.value = ""; inp.focus(); }
+          return false;
+        }
+        let creds = null;
+        try { creds = JSON.parse(jsonStr); } catch (e) {}
+        if (!creds || !creds.username) {
+          showToast("❌ PIN no válido o datos corruptos.");
+          return false;
+        }
+        return await unlockAppWithDecryptedCredentials(creds, "gaso_app_pin_profile", "🔓 Acceso rápido con PIN autorizado.", "pin");
+      } catch (err) {
+        console.error("Error al entrar con PIN:", err);
+        showToast("❌ Error al procesar PIN.");
+        return false;
+      }
+    }
+
+    function appUnlinkQuickPin() {
+      safeStorage.removeItem("gaso_app_pin_enabled");
+      safeStorage.removeItem("gaso_app_pin_data");
+      safeStorage.removeItem("gaso_app_pin_user");
+      safeStorage.removeItem("gaso_app_pin_profile");
+      updateAppBiometricUI();
+      showToast("PIN rápido eliminado de este dispositivo.");
+    }
+
+    function showPinLoginForm() {
+      const bioArea = document.getElementById("login-bio-area");
+      const pinArea = document.getElementById("login-pin-area");
+      const manualForm = document.getElementById("login-manual-form");
+      if (bioArea) bioArea.style.display = "none";
+      if (manualForm) manualForm.style.display = "none";
+      if (pinArea) {
+        pinArea.style.display = "block";
+        const pinInp = document.getElementById("login-quick-pin");
+        if (pinInp) { pinInp.value = ""; setTimeout(() => pinInp.focus(), 80); }
+      }
+    }
+
+    function showBioLoginForm() {
+      const bioArea = document.getElementById("login-bio-area");
+      const pinArea = document.getElementById("login-pin-area");
+      const manualForm = document.getElementById("login-manual-form");
+      if (pinArea) pinArea.style.display = "none";
+      if (manualForm) manualForm.style.display = "none";
+      if (bioArea) bioArea.style.display = "block";
+    }
+
+    function handleMobileMorePinClick() {
+      closeMobileMoreMenu();
+      const pinEnabled = safeStorage.getItem("gaso_app_pin_enabled") === "true";
+      if (pinEnabled) {
+        if (confirm("📱 ¿Deseas eliminar el PIN rápido de este teléfono? Tendrás que ingresar con contraseña la próxima vez.")) {
+          appUnlinkQuickPin();
+        }
+      } else {
+        openQuickPinSetupModal();
+      }
+    }
+
+    function triggerPinEnrollFromBanner() {
+      if (!_pendingBioCreds || !_pendingBioCreds.user || !_pendingBioCreds.pass) {
+        closeBioEnrollBanner();
+        openQuickPinSetupModal();
+        return;
+      }
+      const { user, pass } = _pendingBioCreds;
+      closeBioEnrollBanner();
+      openQuickPinSetupModal(user, pass);
+    }
+
     function updateAppBiometricUI() {
       const bioEnabled = safeStorage.getItem("gaso_app_bio_enabled") === "true";
+      const pinEnabled = safeStorage.getItem("gaso_app_pin_enabled") === "true";
       const bioArea = document.getElementById("login-bio-area");
+      const pinArea = document.getElementById("login-pin-area");
       const manualForm = document.getElementById("login-manual-form");
+      const linkBioToPin = document.getElementById("link-bio-to-pin");
+      const linkPinToBio = document.getElementById("link-pin-to-bio");
 
-      if (bioArea) {
-        bioArea.style.display = bioEnabled ? "block" : "none";
-      }
-      if (manualForm) {
-        manualForm.style.display = bioEnabled ? "none" : "block";
+      if (linkBioToPin) linkBioToPin.style.display = pinEnabled ? "inline" : "none";
+      if (linkPinToBio) linkPinToBio.style.display = bioEnabled ? "inline" : "none";
+
+      if (bioEnabled) {
+        if (bioArea) bioArea.style.display = "block";
+        if (pinArea) pinArea.style.display = "none";
+        if (manualForm) manualForm.style.display = "none";
+      } else if (pinEnabled) {
+        if (bioArea) bioArea.style.display = "none";
+        if (pinArea) pinArea.style.display = "block";
+        if (manualForm) manualForm.style.display = "none";
+      } else {
+        if (bioArea) bioArea.style.display = "none";
+        if (pinArea) pinArea.style.display = "none";
+        if (manualForm) manualForm.style.display = "block";
       }
 
-      // Actualizar botón en el menú móvil Más
+      // Actualizar botones en menú móvil Más
       const moreBioBtn = document.getElementById("btn-mobile-more-bio");
       if (moreBioBtn) {
         if (bioEnabled) {
@@ -10980,7 +11387,18 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         }
       }
 
-      // Actualizar tarjeta en Seguridad / Configuración
+      const morePinBtn = document.getElementById("btn-mobile-more-pin");
+      if (morePinBtn) {
+        if (pinEnabled) {
+          morePinBtn.innerHTML = "🗑️ Eliminar PIN Rápido (Teléfono)";
+          morePinBtn.style.color = "#dc2626";
+        } else {
+          morePinBtn.innerHTML = "🔢 Configurar PIN Rápido (4 Dígitos)";
+          morePinBtn.style.color = "#15803d";
+        }
+      }
+
+      // Actualizar tarjetas en Seguridad / Configuración
       const cfgStatusText = document.getElementById("cfg-bio-status-text");
       const cfgUnlinkBtn = document.getElementById("btn-cfg-unlink-bio");
       const cfgEnrollBtn = document.getElementById("btn-cfg-enroll-bio");
@@ -10994,6 +11412,22 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           cfgStatusText.innerHTML = `<span style="color:#64748b;">⚪ No configurada en este teléfono. Puedes activarla para entrar sin contraseña.</span>`;
           if (cfgUnlinkBtn) cfgUnlinkBtn.style.display = "none";
           if (cfgEnrollBtn) cfgEnrollBtn.textContent = "👆 Configurar Huella";
+        }
+      }
+
+      const cfgPinStatusText = document.getElementById("cfg-pin-status-text");
+      const cfgPinUnlinkBtn = document.getElementById("btn-cfg-unlink-pin");
+      const cfgPinEnrollBtn = document.getElementById("btn-cfg-enroll-pin");
+      if (cfgPinStatusText) {
+        const pinUser = safeStorage.getItem("gaso_app_pin_user") || "este usuario";
+        if (pinEnabled) {
+          cfgPinStatusText.innerHTML = `<span style="color:#10b981; font-weight:700;">✅ Activo y configurado</span> para <strong>${pinUser}</strong> en este teléfono.`;
+          if (cfgPinUnlinkBtn) cfgPinUnlinkBtn.style.display = "inline-flex";
+          if (cfgPinEnrollBtn) cfgPinEnrollBtn.textContent = "🔄 Cambiar PIN";
+        } else {
+          cfgPinStatusText.innerHTML = `<span style="color:#64748b;">⚪ No configurado. Actívalo para entrar tecleando 4 números en 1 segundo offline.</span>`;
+          if (cfgPinUnlinkBtn) cfgPinUnlinkBtn.style.display = "none";
+          if (cfgPinEnrollBtn) cfgPinEnrollBtn.textContent = "🔢 Configurar PIN Rápido";
         }
       }
     }
@@ -11011,13 +11445,17 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function toggleManualLoginForm(showManual) {
+      const bioArea = document.getElementById("login-bio-area");
+      const pinArea = document.getElementById("login-pin-area");
       const manualForm = document.getElementById("login-manual-form");
-      if (manualForm) {
-        manualForm.style.display = showManual ? "block" : "none";
-        if (showManual) {
-          const userInput = document.getElementById("login-username");
-          if (userInput) userInput.focus();
-        }
+      if (showManual) {
+        if (bioArea) bioArea.style.display = "none";
+        if (pinArea) pinArea.style.display = "none";
+        if (manualForm) manualForm.style.display = "block";
+        const userInput = document.getElementById("login-username");
+        if (userInput) userInput.focus();
+      } else {
+        updateAppBiometricUI();
       }
     }
 
@@ -11028,11 +11466,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       safeStorage.removeItem("gaso_app_bio_user");
       safeStorage.removeItem("gaso_app_bio_profile");
       updateAppBiometricUI();
-      toggleManualLoginForm(true);
       showToast("Huella digital desvinculada de este dispositivo.");
     }
 
-    // --- Flujo interactivo post-login para activar huella sin romper el sensor ---
+    // --- Flujo interactivo post-login para activar huella o PIN ---
     let _pendingBioCreds = null;
     function showBioEnrollPostLoginBanner(user, pass) {
       _pendingBioCreds = { user, pass };
@@ -12118,14 +12555,23 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             if (isAppMode) {
               // En modo APK / Aplicación: mostrar directamente el acceso de la plataforma
               openCotizadorLogin();
-              // Si tiene huella activada, solicitarla con el sensor automáticamente
+              // Si tiene huella o PIN activado, preparar acceso rápido
               if (safeStorage.getItem("gaso_app_bio_enabled") === "true") {
                 setTimeout(() => { appLoginWithBiometrics(true); }, 350);
+              } else if (safeStorage.getItem("gaso_app_pin_enabled") === "true") {
+                setTimeout(() => { const p = document.getElementById("login-quick-pin"); if (p) p.focus(); }, 350);
               }
             }
           }
         }).catch(() => {
-          if (isAppMode) openCotizadorLogin();
+          if (isAppMode) {
+            openCotizadorLogin();
+            if (safeStorage.getItem("gaso_app_bio_enabled") === "true") {
+              setTimeout(() => { appLoginWithBiometrics(true); }, 350);
+            } else if (safeStorage.getItem("gaso_app_pin_enabled") === "true") {
+              setTimeout(() => { const p = document.getElementById("login-quick-pin"); if (p) p.focus(); }, 350);
+            }
+          }
         });
     }
 
@@ -12186,10 +12632,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } catch (err) {
         // Soporte Offline: Si no hay conexión pero las credenciales coinciden con las guardadas en el dispositivo
         let cachedProfile = null;
-        try { cachedProfile = JSON.parse(safeStorage.getItem("gaso_app_bio_profile") || "null"); } catch(e) {}
-        const bioUser = (safeStorage.getItem("gaso_app_bio_user") || "").toLowerCase();
+        try { cachedProfile = JSON.parse(safeStorage.getItem("gaso_app_bio_profile") || safeStorage.getItem("gaso_app_pin_profile") || "null"); } catch(e) {}
+        const savedUser = (safeStorage.getItem("gaso_app_bio_user") || safeStorage.getItem("gaso_app_pin_user") || "").toLowerCase();
         if (!navigator.onLine || String(err).includes("fetch")) {
-          if (cachedProfile && (userRaw.toLowerCase() === bioUser || userRaw.toLowerCase() === cachedProfile.username.toLowerCase())) {
+          if (cachedProfile && (userRaw.toLowerCase() === savedUser || (cachedProfile.username && userRaw.toLowerCase() === cachedProfile.username.toLowerCase()))) {
             currentAuthUser = cachedProfile;
             _sessRemember = true;
             document.getElementById("login-password").value = "";
@@ -12212,17 +12658,16 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const nowStr = new Date().toLocaleDateString("es-MX") + " " + new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
       currentAuthUser = { id: "srv_" + data.user.username, fullName: data.user.fullName, username: data.user.username,
         email: data.user.email || "", role: data.user.role, status: "active", lastLogin: nowStr };
+      window._lastInputPassword = passRaw;
       document.getElementById("login-password").value = "";
       _sessRemember = !!data.remember;
       logSecurityEvent(currentAuthUser.username, currentAuthUser.role, "✅ Inicio de sesión exitoso");
       unlockAppForUser(currentAuthUser, true);
 
-      if (typeof isBiometricSupported === "function") {
-        isBiometricSupported().then(supported => {
-          if (supported && safeStorage.getItem("gaso_app_bio_enabled") !== "true") {
-            showBioEnrollPostLoginBanner(userRaw, passRaw);
-          }
-        });
+      const hasBio = safeStorage.getItem("gaso_app_bio_enabled") === "true";
+      const hasPin = safeStorage.getItem("gaso_app_pin_enabled") === "true";
+      if (!hasBio && !hasPin) {
+        showBioEnrollPostLoginBanner(userRaw, passRaw);
       }
     }
 
