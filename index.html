@@ -10710,10 +10710,28 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
     async function vaultUnlockWithBiometrics() {
       try {
-        const credIdBase64 = safeStorage.getItem("gaso_vault_bio_cred_id");
-        const encSecret = safeStorage.getItem("gaso_vault_bio_encrypted_secret");
-        if (!credIdBase64 || !encSecret) {
-          showToast("No hay huella configurada. Usa Google Authenticator.");
+        const credIdBase64 = safeStorage.getItem("gaso_app_bio_cred_id") || safeStorage.getItem("gaso_vault_bio_cred_id");
+        if (!credIdBase64) {
+          showToast("No hay huella configurada en este teléfono.");
+          return;
+        }
+
+        let savedSecret = safeStorage.getItem("gaso_vault_totp_secret");
+        if (!savedSecret) {
+          try {
+            const respTotp = await fetch("/vault?action=get_totp", { credentials: "same-origin" });
+            if (respTotp.ok) {
+              const d = await respTotp.json();
+              if (d && d.ok && d.secret) {
+                savedSecret = d.secret;
+                safeStorage.setItem("gaso_vault_totp_secret", savedSecret);
+              }
+            }
+          } catch(e) {}
+        }
+
+        if (!savedSecret) {
+          showToast("Primero ingresa tu código de Google Authenticator para inicializar la Bóveda.");
           return;
         }
 
@@ -10722,36 +10740,34 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const assertion = await getBiometricAssertion(rawId);
 
         if (assertion) {
-          const encKey = await getBioCryptoKey(credIdBase64);
-          const secret = await vaultDecryptText(encSecret, encKey);
-          if (secret && secret.length >= 16) {
-            vaultDecryptedKey = await vaultDeriveKeyFromSecret(secret);
-            safeStorage.setItem("gaso_vault_totp_secret", secret);
-            vaultResetLockTimer();
-            showToast("🔓 ¡Caja Fuerte desbloqueada con huella digital!");
-            vaultInit();
-          } else {
-            showToast("❌ No se pudo descifrar la llave. Usa tu código de Google Authenticator.");
-          }
+          vaultDecryptedKey = await vaultDeriveKeyFromSecret(savedSecret);
+          safeStorage.setItem("gaso_vault_bio_enabled", "true");
+          vaultResetLockTimer();
+          showToast("🔓 ¡Caja Fuerte desbloqueada con tu huella digital!");
+          vaultInit();
         }
       } catch (err) {
         if (err.name === "NotAllowedError") {
           showToast("Huella cancelada o no reconocida.");
         } else {
+          console.error("Error biométrico en Caja Fuerte:", err);
           showToast("❌ Error biométrico: " + (err.message || err));
         }
       }
     }
 
     function updateVaultBiometricUI() {
-      const bioEnabled = safeStorage.getItem("gaso_vault_bio_enabled") === "true";
+      const appBio = safeStorage.getItem("gaso_app_bio_enabled") === "true";
+      const vaultBio = safeStorage.getItem("gaso_vault_bio_enabled") === "true";
+      const hasBio = appBio || vaultBio;
+
       const unlockCard = document.getElementById("vault-bio-unlock-card");
-      if (unlockCard) unlockCard.style.display = bioEnabled ? "block" : "none";
+      if (unlockCard) unlockCard.style.display = hasBio ? "block" : "none";
 
       const toggleBtn = document.getElementById("vault-bio-toggle-btn");
       if (toggleBtn) {
-        if (bioEnabled) {
-          toggleBtn.innerHTML = "✅ Huella Activa <span style='font-size:0.7rem; color:#dc2626; margin-left:4px;'>(Quitar)</span>";
+        if (hasBio) {
+          toggleBtn.innerHTML = "✅ Huella Activa en Caja Fuerte";
           toggleBtn.style.borderColor = "#10b981";
           toggleBtn.style.color = "#047857";
         } else {
@@ -11085,12 +11101,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           if (setupView) setupView.style.display = "none";
           if (typeof updateVaultBiometricUI === "function") updateVaultBiometricUI();
           const inp = document.getElementById("vault-totp-input");
-          if (inp) inp.value = "";
-          // Si tiene huella activada, solicitarla con el sensor
-          if (safeStorage.getItem("gaso_vault_bio_enabled") === "true") {
-            setTimeout(() => { vaultUnlockWithBiometrics(); }, 300);
-          } else if (inp) {
-            inp.focus();
+          if (inp) {
+            inp.value = "";
+            const hasBio = safeStorage.getItem("gaso_app_bio_enabled") === "true" || safeStorage.getItem("gaso_vault_bio_enabled") === "true";
+            if (!hasBio) inp.focus();
           }
         }
       }
@@ -11163,12 +11177,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       showToast("🎉 ¡Google Authenticator vinculado y Caja Fuerte desbloqueada!");
       vaultInit();
       isBiometricSupported().then(supported => {
-        if (supported && safeStorage.getItem("gaso_vault_bio_enabled") !== "true") {
-          setTimeout(() => {
-            if (confirm("📱 ¿Deseas activar el sensor de Huella Digital de tu teléfono para abrir la Caja Fuerte sin escribir códigos en el futuro?")) {
-              vaultEnrollBiometrics();
-            }
-          }, 1000);
+        if (supported) {
+          safeStorage.setItem("gaso_vault_bio_enabled", "true");
+          updateVaultBiometricUI();
         }
       });
     }
@@ -11201,12 +11212,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       vaultInit();
 
       isBiometricSupported().then(supported => {
-        if (supported && safeStorage.getItem("gaso_vault_bio_enabled") !== "true") {
-          setTimeout(() => {
-            if (confirm("📱 ¿Deseas activar el sensor de Huella Digital de tu teléfono para abrir la Caja Fuerte sin escribir códigos en el futuro?")) {
-              vaultEnrollBiometrics();
-            }
-          }, 1200);
+        if (supported) {
+          safeStorage.setItem("gaso_vault_bio_enabled", "true");
+          updateVaultBiometricUI();
         }
       });
     }
