@@ -3513,9 +3513,6 @@
           <span id="active-user-role-icon">👑</span>
           <span id="active-user-display">Admin</span>
         </div>
-        <button class="btn btn-outline btn-sm" onclick="appLockNow('manual')" title="Bloquear pantalla de inmediato (Modo Banco)" style="padding:0.35rem 0.55rem; font-weight:700; color:#1e293b; border-color:#cbd5e1; display:inline-flex; align-items:center; gap:0.25rem;">
-          🔒 Bloquear
-        </button>
         <button class="btn btn-danger btn-sm" onclick="logoutSession()" title="Cerrar sesión y volver a la página ejecutiva" style="padding:0.35rem 0.6rem; font-weight:700;">
           Salir
         </button>
@@ -4795,70 +4792,46 @@ CLABE: 722969010514249300</textarea>
 
         <!-- Configuración de Bloqueo Bancario y Auto-Bloqueo de Pantalla -->
         <div id="cfg-banking-lock-card" style="background:#ffffff; border:1px solid #fed7aa; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
-          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem; border-bottom:1px solid #ffedd5; padding-bottom:0.75rem;">
-            <div style="display:flex; align-items:center; gap:0.75rem;">
-              <div style="font-size:2.2rem; background:#fff7ed; padding:0.4rem 0.65rem; border-radius:10px;">🛡️</div>
-              <div>
-                <div style="font-weight:800; font-size:1rem; color:#9a3412;">Protección Bancaria y Auto-Bloqueo de Pantalla</div>
-                <div style="font-size:0.78rem; color:#64748b; margin-top:0.15rem;">
-                  Como en una app de banco: bloquea automáticamente la app al salir, por inactividad o cada vez que abras la APK.
-                </div>
+          <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; border-bottom:1px solid #ffedd5; padding-bottom:0.75rem;">
+            <div style="font-size:2.2rem; background:#fff7ed; padding:0.4rem 0.65rem; border-radius:10px;">🛡️</div>
+            <div>
+              <div style="font-weight:800; font-size:1rem; color:#9a3412;">Protección Bancaria Automática (Expiración de Sesión)</div>
+              <div style="font-size:0.78rem; color:#64748b; margin-top:0.15rem;">
+                Comportamiento 100% automático: la sesión expira sola al cerrar la APK o tras 5-10 minutos sin actividad.
               </div>
             </div>
-            <button type="button" class="btn btn-primary" onclick="appLockNow('manual')" style="background:#ea580c; border-color:#ea580c; font-weight:800; font-size:0.82rem; display:flex; align-items:center; gap:0.4rem;">
-              🔒 Probar Bloqueo Ahora
-            </button>
           </div>
 
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;">
-            <!-- Bloqueo al abrir la App / APK (Cold Start) -->
+            <!-- Expiración al cerrar la APK o salir -->
             <div style="background:#fffaf5; border:1px solid #fed7aa; border-radius:8px; padding:0.85rem;">
               <label style="font-size:0.82rem; font-weight:800; color:#9a3412; display:block; margin-bottom:0.35rem;">
-                📱 Bloqueo al Abrir la APK / App:
+                📱 Expirar Sesión al Cerrar la APK / Minimizar:
               </label>
               <select id="cfg-autolock-onlaunch" class="form-input" onchange="saveAutoLockSettings()" style="width:100%; font-size:0.82rem; font-weight:700;">
-                <option value="always">🔒 Siempre pedir PIN / Contraseña al abrir la App (Modo Banco)</option>
+                <option value="always" selected>🔒 Expirar sesión cada vez que se cierre la APK (Modo Banco)</option>
                 <option value="mobile_only">📱 Solo en Teléfono / App Móvil</option>
-                <option value="off">🔓 Entrar directo si la sesión está abierta en el servidor</option>
+                <option value="off">🔓 Mantener sesión abierta aunque se cierre la APK</option>
               </select>
               <div style="font-size:0.72rem; color:#78350f; margin-top:0.35rem;">
-                Impide que alguien tome tu teléfono y vea tus cotizaciones o margen sin identificarse con su PIN.
+                Al cerrar la APK o apagar la pantalla, te pedirá contraseña o PIN de 4 dígitos para volver a entrar.
               </div>
             </div>
 
             <!-- Auto-bloqueo por Inactividad -->
             <div style="background:#fffaf5; border:1px solid #fed7aa; border-radius:8px; padding:0.85rem;">
               <label style="font-size:0.82rem; font-weight:800; color:#9a3412; display:block; margin-bottom:0.35rem;">
-                ⏱️ Tiempo de Auto-Bloqueo por Inactividad:
+                ⏱️ Tiempo para Expirar Sesión por Inactividad:
               </label>
               <select id="cfg-autolock-inactivity" class="form-input" onchange="saveAutoLockSettings()" style="width:100%; font-size:0.82rem; font-weight:700;">
-                <option value="1">1 minuto sin uso</option>
-                <option value="3">3 minutos sin uso</option>
-                <option value="5" selected>5 minutos (Recomendado bancario)</option>
-                <option value="10">10 minutos sin uso</option>
-                <option value="15">15 minutos sin uso</option>
-                <option value="0">Desactivado (No recomendado)</option>
+                <option value="5" selected>5 minutos sin actividad (Recomendado)</option>
+                <option value="10">10 minutos sin actividad</option>
+                <option value="15">15 minutos sin actividad</option>
+                <option value="1">1 minuto sin actividad</option>
+                <option value="0">Desactivado</option>
               </select>
               <div style="font-size:0.72rem; color:#78350f; margin-top:0.35rem;">
-                Si dejas el teléfono sobre el escritorio sin tocar la pantalla, se bloquea automáticamente.
-              </div>
-            </div>
-
-            <!-- Bloqueo al Salir a Segundo Plano -->
-            <div style="background:#fffaf5; border:1px solid #fed7aa; border-radius:8px; padding:0.85rem;">
-              <label style="font-size:0.82rem; font-weight:800; color:#9a3412; display:block; margin-bottom:0.35rem;">
-                🔄 Bloqueo al Minimizar / Salir de la App:
-              </label>
-              <select id="cfg-autolock-background" class="form-input" onchange="saveAutoLockSettings()" style="width:100%; font-size:0.82rem; font-weight:700;">
-                <option value="0">Inmediato (0 segundos al salir de la app)</option>
-                <option value="30">30 segundos en segundo plano</option>
-                <option value="60" selected>1 minuto (Recomendado bancario)</option>
-                <option value="120">2 minutos en segundo plano</option>
-                <option value="300">5 minutos en segundo plano</option>
-                <option value="-1">Desactivado</option>
-              </select>
-              <div style="font-size:0.72rem; color:#78350f; margin-top:0.35rem;">
-                Bloquea la aplicación si cambias de app (a WhatsApp, cámara, etc.) o si apagas la pantalla.
+                Si dejas el celular abierto sin tocar la pantalla, la sesión se cierra automáticamente por seguridad.
               </div>
             </div>
           </div>
@@ -5050,9 +5023,6 @@ CLABE: 722969010514249300</textarea>
       </button>
       <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); openAIModal()">
         ✨ Asistente IA (Chat)
-      </button>
-      <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); appLockNow('manual');" style="color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; font-weight:800; margin-top:0.35rem;">
-        🔒 Bloquear Pantalla Ahora (Modo Banco)
       </button>
       <button type="button" class="mobile-more-btn" onclick="closeMobileMoreMenu(); logoutSession()" style="color:#dc2626; border-top:1px dashed #e2e8f0; margin-top:0.25rem; padding-top:0.65rem;">
         🚪 Cerrar Sesión
@@ -12615,12 +12585,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       if (!document.body.classList.contains("app-authenticated") || _appIsLocked) return;
 
+      safeStorage.setItem("gaso_last_active_ts", String(Date.now()));
+
       const minsSetting = safeStorage.getItem("gaso_autolock_inactivity_mins");
       const mins = minsSetting !== null ? parseInt(minsSetting, 10) : 5;
 
       if (mins > 0) {
         _appInactivityTimer = setTimeout(() => {
-          console.log(`[AutoLock] Inactividad alcanzada (${mins} min). Bloqueando pantalla.`);
+          console.log(`[AutoLock] Sesión expirada por inactividad tras ${mins} minutos.`);
           appLockNow("inactivity");
         }, mins * 60 * 1000);
       }
@@ -12675,51 +12647,60 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     function checkBackgroundElapsedLock() {
       if (!document.body.classList.contains("app-authenticated") || _appIsLocked) return;
 
-      const storedTs = parseInt(safeStorage.getItem("gaso_last_hidden_ts") || "0", 10);
-      const lastHidden = _appLastHiddenTimestamp || storedTs;
-      if (!lastHidden) return;
+      const lastActive = parseInt(safeStorage.getItem("gaso_last_active_ts") || "0", 10);
+      const now = Date.now();
+      const minsSetting = safeStorage.getItem("gaso_autolock_inactivity_mins");
+      const mins = minsSetting !== null ? parseInt(minsSetting, 10) : 5;
+      const maxMs = (mins > 0 ? mins : 5) * 60 * 1000;
 
-      const elapsedSec = (Date.now() - lastHidden) / 1000;
-      const bgSetting = safeStorage.getItem("gaso_autolock_bg_secs");
-      const maxBgSec = bgSetting !== null ? parseInt(bgSetting, 10) : 60;
-
-      if (maxBgSec >= 0 && elapsedSec >= maxBgSec) {
-        console.log(`[AutoLock] Retorno tras ${Math.round(elapsedSec)}s en segundo plano (umbral ${maxBgSec}s). Bloqueando pantalla.`);
+      // 1. Expirar si estuvo inactivo o en segundo plano por más del tiempo límite (5 a 10 min)
+      if (lastActive > 0 && (now - lastActive >= maxMs)) {
+        console.log(`[AutoLock] Sesión expirada por tiempo fuera (${Math.round((now - lastActive) / 60000)} min).`);
         _appLastHiddenTimestamp = 0;
         safeStorage.removeItem("gaso_last_hidden_ts");
-        appLockNow("background");
-      } else {
-        _appLastHiddenTimestamp = 0;
-        safeStorage.removeItem("gaso_last_hidden_ts");
-        resetAppInactivityTimer();
+        appLockNow("inactivity");
+        return;
       }
+
+      // 2. Si la app estuvo minimizada y la política de salida está activa
+      const launchPolicy = safeStorage.getItem("gaso_autolock_on_launch") || "always";
+      const isMobileOrApp = isAppMode || (typeof isMobileDeviceOrApp === "function" && isMobileDeviceOrApp());
+      if (launchPolicy === "always" || (launchPolicy === "mobile_only" && isMobileOrApp)) {
+        const storedTs = parseInt(safeStorage.getItem("gaso_last_hidden_ts") || "0", 10);
+        const lastHidden = _appLastHiddenTimestamp || storedTs;
+        if (lastHidden && (now - lastHidden >= 120000)) { // 2 minutos fuera de la app
+          _appLastHiddenTimestamp = 0;
+          safeStorage.removeItem("gaso_last_hidden_ts");
+          appLockNow("background");
+          return;
+        }
+      }
+
+      _appLastHiddenTimestamp = 0;
+      safeStorage.removeItem("gaso_last_hidden_ts");
+      resetAppInactivityTimer();
     }
 
     function loadAutoLockSettings() {
       const launchSel = document.getElementById("cfg-autolock-onlaunch");
       const inactSel = document.getElementById("cfg-autolock-inactivity");
-      const bgSel = document.getElementById("cfg-autolock-background");
 
       const savedLaunch = safeStorage.getItem("gaso_autolock_on_launch") || "always";
       const savedInact = safeStorage.getItem("gaso_autolock_inactivity_mins") || "5";
-      const savedBg = safeStorage.getItem("gaso_autolock_bg_secs") || "60";
 
       if (launchSel) launchSel.value = savedLaunch;
       if (inactSel) inactSel.value = savedInact;
-      if (bgSel) bgSel.value = savedBg;
     }
 
     function saveAutoLockSettings() {
       const launchSel = document.getElementById("cfg-autolock-onlaunch");
       const inactSel = document.getElementById("cfg-autolock-inactivity");
-      const bgSel = document.getElementById("cfg-autolock-background");
 
       if (launchSel) safeStorage.setItem("gaso_autolock_on_launch", launchSel.value);
       if (inactSel) safeStorage.setItem("gaso_autolock_inactivity_mins", inactSel.value);
-      if (bgSel) safeStorage.setItem("gaso_autolock_bg_secs", bgSel.value);
 
       resetAppInactivityTimer();
-      showToast("⚙️ Preferencias de seguridad bancaria actualizadas.");
+      showToast("⚙️ Preferencias de expiración de sesión actualizadas.");
     }
 
     function appLockNow(reason = "manual") {
@@ -12767,25 +12748,25 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       if (badgeEl && descEl) {
         if (reason === "inactivity") {
-          badgeEl.textContent = "⏱️ Bloqueo por Inactividad";
+          badgeEl.textContent = "⏱️ Sesión Expirada por Inactividad";
           badgeEl.style.background = "rgba(245, 158, 11, 0.2)";
           badgeEl.style.color = "#f59e0b";
-          descEl.textContent = "Por seguridad comercial, la pantalla se bloqueó tras unos minutos sin actividad. Ingresa tu PIN o contraseña para reanudar.";
+          descEl.textContent = "Por seguridad comercial, la sesión expiró tras unos minutos sin actividad. Ingresa tu PIN o contraseña para reanudar.";
         } else if (reason === "background") {
-          badgeEl.textContent = "🛡️ Bloqueo en Segundo Plano";
+          badgeEl.textContent = "🛡️ Sesión Expirada al Salir";
           badgeEl.style.background = "rgba(239, 68, 68, 0.2)";
           badgeEl.style.color = "#f87171";
-          descEl.textContent = "Protección bancaria: la pantalla se bloqueó automáticamente al cambiar de aplicación o apagar la pantalla.";
+          descEl.textContent = "Protección bancaria: la sesión expiró automáticamente al cerrar o cambiar de aplicación.";
         } else if (reason === "launch") {
           badgeEl.textContent = "🔒 Verificación de Acceso Bancario";
           badgeEl.style.background = "rgba(56, 189, 248, 0.2)";
           badgeEl.style.color = "#38bdf8";
           descEl.textContent = "Identifícate con tu PIN de 4 dígitos o contraseña para acceder a la plataforma.";
         } else {
-          badgeEl.textContent = "🔒 Pantalla Bloqueada";
+          badgeEl.textContent = "🔒 Sesión Bloqueada";
           badgeEl.style.background = "rgba(148, 163, 184, 0.2)";
           badgeEl.style.color = "#cbd5e1";
-          descEl.textContent = "Bloqueo de seguridad manual activado. Ingresa tu PIN o contraseña para desbloquear.";
+          descEl.textContent = "Ingresa tu PIN o contraseña para desbloquear.";
         }
       }
 
@@ -12847,7 +12828,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         try { securityLogs = JSON.parse(storedLogs); } catch(e) { securityLogs = []; }
       }
 
-      // Inicializar vigilantes de inactividad, segundo plano y cargar ajustes bancarios
+      // Inicializar vigilantes de inactividad, segundo plano y cargar ajustes
       initInactivityListeners();
       initBackgroundLockListeners();
       loadAutoLockSettings();
@@ -12884,13 +12865,20 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             _sessRemember = !!d.remember;
             applyRolePermissions(currentAuthUser);
 
-            // Política de Bloqueo Bancario al abrir la App (Cold Start)
+            // DETECCIÓN DE CIERRE DE APK O EXPIRACIÓN POR INACTIVIDAD (MODO BANCO)
+            let apkSessionAlive = false;
+            try { apkSessionAlive = sessionStorage.getItem("gaso_apk_session_alive") === "true"; } catch(e) {}
+            const lastActive = parseInt(safeStorage.getItem("gaso_last_active_ts") || "0", 10);
+            const minsSetting = safeStorage.getItem("gaso_autolock_inactivity_mins");
+            const inactivityMins = minsSetting !== null ? parseInt(minsSetting, 10) : 5;
+            const isInactiveExpired = lastActive > 0 && (Date.now() - lastActive >= inactivityMins * 60 * 1000);
+
             const launchPolicy = safeStorage.getItem("gaso_autolock_on_launch") || "always";
             const isMobileOrApp = isAppMode || (typeof isMobileDeviceOrApp === "function" && isMobileDeviceOrApp());
-            const shouldLockOnLaunch = launchPolicy === "always" || (launchPolicy === "mobile_only" && isMobileOrApp);
+            const shouldExpireOnLaunch = (launchPolicy === "always" || (launchPolicy === "mobile_only" && isMobileOrApp)) && (!apkSessionAlive || isInactiveExpired);
 
-            if (shouldLockOnLaunch) {
-              appLockNow("launch");
+            if (shouldExpireOnLaunch) {
+              appLockNow(isInactiveExpired ? "inactivity" : "launch");
             } else {
               unlockAppForUser(currentAuthUser, false);
             }
@@ -13008,6 +12996,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
     function unlockAppForUser(user, showWelcomeToast = true) {
       _appIsLocked = false;
+      try { sessionStorage.setItem("gaso_apk_session_alive", "true"); } catch(e) {}
+      safeStorage.setItem("gaso_last_active_ts", String(Date.now()));
       document.body.classList.add("app-authenticated");
       _postLoginBootstrap();
       const overlay = document.getElementById("auth-login-overlay");
@@ -13077,6 +13067,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
     function logoutSession() {
       _appIsLocked = false;
+      try { sessionStorage.removeItem("gaso_apk_session_alive"); } catch(e) {}
+      safeStorage.removeItem("gaso_last_active_ts");
       if (_appInactivityTimer) {
         clearTimeout(_appInactivityTimer);
         _appInactivityTimer = null;
