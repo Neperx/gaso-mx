@@ -10657,10 +10657,13 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     async function isBiometricSupported() {
       if (!window.PublicKeyCredential || !navigator.credentials) return false;
       try {
-        return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      } catch (e) {
-        return false;
-      }
+        if (typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === "function") {
+          const avail = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+          if (avail) return true;
+        }
+      } catch (e) {}
+      // En Firefox y navegadores de escritorio permitir intentar WebAuthn si la API está presente
+      return typeof navigator.credentials.create === "function";
     }
 
     function getSafeRpId() {
@@ -10967,7 +10970,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           return;
         }
 
-        showToast("👆 Coloca tu dedo en el sensor de huella...");
+        showToast("👤 Mirando a la cámara / sensor de huella...");
         const cred = await createBiometricCredential("gaso-vault-user");
 
         if (cred && cred.rawId) {
@@ -11115,7 +11118,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           return false;
         }
 
-        showToast("👆 Coloca tu dedo en el sensor de huella...");
+        showToast("👤 Mirando a la cámara / sensor de huella...");
         const cred = await createBiometricCredential(username);
 
         if (cred && cred.rawId) {
