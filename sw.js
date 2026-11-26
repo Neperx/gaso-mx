@@ -1,5 +1,5 @@
 // Service Worker para GASO MX - PWA & Android TWA con soporte Offline robusto
-const CACHE_NAME = 'gaso-pwa-v7';
+const CACHE_NAME = 'gaso-pwa-v8';
 const STATIC_RESOURCES = [
   '/',
   '/index.html',

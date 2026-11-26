@@ -3366,13 +3366,13 @@
           </button>
         </div>
 
-        <!-- Acceso Biométrico por Huella Digital -->
+        <!-- Acceso Biométrico por Huella / Rostro Windows Hello -->
         <div id="login-bio-area" style="display:none; background:#f0f9ff; border:2px solid #0284c7; border-radius:12px; padding:1.35rem 1.25rem; margin-bottom:1.25rem; text-align:center;">
-          <div style="font-size:2.8rem; margin-bottom:0.35rem;">👆</div>
-          <div style="font-size:1.1rem; font-weight:800; color:#0369a1; margin-bottom:0.25rem;">Acceso Rápido con Huella</div>
-          <div style="font-size:0.78rem; color:#64748b; margin-bottom:1.15rem;">Toca el botón o tu sensor de huella para ingresar directamente</div>
+          <div style="font-size:2.8rem; margin-bottom:0.35rem;">👤</div>
+          <div style="font-size:1.1rem; font-weight:800; color:#0369a1; margin-bottom:0.25rem;">Acceso con Rostro o Huella (Windows Hello)</div>
+          <div style="font-size:0.78rem; color:#64748b; margin-bottom:1.15rem;">Usa el reconocimiento facial de tu Surface o tu sensor biométrico para ingresar</div>
           <button type="button" class="btn btn-primary" onclick="appLoginWithBiometrics()" style="width:100%; background:#0284c7; border-color:#0284c7; font-weight:800; font-size:1rem; padding:0.8rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow:0 4px 14px rgba(2,132,199,0.35);">
-            👆 Desbloquear con Huella Digital
+            👤 / 👆 Desbloquear con Rostro o Huella
           </button>
           <div style="margin-top:1rem; display:flex; justify-content:center; gap:1.25rem; font-size:0.8rem;">
             <a href="javascript:void(0)" id="link-bio-to-pin" onclick="showPinLoginForm()" style="color:#15803d; text-decoration:underline; font-weight:700; display:none;">
@@ -4745,26 +4745,26 @@ CLABE: 722969010514249300</textarea>
           </table>
         </div>
 
-        <!-- Configuración de Huella Digital en este Dispositivo -->
+        <!-- Configuración de Biometría / Rostro / Huella Windows Hello -->
         <div id="cfg-biometrics-card" style="background:#ffffff; border:1px solid #bae6fd; border-radius:10px; padding:1.15rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
           <div style="display:flex; align-items:center; gap:0.85rem;">
-            <div style="font-size:2.2rem; background:#f0f9ff; padding:0.4rem 0.65rem; border-radius:10px;">👆</div>
+            <div style="font-size:2.2rem; background:#f0f9ff; padding:0.4rem 0.65rem; border-radius:10px;">👤</div>
             <div>
-              <div style="font-weight:800; font-size:0.95rem; color:#0369a1;">Acceso con Huella Digital (WebAuthn / Passkeys)</div>
+              <div style="font-weight:800; font-size:0.95rem; color:#0369a1;">Acceso con Rostro o Huella (Windows Hello / Passkeys)</div>
               <div id="cfg-bio-status-text" style="font-size:0.78rem; color:#64748b; margin-top:0.2rem;">
-                Sensor biométrico para entrar a la plataforma sin escribir contraseñas.
+                Compatible con reconocimiento facial de Windows Hello (Surface, laptops), Touch ID y huella digital.
               </div>
               <div style="font-size:0.7rem; color:#0284c7; margin-top:0.25rem;">
-                💡 En Android, para máxima compatibilidad con huella, abre gaso-mx.pages.dev en Google Chrome y selecciona "Instalar aplicación".
+                💡 En tu Surface con Windows 11 o navegador Edge/Chrome, usa directamente tu rostro o sensor biométrico.
               </div>
             </div>
           </div>
           <div id="cfg-bio-actions" style="display:flex; gap:0.5rem;">
             <button type="button" class="btn btn-outline" id="btn-cfg-unlink-bio" onclick="appUnlinkBiometrics()" style="color:#dc2626; border-color:#fca5a5; font-weight:700; font-size:0.82rem; display:none;">
-              🗑️ Desvincular Huella
+              🗑️ Desvincular Biometría
             </button>
             <button type="button" class="btn btn-primary" id="btn-cfg-enroll-bio" onclick="openBioSetupModal()" style="background:#0284c7; border-color:#0284c7; font-weight:700; font-size:0.82rem;">
-              👆 Configurar Huella
+              👤 Configurar Rostro / Huella
             </button>
           </div>
         </div>
@@ -5030,15 +5030,15 @@ CLABE: 722969010514249300</textarea>
     </div>
   </div>
 
-  <!-- MODAL: CONFIGURAR HUELLA DIGITAL (SIN PROMPTS QUE BLOQUEEN EL SENSOR) -->
+  <!-- MODAL: CONFIGURAR HUELLA / ROSTRO WINDOWS HELLO (SIN PROMPTS QUE BLOQUEEN EL SENSOR) -->
   <div class="modal-backdrop no-print" id="modal-bio-setup" style="display:none;">
     <div class="modal-box" style="max-width:440px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
       <div class="modal-header" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; padding:1rem 1.25rem;">
         <div style="display:flex; align-items:center; gap:0.5rem;">
-          <span style="font-size:1.5rem;">👆</span>
+          <span style="font-size:1.5rem;">👤</span>
           <div>
-            <h3 style="color:#ffffff; margin:0; font-size:1.05rem; font-weight:800;">Activar Huella Digital</h3>
-            <div style="font-size:0.75rem; color:#e0f2fe;">Acceso rápido seguro con el sensor de tu teléfono</div>
+            <h3 style="color:#ffffff; margin:0; font-size:1.05rem; font-weight:800;">Activar Rostro o Huella Digital</h3>
+            <div style="font-size:0.75rem; color:#e0f2fe;">Windows Hello (Surface / Windows 11) o sensor biométrico</div>
           </div>
         </div>
         <button class="modal-close" onclick="closeModal('modal-bio-setup')" style="color:#ffffff; font-size:1.2rem; background:none; border:none; cursor:pointer;">✕</button>
@@ -5046,7 +5046,7 @@ CLABE: 722969010514249300</textarea>
       <form id="bio-setup-form" onsubmit="handleBioModalSubmit(event)" style="margin:0;">
         <div class="modal-body" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.9rem;">
           <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:0.75rem; font-size:0.78rem; color:#0369a1; line-height:1.4;">
-            🛡️ Tus credenciales se guardarán <strong>encriptadas localmente en este dispositivo</strong> con hardware biométrico. Nadie más podrá acceder sin tu huella.
+            🛡️ Tus credenciales se guardarán <strong>encriptadas localmente en este dispositivo</strong> con hardware biométrico (TPM en Surface / Windows Hello). Nadie más podrá acceder sin tu rostro o huella.
           </div>
           <div>
             <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Usuario:</label>
@@ -5058,7 +5058,7 @@ CLABE: 722969010514249300</textarea>
               <input type="password" id="bio-modal-pass" class="form-input" style="width:100%; padding-right:2.5rem;" placeholder="Tu contraseña actual" required autocomplete="current-password">
               <button type="button" onclick="toggleBioModalPassword()" style="position:absolute; right:0.5rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:1rem; color:#64748b;" title="Ver/Ocultar">👁️</button>
             </div>
-            <div style="font-size:0.72rem; color:#64748b; margin-top:0.25rem;">Se validará y protegerá con el sensor de huella.</div>
+            <div style="font-size:0.72rem; color:#64748b; margin-top:0.25rem;">Se validará y protegerá con el reconocimiento facial o huella.</div>
           </div>
           <div id="bio-modal-error" style="display:none; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; padding:0.5rem 0.75rem; border-radius:6px; font-size:0.78rem; font-weight:600;"></div>
         </div>
@@ -5069,7 +5069,7 @@ CLABE: 722969010514249300</textarea>
           <div style="display:flex; gap:0.5rem;">
             <button type="button" class="btn btn-outline" onclick="closeModal('modal-bio-setup')">Cancelar</button>
             <button type="submit" id="bio-modal-submit-btn" class="btn btn-primary" style="background:#0284c7; border-color:#0284c7; font-weight:800; display:flex; align-items:center; gap:0.4rem;">
-              👆 Registrar Huella Digital
+              👤 / 👆 Registrar Rostro o Huella
             </button>
           </div>
         </div>
@@ -11129,7 +11129,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             safeStorage.setItem("gaso_app_bio_profile", JSON.stringify(currentAuthUser));
           }
 
-          showToast("🎉 ¡Huella digital registrada! Podrás entrar tocando tu sensor.");
+          showToast("🎉 ¡Biometría registrada con éxito! Podrás entrar con tu rostro (Windows Hello) o huella.");
           updateAppBiometricUI();
 
           // Si el usuario no estaba autenticado aún, validar y entrar
@@ -11143,13 +11143,13 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const errMsg = String(err && (err.message || err) || "");
         const errLower = errMsg.toLowerCase();
         if (err.name === "NotAllowedError") {
-          showToast("Activación de huella omitida o cancelada.");
+          showToast("Activación de biometría omitida o cancelada.");
         } else if (errLower.includes("credential manager") || errLower.includes("34000") || err.name === "NotReadableError") {
           console.warn("Android Credential Manager no disponible en este WebView/APK:", err);
           showToast("ℹ️ Android requiere PIN Rápido de 4 dígitos en esta app APK. Vamos a configurarlo para tu acceso bancario.");
           setTimeout(() => openQuickPinSetupModal(username, password), 600);
         } else {
-          console.error("Error registrando huella:", err);
+          console.error("Error registrando huella/rostro:", err);
           showToast("❌ Sensor no disponible en este entorno: " + errMsg);
           setTimeout(() => openQuickPinSetupModal(username, password), 900);
         }
@@ -11162,14 +11162,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const credIdBase64 = safeStorage.getItem("gaso_app_bio_cred_id");
         const encData = safeStorage.getItem("gaso_app_bio_data");
         if (!credIdBase64 || !encData) {
-          if (!isAuto) showToast("No hay huella registrada para inicio de sesión.");
+          if (!isAuto) showToast("No hay rostro ni huella registrada en este dispositivo.");
           const hasPin = safeStorage.getItem("gaso_app_pin_enabled") === "true";
           if (hasPin) showPinLoginForm(); else toggleManualLoginForm(true);
           return;
         }
 
         const rawId = base64ToUint8(credIdBase64);
-        if (!isAuto) showToast("👆 Coloca tu dedo en el sensor...");
+        if (!isAuto) showToast("👤 Mirando a la cámara / sensor biométrico...");
         const assertion = await getBiometricAssertion(rawId);
 
         if (assertion) {
