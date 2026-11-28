@@ -4287,14 +4287,14 @@ CLABE: 722969010514249300</textarea>
             <table class="crm-table prj-main-table">
               <thead>
                 <tr>
-                  <th style="width:52px; text-align:center;">N.º</th>
-                  <th style="width:15%;">Cliente / Proyecto</th>
+                  <th style="width:112px; text-align:center;">Folio</th>
+                  <th style="width:14%;">Cliente / Proyecto</th>
                   <th>Alcance Principal</th>
-                  <th style="width:158px;">Estatus</th>
-                  <th style="text-align:right; width:104px;">Monto Total</th>
-                  <th style="text-align:right; width:112px;">Abonos / A cuenta</th>
-                  <th style="text-align:right; width:112px;">Saldo Pendiente</th>
-                  <th style="text-align:center; width:118px;">Acciones</th>
+                  <th style="width:148px;">Estatus</th>
+                  <th style="text-align:right; width:98px;">Monto Total</th>
+                  <th style="text-align:right; width:106px;">Abonos / A cuenta</th>
+                  <th style="text-align:right; width:106px;">Saldo Pendiente</th>
+                  <th style="text-align:center; width:112px;">Acciones</th>
                 </tr>
               </thead>
               <tbody id="prj-list-tbody"></tbody>
@@ -5602,9 +5602,16 @@ CLABE: 722969010514249300</textarea>
         <button class="modal-close" onclick="closeModal('modal-reset-projects')" style="color:#ffffff;">✕</button>
       </div>
       <div class="modal-body" style="padding:1.15rem; display:flex; flex-direction:column; gap:0.9rem;">
+        <div style="background:#eef2ff; border:1px solid #c7d2fe; border-radius:8px; padding:0.75rem; font-size:0.8rem; color:#3730a3;">
+          <strong>Opción A — Alinear proyectos al folio de cotizaciones (Recomendado):</strong><br>
+          Conserva tus proyectos actuales pero renumera los que no tienen folio de cotización justo después de tu última cotización (<code>COT-YYYY-XXX</code>), evitando choques entre cotizaciones y proyectos.
+          <div style="margin-top:0.55rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="alignProjectsToUnifiedFolios(false)" style="background:#4f46e5; border-color:#4f46e5; font-weight:800;">🔗 Alinear Folios con Cotizaciones</button>
+          </div>
+        </div>
         <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:0.75rem; font-size:0.8rem; color:#9a3412;">
-          <strong>Opción A — Iniciar control desde cero (en limpio):</strong><br>
-          Limpia las cuentas actuales de la pestaña Cuentas (también en la nube D1) y arranca el consecutivo desde el folio que indiques:
+          <strong>Opción B — Reiniciar Cuentas desde cero (en limpio):</strong><br>
+          Limpia las cuentas actuales de la pestaña Cuentas (también en la nube D1) para ir metiendo tus proyectos directamente desde tus cotizaciones aprobadas:
           <div style="display:flex; gap:0.5rem; align-items:center; margin-top:0.55rem;">
             <label style="font-weight:700;">Siguiente Folio N.º:</label>
             <input type="number" id="reset-start-folio" class="form-input" value="1" min="1" step="1" style="width:110px; font-weight:800; text-align:center;">
@@ -5612,10 +5619,10 @@ CLABE: 722969010514249300</textarea>
           </div>
         </div>
         <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:0.75rem; font-size:0.8rem; color:#0369a1;">
-          <strong>Opción B — Restaurar tus 6 proyectos base (350–358):</strong><br>
-          Vuelve a cargar el control con tus 6 clientes y desgloses iniciales exactos.
+          <strong>Opción C — Restaurar los 6 proyectos de ejemplo:</strong><br>
+          Vuelve a cargar los 6 clientes iniciales alineados al consecutivo actual.
           <div style="margin-top:0.55rem;">
-            <button type="button" class="btn btn-primary btn-sm" onclick="executeResetProjectsControl('seed')" style="background:#023e8a; border-color:#023e8a; font-weight:800;">Restaurar Proyectos 350–358</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="executeResetProjectsControl('seed')" style="background:#023e8a; border-color:#023e8a; font-weight:800;">Restaurar Ejemplos</button>
           </div>
         </div>
       </div>
@@ -8059,7 +8066,7 @@ function updateDashboardKPIs() { renderDashboard(); }
           const link = r.status === 'sales_note' && r.refCotFolio ? '<div style="font-size:0.66rem; color:#64748b;">↔ ' + escapeHtml(r.refCotFolio) + '</div>' : '';
           const linkedPrj = typeof findLinkedProjectForQuote === 'function' ? findLinkedProjectForQuote(r.number, r.refCotFolio) : null;
           const prjBtn = linkedPrj
-            ? '<button type="button" class="btn btn-outline btn-sm" style="color:#0f766e; border-color:#5eead4; background:#f0fdfa; font-weight:700;" onclick="switchTab(\'projects\'); openProjectDetail(\'' + escapeHtml(linkedPrj.id) + '\')" title="Abrir proyecto vinculado en Cuentas por Cobrar">📂 Proy. N.º ' + linkedPrj.folioNum + '</button> '
+            ? '<button type="button" class="btn btn-outline btn-sm" style="color:#0f766e; border-color:#5eead4; background:#f0fdfa; font-weight:700;" onclick="switchTab(\'projects\'); openProjectDetail(\'' + escapeHtml(linkedPrj.id) + '\')" title="Abrir proyecto vinculado en Cuentas por Cobrar">📂 ' + escapeHtml(typeof getProjectDisplayFolio === 'function' ? getProjectDisplayFolio(linkedPrj) : ('Proy. N.º ' + linkedPrj.folioNum)) + '</button> '
             : ((r.status !== 'cancelled' && r.status !== 'rejected')
                 ? '<button type="button" class="btn btn-outline btn-sm" style="color:#4f46e5; border-color:#c7d2fe; background:#eef2ff; font-weight:700;" onclick="convertQuoteToProjectByIndex(' + idx + ')" title="Aprobar y pasar esta cotización a Proyecto / Cuenta por Cobrar">🚀 Proyecto</button> '
                 : '');
@@ -9318,22 +9325,51 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (typeof updateVaultBiometricUI === "function") updateVaultBiometricUI();
     }
 
+    function parseQuoteFolioParts(f) {
+      const m = String(f || '').trim().match(/^(COT|NV)(?:-([A-Z0-9]+))?-(\d{4})-(\d+)$/i);
+      if (!m) return null;
+      return {
+        type: m[1].toUpperCase(),
+        series: (m[2] || '').toUpperCase(),
+        year: Number(m[3]),
+        seq: parseInt(m[4], 10)
+      };
+    }
+
     function maxFolioSeq(year, series = "") {
       let mx = 0;
-      quotesHistory.forEach(q => {
-        [q.number, q.refCotFolio].forEach(f => {
-          const m = String(f || '').match(/^(?:COT|NV)(?:-([A-Z0-9]+))?-(\d{4})-(\d+)$/);
-          if (m) {
-            const s = (m[1] || "").toUpperCase();
-            const y = Number(m[2]);
-            const n = parseInt(m[3], 10);
-            if (s === series && y === year) {
-              mx = Math.max(mx, n);
-            }
+      (quotesHistory || []).forEach(q => {
+        [q && q.number, q && q.refCotFolio].forEach(f => {
+          const p = parseQuoteFolioParts(f);
+          if (p && p.series === series && p.year === year) {
+            mx = Math.max(mx, p.seq);
+          }
+        });
+      });
+      (projectsHistory || []).forEach(prj => {
+        [prj && prj.folioCode, prj && prj.refCotFolio].forEach(f => {
+          const p = parseQuoteFolioParts(f);
+          if (p && p.series === series && p.year === year) {
+            mx = Math.max(mx, p.seq);
           }
         });
       });
       return mx;
+    }
+
+    function getProjectDisplayFolio(p) {
+      if (!p) return '';
+      if (p.folioCode && String(p.folioCode).trim()) return String(p.folioCode).trim();
+      if (p.refCotFolio && String(p.refCotFolio).trim()) return String(p.refCotFolio).trim();
+      return p.folioNum ? `N.º ${p.folioNum}` : 'Sin folio';
+    }
+
+    function reserveNextUnifiedFolio() {
+      const folioCode = computeNextFolio();
+      bumpFolioSeq(folioCode);
+      const parsed = parseQuoteFolioParts(folioCode);
+      const folioNum = parsed ? parsed.seq : getNextProjectFolio();
+      return { folioCode, folioNum };
     }
 
     function computeNextFolio(forceSeries) {
@@ -9466,6 +9502,11 @@ function updateDashboardKPIs() { renderDashboard(); }
         quotesHistory.splice.apply(quotesHistory, [0, quotesHistory.length].concat(sq));
         projectsHistory.splice.apply(projectsHistory, [0, projectsHistory.length].concat(sp));
         try { seedInitialProjectsIfNeeded(true); } catch (e) {}
+        try {
+          if (safeStorage.getItem('gaso_folios_aligned_v1') !== 'true') {
+            alignProjectsToUnifiedFolios(true);
+          }
+        } catch (e) {}
         // Totales del CRM siempre desde cotizaciones (no confiar en lastFolio/totalQuoted guardados en el cliente).
         try { recomputeAllCRMStats(); } catch (e) {}
         var ns = { c: {}, q: {}, p: {} };
@@ -16209,50 +16250,112 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function seedInitialProjectsIfNeeded(fromCloud) {
+      if (safeStorage.getItem('gaso_folios_aligned_v1') === 'true' || safeStorage.getItem('gaso_projects_seeded_v2') === 'true') {
+        updateProjectsBadge();
+        return;
+      }
       const seeds = buildSeedProjects();
       if (projectsHistory && projectsHistory.length > 0) {
-        if (safeStorage.getItem('gaso_projects_seeded_v2') !== 'true') {
-          let changed = false;
-          const now = Date.now();
-          ['prj-350', 'prj-354', 'prj-355', 'prj-357', 'prj-358'].forEach(sid => {
-            const idx = projectsHistory.findIndex(x => x && x.id === sid);
-            const fresh = seeds.find(s => s.id === sid);
-            if (!fresh) return;
-            if (idx === -1) {
-              projectsHistory.push(fresh);
-              changed = true;
-            } else if (sid === 'prj-357' && (projectsHistory[idx].items || []).length <= 1) {
-              projectsHistory[idx] = Object.assign({}, fresh, { _u: now });
-              changed = true;
-            } else if ((projectsHistory[idx].items || []).length <= 1 && projectsHistory[idx].totalAmount === fresh.totalAmount) {
-              projectsHistory[idx].concept = fresh.concept;
-              projectsHistory[idx].items = fresh.items;
-              projectsHistory[idx]._u = now;
-              changed = true;
-            }
-          });
-          safeStorage.setItem('gaso_projects_seeded_v1', 'true');
-          safeStorage.setItem('gaso_projects_seeded_v2', 'true');
-          if (changed) {
-            safeStorage.setItem('gaso_projects_history', JSON.stringify(projectsHistory));
-            try { cloudPushSoon(); } catch (e) {}
-          }
-        }
+        safeStorage.setItem('gaso_projects_seeded_v1', 'true');
+        safeStorage.setItem('gaso_projects_seeded_v2', 'true');
         updateProjectsBadge();
         return;
       }
-      if (safeStorage.getItem('gaso_projects_seeded_v2') === 'true') {
-        updateProjectsBadge();
-        return;
-      }
-      // Cargar los 6 proyectos base con todos sus desgloses
       if (fromCloud || !safeStorage.getItem('gaso_projects_history')) {
         projectsHistory = seeds;
         safeStorage.setItem('gaso_projects_history', JSON.stringify(projectsHistory));
         safeStorage.setItem('gaso_projects_seeded_v1', 'true');
         safeStorage.setItem('gaso_projects_seeded_v2', 'true');
+        alignProjectsToUnifiedFolios(true);
         updateProjectsBadge();
-        try { cloudPushSoon(); } catch (e) {}
+      }
+    }
+
+    function alignProjectsToUnifiedFolios(silent = false) {
+      if (!silent && !confirm('¿Alinear los folios de tus proyectos actuales con el consecutivo de tus Cotizaciones (COT-YYYY-XXX)?\n\n• Los proyectos provenientes de una cotización conservarán exactamente el folio de su cotización.\n• Los proyectos sin cotización previa recibirán folios consecutivos justo después de tu última cotización para que nunca choquen los números.')) {
+        return;
+      }
+      const y = new Date().getFullYear();
+      const series = isMobileDeviceOrApp() ? 'M' : '';
+      let maxQuoteSeq = 0;
+      (quotesHistory || []).forEach(q => {
+        [q && q.number, q && q.refCotFolio].forEach(f => {
+          const parsed = parseQuoteFolioParts(f);
+          if (parsed && parsed.year === y && parsed.series === series) {
+            maxQuoteSeq = Math.max(maxQuoteSeq, parsed.seq);
+          }
+        });
+      });
+
+      const usedSeqs = new Set();
+      (quotesHistory || []).forEach(q => {
+        const parsed = parseQuoteFolioParts(q && q.number);
+        if (parsed && parsed.year === y && parsed.series === series) usedSeqs.add(parsed.seq);
+      });
+
+      let cursor = maxQuoteSeq;
+      const now = Date.now();
+      let changed = false;
+
+      const sorted = [...(projectsHistory || [])].sort((a, b) => (a.folioNum || 0) - (b.folioNum || 0));
+      sorted.forEach(p => {
+        if (!p) return;
+        const refParsed = parseQuoteFolioParts(p.refCotFolio);
+        if (refParsed) {
+          if (p.folioCode !== p.refCotFolio || p.folioNum !== refParsed.seq) {
+            p.folioCode = p.refCotFolio;
+            p.folioNum = refParsed.seq;
+            p._u = now;
+            changed = true;
+          }
+          if (refParsed.year === y && refParsed.series === series) usedSeqs.add(refParsed.seq);
+          return;
+        }
+        const curParsed = parseQuoteFolioParts(p.folioCode);
+        if (curParsed && !usedSeqs.has(curParsed.seq)) {
+          if (p.folioNum !== curParsed.seq) {
+            p.folioNum = curParsed.seq;
+            p._u = now;
+            changed = true;
+          }
+          if (curParsed.year === y && curParsed.series === series) usedSeqs.add(curParsed.seq);
+          return;
+        }
+
+        // Proyecto heredado sin folio COT (ej. 350..358): reasignar consecutivo limpio siguiendo al de cotizaciones
+        do { cursor++; } while (usedSeqs.has(cursor));
+        usedSeqs.add(cursor);
+        const prefix = series ? `COT-${series}-` : 'COT-';
+        const newCode = `${prefix}${y}-${String(cursor).padStart(3, '0')}`;
+        if (!p.legacyFolio && p.folioNum) p.legacyFolio = p.folioNum;
+        p.folioNum = cursor;
+        p.folioCode = newCode;
+        p._u = now;
+        changed = true;
+      });
+
+      const finalMax = Math.max(maxQuoteSeq, cursor, ...Array.from(usedSeqs), 0);
+      const seqKey = series ? `gaso_folio_seq_${series}_${y}` : `gaso_folio_seq_${y}`;
+      safeStorage.setItem(seqKey, String(finalMax));
+      safeStorage.setItem('gaso_folios_aligned_v1', 'true');
+      safeStorage.setItem('gaso_projects_seeded_v1', 'true');
+      safeStorage.setItem('gaso_projects_seeded_v2', 'true');
+
+      if (changed) {
+        persistProjects(silent ? '' : `🔗 Folios alineados al consecutivo de cotizaciones (siguiente: ${series ? 'COT-' + series + '-' : 'COT-'}${y}-${String(finalMax + 1).padStart(3, '0')}).`);
+      } else if (!silent) {
+        showToast('🔗 Tus folios ya estaban alineados correctamente.');
+      }
+      if (!silent) {
+        closeModal('modal-reset-projects');
+        if (activeProjectId) openProjectDetail(activeProjectId);
+        else renderProjectsDashboard();
+      }
+      // Actualizar folio visible en cotizador si está vacío o nuevo sin guardar
+      const qInp = document.getElementById('quote-number');
+      if (qInp && !currentLoadedQuoteNumber) {
+        qInp.value = computeNextFolio();
+        updateQRStamp();
       }
     }
 
@@ -16262,10 +16365,18 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function getNextProjectFolio() {
-      let mx = (window.__cloudFolioSeq && parseInt(window.__cloudFolioSeq.PROJECT_NUM, 10)) || 0;
+      const y = new Date().getFullYear();
+      const series = isMobileDeviceOrApp() ? 'M' : '';
+      const qMax = maxFolioSeq(y, series);
+      let mx = qMax;
       (projectsHistory || []).forEach(p => {
-        const fn = parseInt(p.folioNum, 10) || 0;
-        if (fn > mx) mx = fn;
+        const parsed = parseQuoteFolioParts(p && (p.folioCode || p.refCotFolio));
+        if (parsed && parsed.year === y && parsed.series === series) {
+          mx = Math.max(mx, parsed.seq);
+        } else if (p && p.folioCode) {
+          const fn = parseInt(p.folioNum, 10) || 0;
+          if (fn > mx) mx = fn;
+        }
       });
       const minNext = parseInt(safeStorage.getItem('gaso_project_next_min') || '0', 10) || 0;
       return Math.max(mx + 1, minNext, 1);
@@ -16398,14 +16509,15 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const paidTxt = (p.paidAmount || 0) > 0 ? '-' + fmtMXN(p.paidAmount) : '$0.00';
         const scope = p.concept || (p.items && p.items[0] ? p.items[0].title : 'Sin descripción');
         const isCut = p.status === 'Corte Cerrado';
+        const dispFolio = getProjectDisplayFolio(p);
         const balCell = isCut
-          ? `<span style="font-size:0.74rem; color:#64748b;">A N.º ${p.closedToFolio || '-'} (${fmtMXN(p.carriedOverBalance || 0)})</span>`
+          ? `<span style="font-size:0.74rem; color:#64748b;">A ${escPrj(p.closedToFolioCode || ('N.º ' + (p.closedToFolio || '-')))} (${fmtMXN(p.carriedOverBalance || 0)})</span>`
           : fmtMXN(p.balanceAmount);
         return `
           <tr style="cursor:pointer; ${isCut ? 'opacity:0.78;' : ''}" onclick="openProjectDetail('${escPrj(p.id)}')">
-            <td style="text-align:center; font-weight:900; color:#023e8a; white-space:nowrap;">${p.folioNum}</td>
+            <td style="text-align:center; font-weight:900; color:#023e8a; white-space:nowrap; font-size:0.74rem; font-family:monospace;">${escPrj(dispFolio)}</td>
             <td style="font-weight:800; color:#0f172a; line-height:1.28;">${escPrj(p.clientName)}</td>
-            <td title="${escPrj(scope)}"><div class="prj-scope-clamp">${p.prevFolioRef ? `<span style="color:#b45309; font-weight:700;">[De N.º ${p.prevFolioRef}]</span> ` : ''}${escPrj(scope)}</div></td>
+            <td title="${escPrj(scope)}"><div class="prj-scope-clamp">${p.prevFolioRef ? `<span style="color:#b45309; font-weight:700;">[De ${escPrj(p.prevFolioCode || ('N.º ' + p.prevFolioRef))}]</span> ` : ''}${escPrj(scope)}</div></td>
             <td>${getProjectStatusBadge(p.status)}</td>
             <td class="prj-money-cell" style="font-weight:700;">${fmtMXN(p.totalAmount)}</td>
             <td class="prj-money-cell" style="color:${p.paidAmount > 0 ? '#15803d' : '#64748b'}; font-weight:700;">${paidTxt}</td>
@@ -16426,11 +16538,12 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function createNewProjectAccount() {
-      const nextFolio = getNextProjectFolio();
+      const { folioCode, folioNum } = reserveNextUnifiedFolio();
       const today = new Date().toISOString().slice(0, 10);
       const np = recomputeProjectTotals({
-        id: 'prj-' + nextFolio + '-' + Date.now().toString(36),
-        folioNum: nextFolio,
+        id: 'prj-' + folioNum + '-' + Date.now().toString(36),
+        folioNum,
+        folioCode,
         date: today,
         clientName: '',
         clientPhone: '',
@@ -16469,7 +16582,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       document.getElementById('prj-det-ai-preview').style.display = 'none';
       document.getElementById('prj-det-ai-input').value = '';
 
-      document.getElementById('prj-det-folio-pill').textContent = `N.º ${p.folioNum}`;
+      document.getElementById('prj-det-folio-pill').textContent = getProjectDisplayFolio(p);
       document.getElementById('prj-det-folio').value = p.folioNum;
       document.getElementById('prj-det-date').value = p.date || new Date().toISOString().slice(0, 10);
       document.getElementById('prj-det-client').value = p.clientName || '';
@@ -16552,7 +16665,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         return;
       }
       p.folioNum = newNum;
-      document.getElementById('prj-det-folio-pill').textContent = `N.º ${newNum}`;
+      if (p.folioCode && /^(?:COT|NV)(?:-([A-Z0-9]+))?-(\d{4})-(\d+)$/i.test(p.folioCode)) {
+        p.folioCode = p.folioCode.replace(/-\d+$/, '-' + String(newNum).padStart(3, '0'));
+        bumpFolioSeq(p.folioCode);
+      }
+      document.getElementById('prj-det-folio-pill').textContent = getProjectDisplayFolio(p);
       onProjectMetaChanged();
     }
 
@@ -16801,7 +16918,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const payPhrase = lastPay ? `, integrando las últimas partidas y aplicando tu abono de ${fmtMXN(lastPay.amount)} MXN` : '';
       const lines = [];
       lines.push(`Estimado ${firstName}, buenas tardes.`);
-      lines.push(`Te comparto tu estado de cuenta actualizado (Nota N.º ${p.folioNum}) por parte de Gaso Ingeniería${payPhrase}:`);
+      lines.push(`Te comparto tu estado de cuenta actualizado (${getProjectDisplayFolio(p)}) por parte de Gaso Ingeniería${payPhrase}:`);
       lines.push('');
       lines.push(`📝 RESUMEN DE TRABAJOS EJECUTADOS (${p.items.length} PARTIDAS):`);
       p.items.forEach(it => {
@@ -17004,10 +17121,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       let target = mode === 'detail' ? getActiveProject() : (parsed.targetProjectId ? projectsHistory.find(x => x.id === parsed.targetProjectId) : null);
 
       if (!target) {
-        const nextFolio = getNextProjectFolio();
+        const { folioCode, folioNum } = reserveNextUnifiedFolio();
         target = {
-          id: 'prj-' + nextFolio + '-' + Date.now().toString(36),
-          folioNum: nextFolio,
+          id: 'prj-' + folioNum + '-' + Date.now().toString(36),
+          folioNum,
+          folioCode,
           date: new Date().toISOString().slice(0, 10),
           clientName: (parsed.clientName || 'Cliente Nuevo').trim(),
           clientPhone: '',
@@ -17217,9 +17335,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         roundRect(metaX, curY, metaBoxW, 56, 12, '#023e8a', null);
         ctx.fillStyle = '#023e8a'; ctx.fillRect(metaX, curY + 40, metaBoxW, 16);
         ctx.font = '800 17px -apple-system, sans-serif'; ctx.fillStyle = '#ffffff';
-        ctx.fillText('ESTADO DE CUENTA Y NOTA DE SERVICIO', metaX + 16, curY + 35);
-        ctx.font = '900 28px -apple-system, sans-serif'; ctx.fillStyle = '#0f172a';
-        ctx.fillText(`N.º ${p.folioNum}`, metaX + 18, curY + 98);
+        ctx.fillText('ESTADO DE CUENTA Y PROYECTO', metaX + 16, curY + 35);
+        ctx.font = '900 25px -apple-system, sans-serif'; ctx.fillStyle = '#0f172a';
+        ctx.fillText(getProjectDisplayFolio(p), metaX + 18, curY + 98);
         ctx.font = '600 17px -apple-system, sans-serif'; ctx.fillStyle = '#334155';
         ctx.fillText(`Fecha: ${fmtLongDateEs(p.date)}`, metaX + 18, curY + 134);
         ctx.font = '700 17px -apple-system, sans-serif'; ctx.fillStyle = '#0369a1';
@@ -17382,13 +17500,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           const sctx = snap.getContext('2d');
           sctx.fillStyle = '#ffffff'; sctx.fillRect(0, H - PAGE_FOOT_H, W, PAGE_FOOT_H);
           sctx.textAlign = 'center'; sctx.font = '700 16px -apple-system, sans-serif'; sctx.fillStyle = '#64748b';
-          sctx.fillText(`GASO INGENIERÍA · Estado de Cuenta N.º ${p.folioNum} · Página ${i + 1} de ${totalP}`, W / 2, H - 15);
+          sctx.fillText(`GASO INGENIERÍA · Estado de Cuenta ${getProjectDisplayFolio(p)} · Página ${i + 1} de ${totalP}`, W / 2, H - 15);
           return { jpegDataUrl: snap.toDataURL('image/jpeg', 0.96), width: W, height: H, texts: pageTextsList[i] || [], links: pageLinksList[i] || [] };
         });
 
         const blob = buildPDFBytesFromJpegPages(pdfPages);
         const safeClient = (p.clientName || 'Cliente').replace(/[^a-zA-Z0-9_-]+/g, '_');
-        const fname = `Estado_Cuenta_N${p.folioNum}_${safeClient}.pdf`;
+        const safeFolio = getProjectDisplayFolio(p).replace(/[^a-zA-Z0-9_-]+/g, '_');
+        const fname = `Estado_Cuenta_${safeFolio}_${safeClient}.pdf`;
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = fname;
         document.body.appendChild(a); a.click(); a.remove();
@@ -17424,16 +17543,18 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         return;
       }
       recomputeProjectTotals(p);
-      const nextFolio = getNextProjectFolio();
+      const { folioCode: nextFolioCode, folioNum: nextFolio } = reserveNextUnifiedFolio();
+      const curDisp = getProjectDisplayFolio(p);
       const carry = Math.max(0, p.balanceAmount || 0);
       const msg = carry > 0
-        ? `¿Hacer corte en la Nota N.º ${p.folioNum}?\n\n• La Nota N.º ${p.folioNum} quedará guardada como "Corte Cerrado" con sus ${p.items.length} partidas y ${p.payments.length} abonos.\n• Se abrirá la NUEVA Nota N.º ${nextFolio} para ${p.clientName || 'este cliente'} iniciando con:\n  "Saldo Nota Anterior (N.º ${p.folioNum}): ${fmtMXN(carry)} MXN".`
-        : `La Nota N.º ${p.folioNum} tiene saldo $0.00. ¿Deseas cerrarla como "Corte Cerrado" y abrir una nueva Nota N.º ${nextFolio} en limpio?`;
+        ? `¿Hacer corte en ${curDisp}?\n\n• ${curDisp} quedará guardado como "Corte Cerrado" con sus ${p.items.length} partidas y ${p.payments.length} abonos.\n• Se abrirá la NUEVA cuenta ${nextFolioCode} para ${p.clientName || 'este cliente'} iniciando con:\n  "Saldo Anterior (${curDisp}): ${fmtMXN(carry)} MXN".`
+        : `${curDisp} tiene saldo $0.00. ¿Deseas cerrarlo como "Corte Cerrado" y abrir ${nextFolioCode} en limpio?`;
       if (!confirm(msg)) return;
 
       const now = Date.now();
       p.status = 'Corte Cerrado';
       p.closedToFolio = nextFolio;
+      p.closedToFolioCode = nextFolioCode;
       p.carriedOverBalance = carry;
       p._u = now;
       recomputeProjectTotals(p);
@@ -17441,12 +17562,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const newNote = recomputeProjectTotals({
         id: 'prj-' + nextFolio + '-' + now.toString(36),
         folioNum: nextFolio,
+        folioCode: nextFolioCode,
         date: new Date().toISOString().slice(0, 10),
         clientName: p.clientName || '',
         clientPhone: p.clientPhone || '',
-        concept: `Continuación de cuenta (Corte Nota N.º ${p.folioNum})${carry > 0 ? ' — Saldo anterior: ' + fmtMXN(carry) : ''}`,
+        concept: `Continuación de cuenta (Corte ${curDisp})${carry > 0 ? ' — Saldo anterior: ' + fmtMXN(carry) : ''}`,
         status: carry > 0 ? 'En ejecución / Con saldo' : 'En ejecución / Por cobrar',
         prevFolioRef: p.folioNum,
+        prevFolioCode: curDisp,
         prevBalanceAmount: carry,
         useIva: !!p.useIva,
         useResico: !!p.useResico,
@@ -17456,7 +17579,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       });
 
       projectsHistory.push(newNote);
-      persistProjects(`✂️ Corte realizado: Nota N.º ${p.folioNum} cerrada → Nueva Nota N.º ${nextFolio} abierta.`);
+      persistProjects(`✂️ Corte realizado: ${curDisp} cerrado → Nuevo folio ${nextFolioCode} abierto.`);
       openProjectDetail(newNote.id);
     }
 
@@ -17468,12 +17591,29 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         showToast('Agrega al menos una partida o saldo antes de pasar a Nota de Venta.');
         return;
       }
-      if (!confirm(`¿Pasar el Proyecto N.º ${p.folioNum} (${p.clientName || 'Cliente'}) al Cotizador como Nota de Venta oficial (NV)?\n\nPodrás aplicar sellos oficiales, firma del cliente y descargar el PDF formato NV.`)) return;
+      const dispFolio = getProjectDisplayFolio(p);
+      if (!confirm(`¿Pasar el Proyecto ${dispFolio} (${p.clientName || 'Cliente'}) al Cotizador como Nota de Venta oficial (NV)?\n\nSe conservará la misma marca de folio para sellos oficiales, firma del cliente y PDF formato NV.`)) return;
 
       startNewQuote();
       QUOTE_AUTOSAVE.suppress = true;
-      document.getElementById('quote-status').value = 'sales_note';
-      handleStatusChange();
+      const baseCotFolio = (p.refCotFolio || p.folioCode || '').trim();
+      const matchedParsed = parseQuoteFolioParts(baseCotFolio);
+      if (matchedParsed) {
+        const prefix = matchedParsed.series ? `NV-${matchedParsed.series}-` : 'NV-';
+        const nvFolio = `${prefix}${matchedParsed.year}-${String(matchedParsed.seq).padStart(3, '0')}`;
+        const cotRef = `${matchedParsed.series ? 'COT-' + matchedParsed.series + '-' : 'COT-'}${matchedParsed.year}-${String(matchedParsed.seq).padStart(3, '0')}`;
+        document.getElementById('quote-number').value = cotRef;
+        if (document.getElementById('ref-cot-folio')) document.getElementById('ref-cot-folio').textContent = cotRef;
+        currentLoadedQuoteNumber = cotRef;
+        // Sincronizar también en quotesHistory si no existía aún
+        document.getElementById('quote-status').value = 'sales_note';
+        handleStatusChange();
+        document.getElementById('quote-number').value = nvFolio;
+        currentLoadedQuoteNumber = nvFolio;
+      } else {
+        document.getElementById('quote-status').value = 'sales_note';
+        handleStatusChange();
+      }
 
       document.getElementById('client-name').value = p.clientName || 'VENTA AL PÚBLICO EN GENERAL';
       if (p.clientPhone) document.getElementById('client-phone').value = p.clientPhone;
@@ -17655,7 +17795,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const useIva = !!(q.billingWithInvoice !== false && rawItems.some(it => it.applyIva !== false));
       const useResico = !!(useIva && q.clientType === 'moral' && q.resicoRet);
       const today = new Date().toISOString().slice(0, 10);
-      const nextFolio = getNextProjectFolio();
+      const parsedFolio = parseQuoteFolioParts(q.number) || parseQuoteFolioParts(q.refCotFolio);
+      const folioCode = (q.number && String(q.number).trim()) || computeNextFolio();
+      const folioNum = parsedFolio ? parsedFolio.seq : getNextProjectFolio();
+      bumpFolioSeq(folioCode);
 
       const payments = [];
       let status = 'En ejecución / Por cobrar';
@@ -17690,8 +17833,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         + (prjItems.length > 3 ? ` (+${prjItems.length - 3} partidas)` : '');
 
       const newPrj = recomputeProjectTotals({
-        id: 'prj-' + nextFolio + '-' + Date.now().toString(36),
-        folioNum: nextFolio,
+        id: 'prj-' + folioCode.replace(/[^a-zA-Z0-9_-]/g, '') + '-' + Date.now().toString(36),
+        folioNum,
+        folioCode,
         date: q.date || today,
         clientName,
         clientPhone: (q.client && q.client.phone) || '',
@@ -17717,7 +17861,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       q.updatedAt = new Date().toISOString();
       safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
 
-      persistProjects(`🚀 Cotización ${q.number} convertida al Proyecto N.º ${newPrj.folioNum} (Cuentas por Cobrar).`);
+      persistProjects(`🚀 Cotización ${q.number} convertida al Proyecto ${folioCode} (Cuentas por Cobrar).`);
       try { recomputeAllCRMStats(); } catch (e) {}
       try { refreshCRMViews(); } catch (e) {}
 
@@ -17762,6 +17906,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         projectsHistory = [];
         safeStorage.setItem('gaso_projects_seeded_v1', 'true');
         safeStorage.setItem('gaso_projects_seeded_v2', 'true');
+        safeStorage.setItem('gaso_folios_aligned_v1', 'true');
         safeStorage.setItem('gaso_project_next_min', String(startFolio));
         safeStorage.setItem('gaso_projects_history', '[]');
         try {
@@ -17778,23 +17923,24 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         closeProjectDetail();
         showToast(`🔄 Control reiniciado en limpio. Siguiente folio: N.º ${startFolio}.`);
       } else if (mode === 'seed') {
-        if (!confirm('¿Restaurar tus 6 proyectos iniciales (350 al 358) con sus desgloses completos?')) return;
+        if (!confirm('¿Cargar los 6 proyectos de ejemplo alineados al consecutivo de cotizaciones?')) return;
         const seeds = buildSeedProjects();
         projectsHistory = seeds;
         safeStorage.removeItem('gaso_project_next_min');
         safeStorage.setItem('gaso_projects_seeded_v1', 'true');
         safeStorage.setItem('gaso_projects_seeded_v2', 'true');
-        safeStorage.setItem('gaso_projects_history', JSON.stringify(seeds));
+        alignProjectsToUnifiedFolios(true);
+        const nextF = getNextProjectFolio();
         try {
           await fetch('/crm', {
             method: 'POST', credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ op: 'reset-projects', startFolio: 359, projects: seeds })
+            body: JSON.stringify({ op: 'reset-projects', startFolio: nextF, projects: projectsHistory })
           });
         } catch (e) {}
         closeModal('modal-reset-projects');
         closeProjectDetail();
-        showToast('📥 Proyectos base 350–358 restaurados.');
+        showToast('📥 Proyectos de ejemplo cargados y alineados al folio de cotizaciones.');
       }
     }
 

@@ -39,6 +39,8 @@ function sanitizeProjectForClient(p) {
   return {
     id: String(p.id || ""),
     folioNum: parseInt(p.folioNum, 10) || 0,
+    folioCode: String(p.folioCode || ""),
+    refCotFolio: String(p.refCotFolio || ""),
     date: String(p.date || ""),
     clientName: String(p.clientName || ""),
     concept: String(p.concept || ""),

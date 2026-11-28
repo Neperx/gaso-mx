@@ -226,7 +226,7 @@
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.65rem;">
             <div>
-              <div style="font-size:1.05rem; font-weight:900; color:#023e8a;">Nota de Servicio N.º ${p.folioNum}</div>
+              <div style="font-size:1.05rem; font-weight:900; color:#023e8a;">Proyecto / Estado de Cuenta ${esc(p.folioCode || ("N.º " + p.folioNum))}</div>
               <div class="muted">Fecha: ${esc(p.date)}</div>
             </div>
             <div>${statusBadge(p.status)}</div>
