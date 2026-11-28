@@ -1659,6 +1659,30 @@
 
   
     /* ========================================================= */
+    /* CUENTAS ACTIVAS, PROYECTOS & COBRANZA IA                  */
+    /* ========================================================= */
+    .prj-container { max-width: 1260px; margin: 0 auto; padding: 0.75rem 0.5rem 2.5rem; }
+    .prj-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+    .prj-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; margin-bottom: 1rem; }
+    .prj-kpi-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 10px; padding: 0.9rem 1rem; box-shadow: var(--shadow-sm); }
+    .prj-kpi-label { font-size: 0.74rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.4px; }
+    .prj-kpi-val { font-size: 1.45rem; font-weight: 900; margin-top: 0.25rem; color: var(--gray-900); }
+    .prj-kpi-sub { font-size: 0.72rem; color: var(--gray-500); margin-top: 0.2rem; }
+    .prj-ai-box { background: linear-gradient(135deg, #f0f9ff 0%, #eff6ff 100%); border: 1.5px solid #93c5fd; border-radius: 12px; padding: 0.95rem 1.05rem; margin-bottom: 1rem; }
+    .prj-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 1rem 1.15rem; box-shadow: var(--shadow-sm); margin-bottom: 1rem; }
+    .prj-pill-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+    .prj-pill { padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--gray-300); background: #fff; color: var(--gray-700); font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+    .prj-pill.active { background: #023e8a; color: #fff; border-color: #023e8a; }
+    .prj-status-badge { display: inline-block; padding: 0.22rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; }
+    .prj-table-wrap { overflow-x: auto; border: 1px solid var(--gray-200); border-radius: 10px; background: #fff; }
+    .prj-detail-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1rem; align-items: start; }
+    .prj-wa-preview { background: #ecfdf5; border: 1px solid #86efac; border-radius: 10px; padding: 0.85rem; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.8rem; white-space: pre-wrap; line-height: 1.45; color: #064e3b; max-height: 360px; overflow-y: auto; }
+    @media (max-width: 900px) {
+      .prj-detail-grid { grid-template-columns: 1fr; }
+      .bottom-nav-item { font-size: 0.62rem !important; }
+    }
+
+    /* ========================================================= */
     /* DIRECT PDF EXPORT MODE (.exporting-pdf-mode)              */
     /* ========================================================= */
     .quote-paper.exporting-pdf-mode {
@@ -3475,6 +3499,11 @@
           Dashboard
         </button>
 
+        <button class="nav-tab-btn" id="tab-btn-projects" onclick="switchTab('projects')" style="border:1px solid rgba(56, 189, 248, 0.35); color:#bae6fd;" title="Cuentas Activas, Estados de Cuenta y Cobranza IA">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+          Cuentas (<span id="projects-badge-count">0</span>)
+        </button>
+
         <button class="nav-tab-btn" id="tab-btn-stores" onclick="switchTab('stores')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           Tiendas
@@ -4089,6 +4118,241 @@ CLABE: 722969010514249300</textarea>
     <!-- =================================================================== -->
     <div class="tab-pane" id="pane-dashboard">
       <div id="dash-root"></div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3B: CUENTAS ACTIVAS, NOTAS DE SERVICIO Y COBRANZA IA            -->
+    <!-- =================================================================== -->
+    <div class="tab-pane" id="pane-projects">
+      <div class="prj-container">
+        <!-- VISTA 1: CONTROL GENERAL DE PROYECTOS ACTIVOS -->
+        <div id="projects-list-view">
+          <div class="prj-header">
+            <div>
+              <h2 style="font-size:1.35rem; color:var(--gray-900); margin:0;">📋 Control General de Proyectos Activos y Cobranza</h2>
+              <p style="font-size:0.84rem; color:var(--gray-500); margin:0.2rem 0 0;">Cuentas abiertas por proyecto, partidas acumuladas con IA, historial multi-abono, WhatsApp de cobro y Estado de Cuenta PDF.</p>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="openLaborCatalogModal()" title="Administrar tabulador rápido de precios de mano de obra">
+                ⚡ Tabulador Mano de Obra
+              </button>
+              <button type="button" class="btn btn-primary" onclick="createNewProjectAccount()" style="background:#023e8a; border-color:#023e8a; font-weight:800;">
+                + Nuevo Proyecto / Cuenta
+              </button>
+            </div>
+          </div>
+
+          <!-- KPIs Cartera -->
+          <div class="prj-kpi-grid" id="prj-kpi-grid"></div>
+
+          <!-- Alerta proactiva de cobranza / oportunidades de ingresos -->
+          <div id="prj-collection-alerts" style="display:none; margin-bottom:1rem;"></div>
+
+          <!-- Asistente IA Global: Nota rápida -> Proyecto / Partidas / Abonos -->
+          <div class="prj-ai-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+              <div style="font-weight:800; font-size:0.92rem; color:#1e3a8a; display:flex; align-items:center; gap:0.4rem;">
+                🤖 Generador Rápido con IA (Nota o Dictado → Partidas y Abonos)
+              </div>
+              <span style="font-size:0.72rem; color:#0369a1; font-weight:700;">Redacción técnica automática + actualización de saldo</span>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:flex-end;">
+              <textarea id="prj-global-ai-input" class="form-input no-uppercase" rows="2" style="flex:1; min-width:240px; background:#fff; font-size:0.86rem;" placeholder="Ej: Fernando Cantero: instalé lámpara sensor 360 y 4m conduit en $650, mantenimiento CPU pasta térmica $450, y me abonó hoy $3,000. O: Nuevo proyecto para Juan Pérez: 2 cámaras PTZ a $650 c/u y cableado $400."></textarea>
+              <button type="button" class="btn btn-primary" id="btn-prj-global-ai" onclick="parseProjectAINote('global')" style="background:linear-gradient(135deg,#0284c7,#1d4ed8); border:none; font-weight:800; padding:0.6rem 1rem; white-space:nowrap;">
+                ✨ Procesar Nota IA
+              </button>
+            </div>
+            <div id="prj-global-ai-preview" style="display:none; margin-top:0.75rem;"></div>
+          </div>
+
+          <!-- Filtros y búsqueda -->
+          <div class="prj-card" style="padding:0.75rem 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+              <div class="prj-pill-bar" id="prj-filter-pills">
+                <button type="button" class="prj-pill active" data-filter="all" onclick="setProjectFilter('all')">Todos</button>
+                <button type="button" class="prj-pill" data-filter="pending" onclick="setProjectFilter('pending')">💰 Con Saldo Pendiente</button>
+                <button type="button" class="prj-pill" data-filter="exec_due" onclick="setProjectFilter('exec_due')">🚨 Ejecutado / Por Cobrar</button>
+                <button type="button" class="prj-pill" data-filter="quoted" onclick="setProjectFilter('quoted')">📝 Cotizados</button>
+                <button type="button" class="prj-pill" data-filter="paid" onclick="setProjectFilter('paid')">✅ Liquidados</button>
+              </div>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="prj-search-input" class="form-input no-uppercase" oninput="renderProjectsDashboard()" placeholder="🔍 Buscar N.º, cliente o alcance..." style="min-width:220px; font-size:0.82rem; padding:0.4rem 0.65rem;">
+                <select id="prj-sort-select" class="form-input" onchange="renderProjectsDashboard()" style="font-size:0.82rem; padding:0.4rem 0.6rem; font-weight:700;">
+                  <option value="folio_asc">Orden: Folio N.º ↑</option>
+                  <option value="folio_desc">Orden: Folio N.º ↓</option>
+                  <option value="balance_desc">Mayor Saldo Pendiente</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla Control General -->
+          <div class="prj-table-wrap">
+            <table class="crm-table" style="width:100%; font-size:0.82rem;">
+              <thead>
+                <tr>
+                  <th style="width:68px; text-align:center;">N.º</th>
+                  <th style="min-width:155px;">Cliente / Proyecto</th>
+                  <th style="min-width:250px;">Alcance Principal</th>
+                  <th style="width:145px;">Estatus</th>
+                  <th style="text-align:right; width:115px;">Monto Total</th>
+                  <th style="text-align:right; width:115px;">Abonos / A cuenta</th>
+                  <th style="text-align:right; width:120px;">Saldo Pendiente</th>
+                  <th style="text-align:center; width:175px;">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="prj-list-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VISTA 2: ESTADO DE CUENTA Y NOTA DE SERVICIO CONSOLIDADA -->
+        <div id="projects-detail-view" style="display:none;">
+          <div class="prj-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.65rem; background:#f8fafc;">
+            <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="closeProjectDetail()" style="font-weight:800;">← Volver al Control General</button>
+              <span id="prj-det-folio-pill" style="background:#0f172a; color:#fff; padding:0.32rem 0.75rem; border-radius:8px; font-weight:900; font-size:0.9rem;">N.º 353</span>
+              <select id="prj-det-status" class="form-input" onchange="onProjectMetaChanged()" style="font-size:0.82rem; font-weight:800; padding:0.35rem 0.6rem;">
+                <option value="Cotizado">📝 Cotizado</option>
+                <option value="En ejecución / Con saldo">🔧 En ejecución / Con saldo</option>
+                <option value="En ejecución / Por cobrar">⏳ En ejecución / Por cobrar</option>
+                <option value="Ejecutado / Por cobrar">🚨 Ejecutado / Por cobrar</option>
+                <option value="Liquidado">✅ Liquidado</option>
+                <option value="Cancelado">⛔ Cancelado</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="saveActiveProjectNow(true)" style="font-weight:700; color:#15803d; border-color:#86efac;">💾 Guardar</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="openProjectMercadoPago()" style="font-weight:700; color:#0284c7; border-color:#7dd3fc;">💳 Link Mercado Pago</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="openProjectWhatsApp(null, true)" style="font-weight:700; color:#16a34a; border-color:#86efac;">📲 WhatsApp</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-prj-export-pdf" onclick="exportProjectPDF()" style="background:#023e8a; border-color:#023e8a; font-weight:800;">📥 Descargar PDF</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="deleteActiveProject()" style="color:#dc2626; border-color:#fca5a5;" title="Eliminar proyecto">🗑️</button>
+            </div>
+          </div>
+
+          <!-- Encabezado y Opciones Fiscales (Opcionales) -->
+          <div class="prj-card">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:0.75rem; margin-bottom:0.75rem;">
+              <div>
+                <label style="font-size:0.75rem; font-weight:700; color:var(--gray-600); display:block; margin-bottom:0.2rem;">N.º Folio Consecutivo:</label>
+                <input type="number" id="prj-det-folio" class="form-input no-uppercase" onchange="onProjectFolioChanged()" min="1" step="1" style="width:100%; font-weight:800;">
+              </div>
+              <div>
+                <label style="font-size:0.75rem; font-weight:700; color:var(--gray-600); display:block; margin-bottom:0.2rem;">Fecha del Estado de Cuenta:</label>
+                <input type="date" id="prj-det-date" class="form-input" onchange="onProjectMetaChanged()" style="width:100%;">
+              </div>
+              <div>
+                <label style="font-size:0.75rem; font-weight:700; color:var(--gray-600); display:block; margin-bottom:0.2rem;">Cliente:</label>
+                <input type="text" id="prj-det-client" list="prj-crm-clients-datalist" class="form-input no-uppercase" oninput="onProjectClientInput()" onchange="onProjectMetaChanged()" placeholder="Nombre del cliente..." style="width:100%; font-weight:700;">
+                <datalist id="prj-crm-clients-datalist"></datalist>
+              </div>
+              <div>
+                <label style="font-size:0.75rem; font-weight:700; color:var(--gray-600); display:block; margin-bottom:0.2rem;">WhatsApp / Teléfono:</label>
+                <input type="text" id="prj-det-phone" class="form-input no-uppercase" onchange="onProjectMetaChanged()" placeholder="Ej. 2221234567" style="width:100%;">
+              </div>
+            </div>
+            <div style="margin-bottom:0.75rem;">
+              <label style="font-size:0.75rem; font-weight:700; color:var(--gray-600); display:block; margin-bottom:0.2rem;">Concepto / Alcance Principal del Proyecto:</label>
+              <textarea id="prj-det-concept" class="form-input no-uppercase" rows="2" onchange="onProjectMetaChanged()" placeholder="Ej. Servicios Integrales de Telecomunicaciones RF, Redes Wi-Fi, Videovigilancia..." style="width:100%; font-size:0.84rem;"></textarea>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; padding-top:0.5rem; border-top:1px dashed var(--gray-200);">
+              <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center; font-size:0.8rem;">
+                <label style="display:inline-flex; align-items:center; gap:0.35rem; font-weight:700; color:#0f172a; cursor:pointer;">
+                  <input type="checkbox" id="prj-det-use-iva" onchange="onProjectMetaChanged()"> 🧾 Con Factura (+16% IVA opcional)
+                </label>
+                <label id="prj-det-resico-wrap" style="display:none; align-items:center; gap:0.35rem; font-weight:700; color:#b45309; cursor:pointer;">
+                  <input type="checkbox" id="prj-det-use-resico" onchange="onProjectMetaChanged()"> Ret. ISR RESICO (-1.25%)
+                </label>
+              </div>
+              <div id="prj-det-mp-badge" style="display:none; font-size:0.76rem; background:#ecfdf5; border:1px solid #86efac; color:#15803d; padding:0.25rem 0.6rem; border-radius:6px; font-weight:700;"></div>
+            </div>
+          </div>
+
+          <!-- Asistente IA dentro del Proyecto -->
+          <div class="prj-ai-box">
+            <div style="font-weight:800; font-size:0.86rem; color:#1e3a8a; margin-bottom:0.4rem;">
+              🤖 Agregar avances o abonos por nota rápida a este proyecto:
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:flex-end;">
+              <textarea id="prj-det-ai-input" class="form-input no-uppercase" rows="2" style="flex:1; min-width:220px; background:#fff; font-size:0.84rem;" placeholder="Ej: Agregué instalación de 2 apagadores smart en $400 c/u y me dio un abono en efectivo de $1,500 hoy."></textarea>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-prj-det-ai" onclick="parseProjectAINote('detail')" style="background:#1d4ed8; border-color:#1d4ed8; font-weight:800; padding:0.55rem 0.9rem;">
+                ✨ Interpretar y Sumar
+              </button>
+            </div>
+            <div id="prj-det-ai-preview" style="display:none; margin-top:0.65rem;"></div>
+          </div>
+
+          <!-- 1. DETALLE TÉCNICO Y DESGLOSE DE PARTIDAS -->
+          <div class="prj-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+              <h3 style="margin:0; font-size:1rem; color:#023e8a;">1. DETALLE TÉCNICO Y DESGLOSE DE PARTIDAS (<span id="prj-det-items-count">0</span> SERVICIOS)</h3>
+              <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openLaborCatalogModal(true)" style="font-weight:700; color:#0369a1; border-color:#7dd3fc;">
+                  ⚡ Tabulador Rápido
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="addProjectItem()" style="background:#023e8a; border-color:#023e8a; font-weight:700;">
+                  + Agregar Partida
+                </button>
+              </div>
+            </div>
+            <div class="prj-table-wrap">
+              <table class="crm-table" style="width:100%; font-size:0.8rem;">
+                <thead>
+                  <tr>
+                    <th style="width:52px; text-align:center;">N.º</th>
+                    <th style="min-width:280px;">Título y Descripción del Servicio Técnico</th>
+                    <th style="width:74px; text-align:center;">Cant.</th>
+                    <th style="width:78px; text-align:center;">Unidad</th>
+                    <th style="width:110px; text-align:right;">P. Unitario</th>
+                    <th style="width:115px; text-align:right;">Importe Total</th>
+                    <th style="width:92px; text-align:center;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="prj-det-items-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 2. HISTORIAL DE ABONOS + WHATSAPP ACTUALIZADO -->
+          <div class="prj-detail-grid">
+            <!-- Historial de abonos y balance -->
+            <div class="prj-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+                <h3 style="margin:0; font-size:0.98rem; color:#023e8a;">2. CONTROL FINANCIERO E HISTORIAL DE ABONOS</h3>
+                <button type="button" class="btn btn-primary btn-sm" onclick="addProjectPayment()" style="background:#16a34a; border-color:#16a34a; font-weight:700;">
+                  + Registrar Abono
+                </button>
+              </div>
+              <div class="prj-table-wrap" style="margin-bottom:0.85rem;">
+                <table class="crm-table" style="width:100%; font-size:0.79rem;">
+                  <thead>
+                    <tr>
+                      <th style="width:128px;">Fecha</th>
+                      <th>Concepto del Movimiento</th>
+                      <th style="width:115px; text-align:right;">Importe</th>
+                      <th style="width:46px; text-align:center;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="prj-det-payments-tbody"></tbody>
+                </table>
+              </div>
+              <div id="prj-det-totals-box" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:0.85rem 1rem; font-size:0.84rem;"></div>
+            </div>
+
+            <!-- WhatsApp actualizado -->
+            <div class="prj-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.65rem;">
+                <h3 style="margin:0; font-size:0.98rem; color:#15803d;">📲 MENSAJE DE WHATSAPP ACTUALIZADO</h3>
+                <div style="display:flex; gap:0.4rem;">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="copyProjectWhatsApp()" style="font-weight:700;">📋 Copiar</button>
+                  <button type="button" class="btn btn-primary btn-sm" onclick="openProjectWhatsApp(null, true)" style="background:#16a34a; border-color:#16a34a; font-weight:700;">📲 Enviar WA</button>
+                </div>
+              </div>
+              <div class="prj-wa-preview" id="prj-det-wa-preview"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- =================================================================== -->
@@ -4987,6 +5251,11 @@ CLABE: 722969010514249300</textarea>
       <span>Dashboard</span>
     </button>
 
+    <button type="button" class="bottom-nav-item" id="bnav-btn-projects" onclick="switchTab('projects')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+      <span>Cuentas</span>
+    </button>
+
     <button type="button" class="bottom-nav-item" id="bnav-btn-vault" onclick="switchTab('vault')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>
       <span>Caja Fuerte</span>
@@ -5006,6 +5275,9 @@ CLABE: 722969010514249300</textarea>
       <button type="button" onclick="closeMobileMoreMenu()" style="border:none; background:none; font-size:1.2rem; color:#64748b;">✕</button>
     </div>
     <div style="display:flex; flex-direction:column; gap:0.35rem; padding-top:0.6rem;">
+      <button type="button" class="mobile-more-btn" id="bnav-more-projects" onclick="closeMobileMoreMenu(); switchTab('projects')" style="color:#023e8a; background:#eff6ff; font-weight:800;">
+        📋 Cuentas Activas y Cobranza IA
+      </button>
       <button type="button" class="mobile-more-btn" id="btn-mobile-more-bio" onclick="handleMobileMoreBioClick()" style="color:#0284c7; font-weight:700;">
         👆 Configurar Huella Digital (Teléfono)
       </button>
@@ -5128,6 +5400,31 @@ CLABE: 722969010514249300</textarea>
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TABULADOR RÁPIDO DE MANO DE OBRA GASO -->
+  <div class="modal-backdrop no-print" id="modal-labor-catalog" style="display:none;">
+    <div class="modal-box" style="max-width:720px; background:#ffffff; border-radius:14px; overflow:hidden;">
+      <div class="modal-header" style="background:#023e8a; color:#ffffff;">
+        <div>
+          <h3 style="color:#ffffff; margin:0; font-size:1.05rem;">⚡ Tabulador Rápido de Mano de Obra GASO</h3>
+          <div style="font-size:0.74rem; color:#bae6fd;">Precios base estandarizados para cotizar e ingresar servicios en 1 clic sin cobrar de menos</div>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-labor-catalog')" style="color:#ffffff;">✕</button>
+      </div>
+      <div class="modal-body" style="padding:1rem; max-height:72vh; overflow-y:auto;">
+        <div style="display:grid; grid-template-columns:1.2fr 1.8fr 0.7fr auto; gap:0.4rem; margin-bottom:0.85rem; background:#f8fafc; padding:0.65rem; border-radius:8px; border:1px solid #e2e8f0;">
+          <input type="text" id="lc-new-title" class="form-input no-uppercase" placeholder="Servicio (ej. Cámara PT Wi-Fi)" style="font-size:0.8rem;">
+          <input type="text" id="lc-new-desc" class="form-input no-uppercase" placeholder="Descripción técnica..." style="font-size:0.8rem;">
+          <input type="number" id="lc-new-price" class="form-input" placeholder="Precio $" min="0" step="10" style="font-size:0.8rem;">
+          <button type="button" class="btn btn-primary btn-sm" onclick="addLaborCatalogEntry()" style="background:#16a34a; border-color:#16a34a; font-weight:700;">+ Guardar</button>
+        </div>
+        <div id="labor-catalog-list" style="display:flex; flex-direction:column; gap:0.45rem;"></div>
+      </div>
+      <div class="modal-footer" style="padding:0.75rem 1rem; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-labor-catalog')">Cerrar</button>
+      </div>
     </div>
   </div>
 
@@ -5480,6 +5777,8 @@ CLABE: 722969010514249300</textarea>
     let exchangeRate = 19.80; // USD to MXN
     let quotesHistory = [];
     let crmClients = [];
+    let projectsHistory = [];
+    let laborCatalog = [];
     let storeProducts = [];
 
     /* Captura uniforme: todo texto de formularios se guarda en MAYÚSCULAS (es-MX). */
@@ -6009,6 +6308,10 @@ CLABE: 722969010514249300</textarea>
         showToast("Tu rol tiene acceso únicamente al Cotizador y Catálogo.");
         return;
       }
+      if (tabName === 'projects' && currentAuthUser && currentAuthUser.role === 'COTIZADOR') {
+        showToast("Acceso restringido a Superusuario y Ventas.");
+        return;
+      }
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -6023,6 +6326,9 @@ CLABE: 722969010514249300</textarea>
 
       if (tabName === 'crm' || tabName === 'dashboard') {
         refreshCRMViews();
+      }
+      if (tabName === 'projects') {
+        renderProjectsDashboard();
       }
       if (tabName === 'cotizador') {
         setTimeout(updateQRStamp, 100);
@@ -6090,6 +6396,13 @@ CLABE: 722969010514249300</textarea>
       if (storedClients) {
         try { crmClients = JSON.parse(storedClients); } catch(e) { crmClients = []; }
       }
+
+      const storedProjects = safeStorage.getItem('gaso_projects_history');
+      if (storedProjects) {
+        try { projectsHistory = JSON.parse(storedProjects); } catch(e) { projectsHistory = []; }
+      }
+      try { initLaborCatalog(); } catch(e) {}
+      try { seedInitialProjectsIfNeeded(false); } catch(e) {}
 
       // Cargar catálogos base (Syscom + CT) y únicamente los productos de Tecnosinergia extraídos vía API real
       const customImportedRaw = safeStorage.getItem('gaso_tecno_api_products_v6') || safeStorage.getItem('gaso_tecno_api_products_v5') || safeStorage.getItem('gaso_custom_imported_products_v4');
@@ -8835,10 +9148,12 @@ function updateDashboardKPIs() { renderDashboard(); }
     function cloudStrip(o) { var x = Object.assign({}, o); delete x._u; return JSON.stringify(x); }
     function cloudDiff() {
       var snap = cloudSnapLoad(), first = !snap;
-      snap = snap || { c: {}, q: {} };
+      snap = snap || { c: {}, q: {}, p: {} };
+      var firstP = !snap.p;
+      if (!snap.p) snap.p = {};
       var now = Date.now();
-      var out = { clients: [], quotes: [], delClients: [], delQuotes: [], sentC: {}, sentQ: {} };
-      var seenC = {}, seenQ = {};
+      var out = { clients: [], quotes: [], projects: [], delClients: [], delQuotes: [], delProjects: [], sentC: {}, sentQ: {}, sentP: {} };
+      var seenC = {}, seenQ = {}, seenP = {};
       crmClients.forEach(function(c) {
         if (!c || !c.name) return;
         if (!c.id) c.id = 'cli-' + now + '-' + Math.random().toString(36).slice(2, 6);
@@ -8859,9 +9174,21 @@ function updateDashboardKPIs() { renderDashboard(); }
           out.quotes.push(q); out.sentQ[q.number] = h;
         }
       });
+      (projectsHistory || []).forEach(function(p) {
+        if (!p || !p.id) return;
+        seenP[p.id] = 1;
+        var h = cloudStrip(p);
+        if (snap.p[p.id] !== h) {
+          p._u = now;
+          out.projects.push(p); out.sentP[p.id] = h;
+        }
+      });
       if (!first) {
         Object.keys(snap.c).forEach(function(k) { if (!seenC[k]) out.delClients.push({ key: k, _d: now }); });
         Object.keys(snap.q).forEach(function(k) { if (!seenQ[k]) out.delQuotes.push({ key: k, _d: now }); });
+      }
+      if (!firstP) {
+        Object.keys(snap.p).forEach(function(k) { if (!seenP[k]) out.delProjects.push({ key: k, _d: now }); });
       }
       return out;
     }
@@ -8881,36 +9208,44 @@ function updateDashboardKPIs() { renderDashboard(); }
       try {
         var r = await fetch('/crm', { method: 'POST', credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ op: 'sync', clients: d.clients, quotes: d.quotes, delClients: d.delClients, delQuotes: d.delQuotes }) });
+          body: JSON.stringify({ op: 'sync', clients: d.clients, quotes: d.quotes, projects: d.projects, delClients: d.delClients, delQuotes: d.delQuotes, delProjects: d.delProjects }) });
         if (r.status === 401) { cloudStatus('Sesión expirada: inicia sesión de nuevo', 'err'); return false; }
         var s = null;
         try { s = await r.json(); } catch (e) {}
         if (!r.ok || !s || !s.status) throw new Error((s && s.message) || ('HTTP ' + r.status));
-        var snap = cloudSnapLoad() || { c: {}, q: {} };
+        var snap = cloudSnapLoad() || { c: {}, q: {}, p: {} };
+        if (!snap.p) snap.p = {};
         Object.keys(d.sentC).forEach(function(k) { snap.c[k] = d.sentC[k]; });
         Object.keys(d.sentQ).forEach(function(k) { snap.q[k] = d.sentQ[k]; });
+        Object.keys(d.sentP).forEach(function(k) { snap.p[k] = d.sentP[k]; });
         d.delClients.forEach(function(x) { delete snap.c[x.key]; });
         d.delQuotes.forEach(function(x) { delete snap.q[x.key]; });
+        d.delProjects.forEach(function(x) { delete snap.p[x.key]; });
         cloudSnapSave(snap);
         if (s.folioSeq) window.__cloudFolioSeq = s.folioSeq;
         if (CLOUD.dirty) { clearTimeout(CLOUD.timer); CLOUD.timer = setTimeout(cloudSync, 300); return true; }
         var before = JSON.stringify([crmClients, quotesHistory]);
-        var sc = Array.isArray(s.clients) ? s.clients : [], sq = Array.isArray(s.quotes) ? s.quotes : [];
+        var sc = Array.isArray(s.clients) ? s.clients : [], sq = Array.isArray(s.quotes) ? s.quotes : [], sp = Array.isArray(s.projects) ? s.projects : [];
         crmClients.splice.apply(crmClients, [0, crmClients.length].concat(sc));
         quotesHistory.splice.apply(quotesHistory, [0, quotesHistory.length].concat(sq));
+        projectsHistory.splice.apply(projectsHistory, [0, projectsHistory.length].concat(sp));
+        try { seedInitialProjectsIfNeeded(true); } catch (e) {}
         // Totales del CRM siempre desde cotizaciones (no confiar en lastFolio/totalQuoted guardados en el cliente).
         try { recomputeAllCRMStats(); } catch (e) {}
-        var ns = { c: {}, q: {} };
+        var ns = { c: {}, q: {}, p: {} };
         crmClients.forEach(function(c) { if (c && c.id) ns.c[c.id] = cloudStrip(c); });
         quotesHistory.forEach(function(q) { if (q && q.number) ns.q[q.number] = cloudStrip(q); });
+        projectsHistory.forEach(function(p) { if (p && p.id) ns.p[p.id] = cloudStrip(p); });
         cloudSnapSave(ns);
         safeStorage.setItem('gaso_crm_clients', JSON.stringify(crmClients));
         safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
+        safeStorage.setItem('gaso_projects_history', JSON.stringify(projectsHistory));
         try { refreshCRMViews(); } catch (e) {}
-        // Si el recálculo corrigió totales, súbelos a la nube en el siguiente ciclo.
+        try { updateProjectsBadge(); if (document.getElementById('pane-projects')?.classList.contains('active')) renderProjectsDashboard(); } catch (e) {}
+        // Si el recálculo corrigió totales o sembró proyectos base, súbelos a la nube en el siguiente ciclo.
         try {
           var d2 = cloudDiff();
-          if ((d2.clients && d2.clients.length) || (d2.quotes && d2.quotes.length)) {
+          if ((d2.clients && d2.clients.length) || (d2.quotes && d2.quotes.length) || (d2.projects && d2.projects.length)) {
             clearTimeout(CLOUD.timer);
             CLOUD.timer = setTimeout(cloudSync, 800);
           }
@@ -13046,10 +13381,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       if (btnVault) btnVault.style.display = isSuper ? "inline-flex" : "none";
       const btnDash = document.getElementById("tab-btn-dashboard");
       const btnCrm = document.getElementById("tab-btn-crm");
+      const btnPrj = document.getElementById("tab-btn-projects");
+      const bnavPrj = document.getElementById("bnav-btn-projects");
 
       if (btnUsers) btnUsers.style.display = isSuper ? "inline-flex" : "none";
       if (btnDash) btnDash.style.display = isSuper ? "inline-flex" : "none";
       if (btnCrm) btnCrm.style.display = (isSuper || isVentas) ? "inline-flex" : "none";
+      if (btnPrj) btnPrj.style.display = (isSuper || isVentas) ? "inline-flex" : "none";
+      if (bnavPrj) bnavPrj.style.display = (isSuper || isVentas) ? "flex" : "none";
 
       // Lock issuer fiscal/banking fields if not SUPERADMIN
       const issuerIds = ["company-name", "company-tagline", "company-rfc", "company-phone", "company-address", "company-email", "company-professional", "banking-details"];
@@ -13068,6 +13407,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         if (activePane.id === "pane-vault" && !isSuper) switchTab("cotizador");
         if (activePane.id === "pane-dashboard" && !isSuper) switchTab("cotizador");
         if (activePane.id === "pane-crm" && isCotizador) switchTab("cotizador");
+        if (activePane.id === "pane-projects" && isCotizador) switchTab("cotizador");
       }
     }
 
@@ -15352,6 +15692,1327 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       document.getElementById("pub-ai-subtitle").textContent = "Déjanos tus datos y un asesor te contacta";
     }
 
-</script>
+    /* ======================================================================= */
+    /* MÓDULO DEDICADO: CUENTAS ACTIVAS, NOTAS DE SERVICIO Y COBRANZA IA       */
+    /* ======================================================================= */
+    let activeProjectId = null;
+    let projectFilterMode = 'all';
+    let _pendingAIParsedNote = null;
+    let _laborModalInsertMode = false;
+
+    const DEFAULT_LABOR_CATALOG = [
+      { id: 'lc1', title: 'Sustitución de Iluminación Exterior', desc: 'Desmontaje y conexión de reflector LED de 50W.', price: 350 },
+      { id: 'lc2', title: 'Instalación de Cámara PT / Wi-Fi', desc: 'Montaje físico de cámara robótica, fijación y enlace eléctrico/red.', price: 650 },
+      { id: 'lc3', title: 'Soporte Técnico PC / Laptop / Mini PC', desc: 'Formateo completo, sistema operativo, drivers oficiales y paquetería básica.', price: 500 },
+      { id: 'lc4', title: 'Apagador Inteligente', desc: 'Instalación eléctrica de apagador smart y enlace a aplicación móvil.', price: 400 },
+      { id: 'lc5', title: 'Punto Wi-Fi Ruijie Cloud (por AP)', desc: 'Cableado UTP, montaje de Access Point PoE y alta en Ruijie Cloud.', price: 700 },
+      { id: 'lc6', title: 'Instalación Reloj Checador BioTime Pro', desc: 'Montaje de terminal biométrica, cable UTP a switch, IP, ADMS y alta en BioTime Pro.', price: 1000 },
+      { id: 'lc7', title: 'Programación de Radio Digital DMR', desc: 'Lectura/escritura CPS, frecuencias, Color Code, Time Slots y Talkgroups.', price: 1050 },
+      { id: 'lc8', title: 'Mantenimiento Centro de Carga', desc: 'Limpieza interior de bornes y pastillas termomagnéticas; detallado de gabinete.', price: 450 },
+      { id: 'lc9', title: 'Mantenimiento Impresora Tinta Continua', desc: 'Limpieza profunda de cabezales, purgado, prueba de inyectores y escaneo.', price: 450 },
+      { id: 'lc10', title: 'Mantenimiento a CPU / Pasta Térmica', desc: 'Limpieza interna profunda, ventiladores/disipadores y reemplazo de pasta térmica.', price: 450 },
+      { id: 'lc11', title: 'Retiro e Instalación de Pantalla', desc: 'Desmontaje, adecuación de herrajes, nivelación en muro y conexiones.', price: 600 },
+      { id: 'lc12', title: 'Contacto Dúplex Polarizado', desc: 'Cableado, caja/tapa y fijación de contacto dúplex polarizado.', price: 250 }
+    ];
+
+    function initLaborCatalog() {
+      const raw = safeStorage.getItem('gaso_labor_catalog');
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length) { laborCatalog = parsed; return; }
+        } catch (e) {}
+      }
+      laborCatalog = DEFAULT_LABOR_CATALOG.map(x => Object.assign({}, x));
+      safeStorage.setItem('gaso_labor_catalog', JSON.stringify(laborCatalog));
+    }
+
+    function escPrj(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function fmtMXN(num) {
+      const n = Number(num) || 0;
+      return '$' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function round2(n) { return Math.round((Number(n) || 0) * 100) / 100; }
+
+    function recomputeProjectTotals(p) {
+      if (!p) return p;
+      p.items = Array.isArray(p.items) ? p.items : [];
+      p.payments = Array.isArray(p.payments) ? p.payments : [];
+      let sub = 0;
+      p.items.forEach(it => {
+        const qty = parseFloat(it.qty) || 0;
+        const up = parseFloat(it.unitPrice) || 0;
+        it.total = round2(qty * up);
+        sub += it.total;
+      });
+      sub = round2(sub);
+      const iva = p.useIva ? round2(sub * 0.16) : 0;
+      const resico = (p.useIva && p.useResico) ? round2(sub * 0.0125) : 0;
+      const total = round2(sub + iva - resico);
+      let paid = 0;
+      p.payments.forEach(pay => { paid += parseFloat(pay.amount) || 0; });
+      paid = round2(paid);
+      const balance = round2(total - paid);
+      p.subtotalAmount = sub;
+      p.ivaAmount = iva;
+      p.resicoAmount = resico;
+      p.totalAmount = total;
+      p.paidAmount = paid;
+      p.balanceAmount = balance;
+      return p;
+    }
+
+    function buildSeedProjects() {
+      const now = Date.now();
+      const rawSeeds = [
+        {
+          id: 'prj-350',
+          folioNum: 350,
+          date: '2026-10-01',
+          clientName: 'Mamá Anilu',
+          clientPhone: '',
+          concept: 'Mano de obra: ~50m tira COB fachada, 50m manguera neón jardín, 5 apagadores smart y fuentes.',
+          status: 'Cotizado',
+          useIva: false,
+          useResico: false,
+          items: [
+            { title: 'Mano de obra iluminación y automatización', desc: '~50m tira COB fachada, 50m manguera neón jardín, 5 apagadores smart y fuentes.', qty: 1, unit: 'Serv.', unitPrice: 10140 }
+          ],
+          payments: [],
+          _u: now
+        },
+        {
+          id: 'prj-353',
+          folioNum: 353,
+          date: '2026-11-27',
+          clientName: 'Fernando Cantero',
+          clientPhone: '',
+          concept: 'Servicios Integrales de Telecomunicaciones RF, Redes Wi-Fi, Videovigilancia, Automatización, Control de Asistencia, Instalación Eléctrica, Soporte TI, Reparación de Scooter Eléctrico y Rehabilitación de Repetidor RF',
+          status: 'En ejecución / Con saldo',
+          useIva: false,
+          useResico: false,
+          items: [
+            { title: 'Sustitución de Iluminación Exterior', desc: 'Desmontaje y conexión de reflectores LED de 50W.', qty: 3, unit: 'Serv.', unitPrice: 350 },
+            { title: 'Instalación de Cámaras PT', desc: 'Montaje físico de cámaras robóticas, fijación y enlace eléctrico/red.', qty: 3, unit: 'Serv.', unitPrice: 650 },
+            { title: 'Soporte Técnico Laptop', desc: 'Formateo, sistema operativo, controladores y paquetería básica.', qty: 1, unit: 'Serv.', unitPrice: 500 },
+            { title: 'Apagador Inteligente', desc: 'Instalación eléctrica de apagador smart de 3 ventanas y enlace a app.', qty: 1, unit: 'Serv.', unitPrice: 400 },
+            { title: 'Iluminación en Barra', desc: 'Instalación y conexión de luminaria LED de 8W.', qty: 1, unit: 'Serv.', unitPrice: 250 },
+            { title: 'Centro de Monitoreo PC', desc: 'Configuración de VMS en laptop, maquetación de cámaras y capacitación.', qty: 1, unit: 'Serv.', unitPrice: 500 },
+            { title: 'Red Wi-Fi Ruijie (Zapatería 1)', desc: 'Cableado UTP, montaje de 2 Access Points PoE y alta en Ruijie Cloud.', qty: 2, unit: 'Serv.', unitPrice: 700 },
+            { title: 'Red Wi-Fi Ruijie (Zapatería 2)', desc: 'Cableado UTP, montaje de 2 Access Points PoE y alta en Ruijie Cloud.', qty: 2, unit: 'Serv.', unitPrice: 700 },
+            { title: 'Instalación de Contacto en Tapa Especializada', desc: 'Adaptación, cableado y fijación de contacto dúplex polarizado en tapa de 1" con ranura tipo chalupa.', qty: 1, unit: 'Serv.', unitPrice: 250 },
+            { title: 'Mantenimiento y Limpieza de Centro de Carga', desc: 'Limpieza interior profunda de bornes y pastillas termomagnéticas; detallado y limpieza exterior de gabinete y visor CHNT.', qty: 1, unit: 'Serv.', unitPrice: 450 },
+            { title: 'Instalación y Configuración de Reloj Checador (BioTime Pro)', desc: 'Montaje en muro de terminal biométrica, tirada de cable UTP a switch, direccionamiento IP, enlace ADMS y configuración en plataforma BioTime Pro.', qty: 1, unit: 'Serv.', unitPrice: 1000 },
+            { title: 'Soporte Técnico Mini PC', desc: 'Formateo completo, instalación de sistema operativo, drivers oficiales y utilerías.', qty: 1, unit: 'Serv.', unitPrice: 500 },
+            { title: 'Programación de Radios Digitales DMR (TXPRO TX790U)', desc: 'Lectura y escritura vía software CPS, asignación de frecuencias operativas, Color Code, Time Slots, grupos de conversación (Talkgroups), contactos digitales y parámetros de RF.', qty: 1, unit: 'Serv.', unitPrice: 1050 },
+            { title: 'Instalación de 2 Contactos Dúplex y Canaleta (Mano de Obra y Obra)', desc: 'Perforación, fijación de canaleta plástica para guiado de cableado superficial, ranurado/montaje de cajas y colocación/cableado de 2 contactos dúplex polarizados.', qty: 1, unit: 'Serv.', unitPrice: 800 },
+            { title: 'Mantenimiento Impresora Multifuncional (Brother DCP-T510W)', desc: 'Servicio correctivo y preventivo, limpieza profunda de cabezales, purgado de sistema de tinta continua, prueba de inyectores y escaneo.', qty: 1, unit: 'Serv.', unitPrice: 450 },
+            { title: 'Retiro e Instalación de Pantalla de 50"', desc: 'Desmontaje de pantalla de 50 pulgadas de ubicación previa, adecuación de herrajes/soporte, fijación en nuevo muro, nivelación y conexiones de video/alimentación.', qty: 1, unit: 'Serv.', unitPrice: 600 },
+            { title: 'Reparación de Scooter Eléctrico (Mano de Obra)', desc: 'Sustitución de centro de carga, cambio de chapa de encendido y diagnóstico/reseteo de código de error E09.', qty: 1, unit: 'Serv.', unitPrice: 850 },
+            { title: 'Rehabilitación de Repetidor RF (Hytera RD626)', desc: 'Diagnóstico tras descarga eléctrica, liberación de bloqueo/traba del equipo, restablecimiento de fuente de alimentación en modo protección y pruebas de operación.', qty: 1, unit: 'Serv.', unitPrice: 1200 },
+            { title: 'Mantenimiento a CPU / Caja de Comando', desc: 'Limpieza interna profunda, desempolvado de ventiladores/disipadores y reemplazo de pasta térmica.', qty: 1, unit: 'Serv.', unitPrice: 450 },
+            { title: 'Instalación de Lámpara con Sensor 360° y Tubería Conduit PVC (~4 m)', desc: 'Tendido y fijación de tubería conduit PVC de aprox. 4 metros, cableado, montaje de lámpara con sensor de movimiento 360° y calibración de detección/tiempo.', qty: 1, unit: 'Serv.', unitPrice: 650 }
+          ],
+          payments: [
+            { date: '2026-10-05', concept: 'Primer anticipo recibido', amount: 2500 },
+            { date: '2026-10-10', concept: 'Segundo abono recibido', amount: 2000 },
+            { date: '2026-10-20', concept: 'Tercer abono recibido', amount: 3000 },
+            { date: '2026-11-27', concept: 'Abono aplicado', amount: 3000 }
+          ],
+          _u: now
+        },
+        {
+          id: 'prj-354',
+          folioNum: 354,
+          date: '2026-11-01',
+          clientName: 'Anilú Velázquez',
+          clientPhone: '',
+          concept: 'Arbotante, ajuste chapa zaguán, 40m neón en pérgola y 40m neón en jardín.',
+          status: 'En ejecución / Por cobrar',
+          useIva: false,
+          useResico: false,
+          items: [
+            { title: 'Instalación de arbotante', desc: 'Montaje y conexión eléctrica de luminaria arbotante.', qty: 1, unit: 'Serv.', unitPrice: 450 },
+            { title: 'Ajuste de chapa en zaguán', desc: 'Ajuste mecánico y calibración de chapa de zaguán.', qty: 1, unit: 'Serv.', unitPrice: 850 },
+            { title: 'Instalación de 40m neón en pérgola', desc: 'Tendido, fijación y conexión de 40m de manguera neón en pérgola.', qty: 1, unit: 'Serv.', unitPrice: 3000 },
+            { title: 'Instalación de 40m neón en jardín', desc: 'Tendido, fijación y conexión de 40m de manguera neón en jardín.', qty: 1, unit: 'Serv.', unitPrice: 3000 }
+          ],
+          payments: [],
+          _u: now
+        },
+        {
+          id: 'prj-355',
+          folioNum: 355,
+          date: '2026-11-05',
+          clientName: 'Armando Cantero',
+          clientPhone: '',
+          concept: 'Mástil 9m, gabinete 9U, RF, ranurado/8 contactos, tablero QO2, recableado, lámparas, materiales y calzado a cuenta.',
+          status: 'En ejecución / Con saldo',
+          useIva: false,
+          useResico: false,
+          items: [
+            { title: 'Trabajos integrales RF, obra eléctrica y materiales', desc: 'Mástil 9m, gabinete 9U, RF, ranurado/8 contactos, tablero QO2, recableado, lámparas y materiales.', qty: 1, unit: 'Serv.', unitPrice: 14720 }
+          ],
+          payments: [
+            { date: '2026-11-15', concept: 'Abonos acumulados y calzado a cuenta', amount: 12920 }
+          ],
+          _u: now
+        },
+        {
+          id: 'prj-357',
+          folioNum: 357,
+          date: '2026-11-18',
+          clientName: 'Don Noel Contreras',
+          clientPhone: '',
+          concept: 'Echo Show 21", montaje/reubicación 3 TVs (43", 32", 24"), cableado UTP 15m y cambio de extensor HDMI.',
+          status: 'Ejecutado / Por cobrar',
+          useIva: false,
+          useResico: false,
+          items: [
+            { title: 'Montaje y configuración audiovisual integral', desc: 'Echo Show 21", montaje/reubicación 3 TVs (43", 32", 24"), cableado UTP 15m y cambio de extensor HDMI.', qty: 1, unit: 'Serv.', unitPrice: 2300 }
+          ],
+          payments: [],
+          _u: now
+        },
+        {
+          id: 'prj-358',
+          folioNum: 358,
+          date: '2026-11-22',
+          clientName: 'Jorge Adrián García Chávez',
+          clientPhone: '',
+          concept: '5 PTZ doble lente Uniarch, 3 fijas Wi-Fi, 25m cable uso rudo + 6 contactos a 3m y migración a DVR 32ch UNV.',
+          status: 'Ejecutado / Por cobrar',
+          useIva: false,
+          useResico: false,
+          items: [
+            { title: 'Sistema de videovigilancia y circuito eléctrico', desc: '5 PTZ doble lente Uniarch, 3 fijas Wi-Fi, 25m cable uso rudo + 6 contactos a 3m y migración a DVR 32ch UNV.', qty: 1, unit: 'Serv.', unitPrice: 8500 }
+          ],
+          payments: [],
+          _u: now
+        }
+      ];
+      return rawSeeds.map(p => recomputeProjectTotals(p));
+    }
+
+    function seedInitialProjectsIfNeeded(fromCloud) {
+      if (projectsHistory && projectsHistory.length > 0) {
+        safeStorage.setItem('gaso_projects_seeded_v1', 'true');
+        updateProjectsBadge();
+        return;
+      }
+      if (safeStorage.getItem('gaso_projects_seeded_v1') === 'true') {
+        updateProjectsBadge();
+        return;
+      }
+      // Si ya se sincronizó con nube y vino vacío, o si apenas arranca sin nube: cargar los 6 proyectos base
+      if (fromCloud || !safeStorage.getItem('gaso_projects_history')) {
+        projectsHistory = buildSeedProjects();
+        safeStorage.setItem('gaso_projects_history', JSON.stringify(projectsHistory));
+        safeStorage.setItem('gaso_projects_seeded_v1', 'true');
+        updateProjectsBadge();
+        try { cloudPushSoon(); } catch (e) {}
+      }
+    }
+
+    function updateProjectsBadge() {
+      const el = document.getElementById('projects-badge-count');
+      if (el) el.textContent = (projectsHistory || []).filter(p => p && p.status !== 'Liquidado' && p.status !== 'Cancelado').length;
+    }
+
+    function getNextProjectFolio() {
+      let mx = (window.__cloudFolioSeq && parseInt(window.__cloudFolioSeq.PROJECT_NUM, 10)) || 0;
+      (projectsHistory || []).forEach(p => {
+        const fn = parseInt(p.folioNum, 10) || 0;
+        if (fn > mx) mx = fn;
+      });
+      return Math.max(mx, 358) + 1;
+    }
+
+    function persistProjects(msg) {
+      projectsHistory.forEach(p => recomputeProjectTotals(p));
+      safeStorage.setItem('gaso_projects_history', JSON.stringify(projectsHistory));
+      updateProjectsBadge();
+      try { cloudPushSoon(); } catch (e) {}
+      if (msg) showToast(msg);
+    }
+
+    function getProjectStatusBadge(status) {
+      const map = {
+        'Cotizado': ['#e0f2fe', '#0369a1'],
+        'En ejecución / Con saldo': ['#fef3c7', '#b45309'],
+        'En ejecución / Por cobrar': ['#ffedd5', '#c2410c'],
+        'Ejecutado / Por cobrar': ['#fee2e2', '#b91c1c'],
+        'Liquidado': ['#dcfce7', '#15803d'],
+        'Cancelado': ['#f1f5f9', '#475569']
+      };
+      const pair = map[status] || ['#f1f5f9', '#334155'];
+      return `<span class="prj-status-badge" style="background:${pair[0]}; color:${pair[1]};">${escPrj(status)}</span>`;
+    }
+
+    function setProjectFilter(mode) {
+      projectFilterMode = mode || 'all';
+      document.querySelectorAll('#prj-filter-pills .prj-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === projectFilterMode);
+      });
+      renderProjectsDashboard();
+    }
+
+    function renderProjectsDashboard() {
+      updateProjectsBadge();
+      const list = (projectsHistory || []).map(p => recomputeProjectTotals(p));
+
+      let totalPend = 0, totalExecDue = 0, totalExecCount = 0, totalContracted = 0, totalPaid = 0;
+      const execDueNames = [];
+      list.forEach(p => {
+        if (p.status === 'Cancelado') return;
+        totalContracted += p.totalAmount || 0;
+        totalPaid += p.paidAmount || 0;
+        if ((p.balanceAmount || 0) > 0.01) totalPend += p.balanceAmount;
+        if (p.status === 'Ejecutado / Por cobrar' && (p.balanceAmount || 0) > 0.01) {
+          totalExecDue += p.balanceAmount;
+          totalExecCount++;
+          execDueNames.push(`#${p.folioNum} ${p.clientName} (${fmtMXN(p.balanceAmount)})`);
+        }
+      });
+
+      const kpiGrid = document.getElementById('prj-kpi-grid');
+      if (kpiGrid) {
+        kpiGrid.innerHTML = `
+          <div class="prj-kpi-card" style="border-left:4px solid #d97706;">
+            <div class="prj-kpi-label">💰 Saldo Pendiente en Cartera</div>
+            <div class="prj-kpi-val" style="color:#b45309;">${fmtMXN(totalPend)}</div>
+            <div class="prj-kpi-sub">${list.filter(p => p.status !== 'Cancelado' && (p.balanceAmount || 0) > 0.01).length} cuentas activas con saldo</div>
+          </div>
+          <div class="prj-kpi-card" style="border-left:4px solid #dc2626;">
+            <div class="prj-kpi-label">🚨 Ejecutado Listo para Cobrar</div>
+            <div class="prj-kpi-val" style="color:#b91c1c;">${fmtMXN(totalExecDue)}</div>
+            <div class="prj-kpi-sub">${totalExecCount} proyectos terminados pendientes de pago</div>
+          </div>
+          <div class="prj-kpi-card" style="border-left:4px solid #023e8a;">
+            <div class="prj-kpi-label">📊 Total Proyectos Activos</div>
+            <div class="prj-kpi-val" style="color:#023e8a;">${fmtMXN(totalContracted)}</div>
+            <div class="prj-kpi-sub">${list.filter(p => p.status !== 'Cancelado').length} proyectos registrados</div>
+          </div>
+          <div class="prj-kpi-card" style="border-left:4px solid #16a34a;">
+            <div class="prj-kpi-label">✅ Total Cobrado / Abonos</div>
+            <div class="prj-kpi-val" style="color:#15803d;">${fmtMXN(totalPaid)}</div>
+            <div class="prj-kpi-sub">Anticipos, abonos y pagos a cuenta aplicados</div>
+          </div>`;
+      }
+
+      const alertBox = document.getElementById('prj-collection-alerts');
+      if (alertBox) {
+        if (execDueNames.length > 0) {
+          alertBox.style.display = 'block';
+          alertBox.innerHTML = `
+            <div style="background:#fef2f2; border:1px solid #fca5a5; border-radius:10px; padding:0.7rem 0.95rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <div style="font-size:0.82rem; color:#991b1b;">
+                <strong>🔔 Recordatorio de Cobranza (${fmtMXN(totalExecDue)} listos para cobrar):</strong>
+                Trabajos ya terminados pendientes de cobro: ${escPrj(execDueNames.join(' · '))}
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="setProjectFilter('exec_due')" style="color:#b91c1c; border-color:#f87171; font-weight:800;">Ver por cobrar</button>
+            </div>`;
+        } else {
+          alertBox.style.display = 'none';
+        }
+      }
+
+      const q = (document.getElementById('prj-search-input')?.value || '').trim().toLowerCase();
+      const sortMode = document.getElementById('prj-sort-select')?.value || 'folio_asc';
+
+      let filtered = list.filter(p => {
+        if (projectFilterMode === 'pending' && !(p.status !== 'Cancelado' && (p.balanceAmount || 0) > 0.01)) return false;
+        if (projectFilterMode === 'exec_due' && p.status !== 'Ejecutado / Por cobrar') return false;
+        if (projectFilterMode === 'quoted' && p.status !== 'Cotizado') return false;
+        if (projectFilterMode === 'paid' && p.status !== 'Liquidado' && (p.balanceAmount || 0) > 0.01) return false;
+        if (q) {
+          const hay = `${p.folioNum} ${p.clientName} ${p.concept} ${p.status}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        if (sortMode === 'folio_desc') return (b.folioNum || 0) - (a.folioNum || 0);
+        if (sortMode === 'balance_desc') return (b.balanceAmount || 0) - (a.balanceAmount || 0);
+        return (a.folioNum || 0) - (b.folioNum || 0);
+      });
+
+      const tbody = document.getElementById('prj-list-tbody');
+      if (!tbody) return;
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:1.5rem; color:var(--gray-500);">No hay proyectos en esta vista. Usa "+ Nuevo Proyecto / Cuenta" o la Nota Rápida IA.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(p => {
+        const paidTxt = (p.paidAmount || 0) > 0 ? '-' + fmtMXN(p.paidAmount) : '$0.00';
+        const scope = p.concept || (p.items && p.items[0] ? p.items[0].title : 'Sin descripción');
+        return `
+          <tr style="cursor:pointer;" onclick="openProjectDetail('${escPrj(p.id)}')">
+            <td style="text-align:center; font-weight:900; color:#023e8a;">${p.folioNum}</td>
+            <td style="font-weight:800; color:#0f172a;">${escPrj(p.clientName)}</td>
+            <td style="font-size:0.78rem; color:#475569; max-width:340px;">${escPrj(scope)}</td>
+            <td>${getProjectStatusBadge(p.status)}</td>
+            <td style="text-align:right; font-weight:700;">${fmtMXN(p.totalAmount)}</td>
+            <td style="text-align:right; color:${p.paidAmount > 0 ? '#15803d' : '#64748b'}; font-weight:700;">${paidTxt}</td>
+            <td style="text-align:right; font-weight:900; color:${p.balanceAmount > 0.01 ? '#b45309' : '#15803d'};">${fmtMXN(p.balanceAmount)}</td>
+            <td style="text-align:center; white-space:nowrap;" onclick="event.stopPropagation()">
+              <button type="button" class="btn btn-outline btn-sm" onclick="openProjectDetail('${escPrj(p.id)}')" title="Abrir estado de cuenta">✏️</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="openProjectWhatsApp('${escPrj(p.id)}', true)" title="Enviar estado de cuenta por WhatsApp" style="color:#16a34a;">📲</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="exportProjectPDF('${escPrj(p.id)}')" title="Descargar Estado de Cuenta PDF" style="color:#023e8a;">📥</button>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function getActiveProject() {
+      return (projectsHistory || []).find(p => p.id === activeProjectId) || null;
+    }
+
+    function createNewProjectAccount() {
+      const nextFolio = getNextProjectFolio();
+      const today = new Date().toISOString().slice(0, 10);
+      const np = recomputeProjectTotals({
+        id: 'prj-' + nextFolio + '-' + Date.now().toString(36),
+        folioNum: nextFolio,
+        date: today,
+        clientName: '',
+        clientPhone: '',
+        concept: '',
+        status: 'En ejecución / Por cobrar',
+        useIva: false,
+        useResico: false,
+        items: [],
+        payments: [],
+        _u: Date.now()
+      });
+      projectsHistory.push(np);
+      persistProjects(`Proyecto N.º ${nextFolio} creado.`);
+      openProjectDetail(np.id);
+      setTimeout(() => { document.getElementById('prj-det-client')?.focus(); }, 100);
+    }
+
+    function populateProjectClientDatalist() {
+      const dl = document.getElementById('prj-crm-clients-datalist');
+      if (!dl) return;
+      const names = new Set();
+      (crmClients || []).forEach(c => { if (c && c.name) names.add(c.name); });
+      (projectsHistory || []).forEach(p => { if (p && p.clientName) names.add(p.clientName); });
+      dl.innerHTML = Array.from(names).sort().map(n => `<option value="${escPrj(n)}">`).join('');
+    }
+
+    function openProjectDetail(id) {
+      const p = (projectsHistory || []).find(x => x.id === id);
+      if (!p) return;
+      activeProjectId = id;
+      recomputeProjectTotals(p);
+      populateProjectClientDatalist();
+
+      document.getElementById('projects-list-view').style.display = 'none';
+      document.getElementById('projects-detail-view').style.display = 'block';
+      document.getElementById('prj-det-ai-preview').style.display = 'none';
+      document.getElementById('prj-det-ai-input').value = '';
+
+      document.getElementById('prj-det-folio-pill').textContent = `N.º ${p.folioNum}`;
+      document.getElementById('prj-det-folio').value = p.folioNum;
+      document.getElementById('prj-det-date').value = p.date || new Date().toISOString().slice(0, 10);
+      document.getElementById('prj-det-client').value = p.clientName || '';
+      document.getElementById('prj-det-phone').value = p.clientPhone || '';
+      document.getElementById('prj-det-concept').value = p.concept || '';
+      document.getElementById('prj-det-status').value = p.status || 'Cotizado';
+      document.getElementById('prj-det-use-iva').checked = !!p.useIva;
+      document.getElementById('prj-det-use-resico').checked = !!p.useResico;
+      document.getElementById('prj-det-resico-wrap').style.display = p.useIva ? 'inline-flex' : 'none';
+
+      renderProjectMPBadge(p);
+      renderProjectItems();
+      renderProjectPayments();
+      renderProjectFinancialSummary();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeProjectDetail() {
+      activeProjectId = null;
+      document.getElementById('projects-detail-view').style.display = 'none';
+      document.getElementById('projects-list-view').style.display = 'block';
+      renderProjectsDashboard();
+    }
+
+    function renderProjectMPBadge(p) {
+      const badge = document.getElementById('prj-det-mp-badge');
+      if (!badge) return;
+      if (p && p.mercadopagoUrl) {
+        badge.style.display = 'inline-block';
+        badge.innerHTML = `💳 Link Mercado Pago activo · <a href="${escPrj(p.mercadopagoUrl)}" target="_blank" style="color:#0284c7; text-decoration:underline;">Abrir</a>`;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    function onProjectClientInput() {
+      const val = (document.getElementById('prj-det-client')?.value || '').trim().toLowerCase();
+      const phoneEl = document.getElementById('prj-det-phone');
+      if (!val || !phoneEl || phoneEl.value.trim()) return;
+      const crmMatch = (crmClients || []).find(c => (c.name || '').trim().toLowerCase() === val);
+      if (crmMatch && crmMatch.phone) phoneEl.value = crmMatch.phone;
+    }
+
+    function onProjectFolioChanged() {
+      const p = getActiveProject();
+      if (!p) return;
+      const newNum = parseInt(document.getElementById('prj-det-folio').value, 10);
+      if (!newNum || newNum < 1) {
+        document.getElementById('prj-det-folio').value = p.folioNum;
+        return;
+      }
+      const dup = (projectsHistory || []).find(x => x.id !== p.id && parseInt(x.folioNum, 10) === newNum);
+      if (dup) {
+        showToast(`⚠️ El folio N.º ${newNum} ya pertenece a ${dup.clientName}. Elige otro número para mantener el orden.`);
+        document.getElementById('prj-det-folio').value = p.folioNum;
+        return;
+      }
+      p.folioNum = newNum;
+      document.getElementById('prj-det-folio-pill').textContent = `N.º ${newNum}`;
+      onProjectMetaChanged();
+    }
+
+    function onProjectMetaChanged() {
+      const p = getActiveProject();
+      if (!p) return;
+      p.date = document.getElementById('prj-det-date').value || p.date;
+      p.clientName = (document.getElementById('prj-det-client').value || '').trim();
+      p.clientPhone = (document.getElementById('prj-det-phone').value || '').trim();
+      p.concept = (document.getElementById('prj-det-concept').value || '').trim();
+      p.status = document.getElementById('prj-det-status').value;
+      p.useIva = !!document.getElementById('prj-det-use-iva').checked;
+      document.getElementById('prj-det-resico-wrap').style.display = p.useIva ? 'inline-flex' : 'none';
+      if (!p.useIva) {
+        p.useResico = false;
+        document.getElementById('prj-det-use-resico').checked = false;
+      } else {
+        p.useResico = !!document.getElementById('prj-det-use-resico').checked;
+      }
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectFinancialSummary();
+      persistProjects();
+    }
+
+    function saveActiveProjectNow(notify) {
+      onProjectMetaChanged();
+      if (notify) showToast('💾 Proyecto y estado de cuenta guardados.');
+    }
+
+    function deleteActiveProject() {
+      const p = getActiveProject();
+      if (!p) return;
+      if (!confirm(`¿Eliminar el proyecto N.º ${p.folioNum} (${p.clientName})? Esta acción también lo borrará de la nube.`)) return;
+      projectsHistory = projectsHistory.filter(x => x.id !== p.id);
+      persistProjects(`Proyecto N.º ${p.folioNum} eliminado.`);
+      closeProjectDetail();
+    }
+
+    function renderProjectItems() {
+      const p = getActiveProject();
+      if (!p) return;
+      const tbody = document.getElementById('prj-det-items-tbody');
+      const countEl = document.getElementById('prj-det-items-count');
+      if (countEl) countEl.textContent = p.items.length;
+      if (!tbody) return;
+      if (!p.items.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:1rem; color:var(--gray-500);">Sin partidas aún. Usa "+ Agregar Partida", "⚡ Tabulador Rápido" o dicta una nota arriba con IA.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = p.items.map((it, idx) => `
+        <tr>
+          <td style="text-align:center; font-weight:800; color:#023e8a;">${idx + 1}</td>
+          <td>
+            <input type="text" class="form-input no-uppercase" value="${escPrj(it.title)}" placeholder="Título del servicio..." oninput="updateProjectItem(${idx}, 'title', this.value)" style="width:100%; font-weight:700; font-size:0.8rem; margin-bottom:0.25rem; padding:0.28rem 0.5rem;">
+            <textarea class="form-input no-uppercase" rows="2" placeholder="Descripción técnica..." oninput="updateProjectItem(${idx}, 'desc', this.value)" style="width:100%; font-size:0.76rem; color:#475569; padding:0.28rem 0.5rem;">${escPrj(it.desc || '')}</textarea>
+          </td>
+          <td><input type="number" class="form-input" value="${it.qty ?? 1}" min="0" step="0.5" oninput="updateProjectItem(${idx}, 'qty', this.value)" style="width:100%; text-align:center; font-weight:700; font-size:0.8rem; padding:0.3rem;"></td>
+          <td><input type="text" class="form-input no-uppercase" value="${escPrj(it.unit || 'Serv.')}" oninput="updateProjectItem(${idx}, 'unit', this.value)" style="width:100%; text-align:center; font-size:0.78rem; padding:0.3rem;"></td>
+          <td><input type="number" class="form-input" value="${it.unitPrice ?? 0}" min="0" step="10" oninput="updateProjectItem(${idx}, 'unitPrice', this.value)" style="width:100%; text-align:right; font-weight:700; font-size:0.8rem; padding:0.3rem;"></td>
+          <td style="text-align:right; font-weight:800; color:#0f172a;" id="prj-item-tot-${idx}">${fmtMXN((parseFloat(it.qty)||0)*(parseFloat(it.unitPrice)||0))}</td>
+          <td style="text-align:center; white-space:nowrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="moveProjectItem(${idx}, -1)" title="Subir" style="padding:0.15rem 0.35rem;">↑</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="moveProjectItem(${idx}, 1)" title="Bajar" style="padding:0.15rem 0.35rem;">↓</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="removeProjectItem(${idx})" title="Eliminar" style="padding:0.15rem 0.35rem; color:#dc2626;">✕</button>
+          </td>
+        </tr>`).join('');
+    }
+
+    function addProjectItem(preset) {
+      const p = getActiveProject();
+      if (!p) return;
+      p.items.push({
+        title: (preset && preset.title) || 'Nuevo servicio técnico',
+        desc: (preset && preset.desc) || '',
+        qty: (preset && preset.qty) || 1,
+        unit: (preset && preset.unit) || 'Serv.',
+        unitPrice: (preset && preset.price != null) ? preset.price : ((preset && preset.unitPrice) || 0)
+      });
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectItems();
+      renderProjectFinancialSummary();
+      persistProjects();
+    }
+
+    function updateProjectItem(idx, field, val) {
+      const p = getActiveProject();
+      if (!p || !p.items[idx]) return;
+      if (field === 'qty' || field === 'unitPrice') {
+        p.items[idx][field] = parseFloat(val) || 0;
+        const totCell = document.getElementById('prj-item-tot-' + idx);
+        if (totCell) totCell.textContent = fmtMXN((parseFloat(p.items[idx].qty) || 0) * (parseFloat(p.items[idx].unitPrice) || 0));
+      } else {
+        p.items[idx][field] = val;
+      }
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectFinancialSummary();
+      clearTimeout(window._prjSaveDeb);
+      window._prjSaveDeb = setTimeout(() => persistProjects(), 700);
+    }
+
+    function moveProjectItem(idx, dir) {
+      const p = getActiveProject();
+      if (!p) return;
+      const target = idx + dir;
+      if (target < 0 || target >= p.items.length) return;
+      const tmp = p.items[idx];
+      p.items[idx] = p.items[target];
+      p.items[target] = tmp;
+      p._u = Date.now();
+      renderProjectItems();
+      renderProjectFinancialSummary();
+      persistProjects();
+    }
+
+    function removeProjectItem(idx) {
+      const p = getActiveProject();
+      if (!p) return;
+      p.items.splice(idx, 1);
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectItems();
+      renderProjectFinancialSummary();
+      persistProjects();
+    }
+
+    function renderProjectPayments() {
+      const p = getActiveProject();
+      if (!p) return;
+      const tbody = document.getElementById('prj-det-payments-tbody');
+      if (!tbody) return;
+      if (!p.payments.length) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:0.85rem; color:var(--gray-500);">Sin abonos registrados aún.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = p.payments.map((pay, idx) => `
+        <tr>
+          <td><input type="date" class="form-input" value="${escPrj(pay.date || '')}" onchange="updateProjectPayment(${idx}, 'date', this.value)" style="width:100%; font-size:0.75rem; padding:0.25rem;"></td>
+          <td><input type="text" class="form-input no-uppercase" value="${escPrj(pay.concept || '')}" placeholder="Anticipo, transferencia, efectivo..." oninput="updateProjectPayment(${idx}, 'concept', this.value)" style="width:100%; font-size:0.78rem; padding:0.25rem 0.45rem;"></td>
+          <td><input type="number" class="form-input" value="${pay.amount ?? 0}" min="0" step="10" oninput="updateProjectPayment(${idx}, 'amount', this.value)" style="width:100%; text-align:right; font-weight:800; color:#15803d; font-size:0.79rem; padding:0.25rem;"></td>
+          <td style="text-align:center;"><button type="button" class="btn btn-outline btn-sm" onclick="removeProjectPayment(${idx})" style="padding:0.15rem 0.35rem; color:#dc2626;">✕</button></td>
+        </tr>`).join('');
+    }
+
+    function addProjectPayment(preset) {
+      const p = getActiveProject();
+      if (!p) return;
+      const today = new Date().toISOString().slice(0, 10);
+      p.payments.push({
+        date: (preset && preset.date) || today,
+        concept: (preset && preset.concept) || (p.payments.length === 0 ? 'Anticipo recibido' : 'Abono aplicado'),
+        amount: (preset && preset.amount) || 0
+      });
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectPayments();
+      renderProjectFinancialSummary();
+      persistProjects();
+    }
+
+    function updateProjectPayment(idx, field, val) {
+      const p = getActiveProject();
+      if (!p || !p.payments[idx]) return;
+      p.payments[idx][field] = field === 'amount' ? (parseFloat(val) || 0) : val;
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectFinancialSummary();
+      clearTimeout(window._prjSaveDeb);
+      window._prjSaveDeb = setTimeout(() => persistProjects(), 700);
+    }
+
+    function removeProjectPayment(idx) {
+      const p = getActiveProject();
+      if (!p) return;
+      p.payments.splice(idx, 1);
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectPayments();
+      renderProjectFinancialSummary();
+      persistProjects();
+    }
+
+    function renderProjectFinancialSummary() {
+      const p = getActiveProject();
+      if (!p) return;
+      recomputeProjectTotals(p);
+      const box = document.getElementById('prj-det-totals-box');
+      if (box) {
+        const words = typeof numberToWordsSpanish === 'function' ? numberToWordsSpanish(Math.max(0, p.balanceAmount), 'MXN') : '';
+        box.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
+            <span style="color:#475569; font-weight:700;">Subtotal de Servicios (${p.items.length} partidas):</span>
+            <strong>${fmtMXN(p.subtotalAmount)} MXN</strong>
+          </div>
+          ${p.useIva ? `<div style="display:flex; justify-content:space-between; margin-bottom:0.3rem; color:#0369a1;"><span>(+) IVA (16%):</span><strong>${fmtMXN(p.ivaAmount)} MXN</strong></div>` : ''}
+          ${(p.useIva && p.useResico) ? `<div style="display:flex; justify-content:space-between; margin-bottom:0.3rem; color:#b45309;"><span>(-) Retención ISR RESICO (1.25%):</span><strong>-${fmtMXN(p.resicoAmount)} MXN</strong></div>` : ''}
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; padding-top:0.3rem; border-top:1px dashed #cbd5e1;">
+            <span style="font-weight:800; color:#0f172a;">TOTAL ACUMULADO:</span>
+            <strong style="color:#023e8a;">${fmtMXN(p.totalAmount)} MXN</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.45rem; color:#15803d;">
+            <span style="font-weight:700;">(-) TOTAL ACREDITADO (Abonos):</span>
+            <strong>-${fmtMXN(p.paidAmount)} MXN</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; background:${p.balanceAmount > 0.01 ? '#fef3c7' : '#dcfce7'}; border:1.5px solid ${p.balanceAmount > 0.01 ? '#f59e0b' : '#22c55e'}; padding:0.55rem 0.75rem; border-radius:8px; color:${p.balanceAmount > 0.01 ? '#92400e' : '#166534'}; font-weight:900; font-size:1rem;">
+            <span>SALDO PENDIENTE:</span>
+            <span>${fmtMXN(p.balanceAmount)} MXN</span>
+          </div>
+          ${words ? `<div style="font-size:0.72rem; color:#64748b; margin-top:0.35rem; text-align:right; font-weight:600;">(${escPrj(words)})</div>` : ''}
+        `;
+      }
+      const waPrev = document.getElementById('prj-det-wa-preview');
+      if (waPrev) waPrev.textContent = buildProjectWhatsAppText(p);
+    }
+
+    function fmtShortDateEs(iso) {
+      if (!iso) return '';
+      const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return iso;
+      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      return `${m[3]}/${meses[parseInt(m[2], 10) - 1] || m[2]}/${m[1]}`;
+    }
+
+    function fmtLongDateEs(iso) {
+      if (!iso) return '';
+      const d = new Date(iso + 'T12:00:00');
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    function buildProjectWhatsAppText(p) {
+      recomputeProjectTotals(p);
+      const firstName = (p.clientName || 'Cliente').trim().split(/\s+/)[0] || 'Cliente';
+      const lastPay = p.payments.length ? p.payments[p.payments.length - 1] : null;
+      const payPhrase = lastPay ? `, integrando las últimas partidas y aplicando tu abono de ${fmtMXN(lastPay.amount)} MXN` : '';
+      const lines = [];
+      lines.push(`Estimado ${firstName}, buenas tardes.`);
+      lines.push(`Te comparto tu estado de cuenta actualizado (Nota N.º ${p.folioNum}) por parte de Gaso Ingeniería${payPhrase}:`);
+      lines.push('');
+      lines.push(`📝 RESUMEN DE TRABAJOS EJECUTADOS (${p.items.length} PARTIDAS):`);
+      p.items.forEach(it => {
+        const qtyTag = (parseFloat(it.qty) || 1) > 1 ? `${it.qty}x ` : '';
+        lines.push(`• ${qtyTag}${it.title} (${fmtMXN(it.total)})`);
+      });
+      lines.push('');
+      lines.push('💵 BALANCE FINANCIERO AL DÍA:');
+      if (p.useIva) {
+        lines.push(`• Subtotal servicios: ${fmtMXN(p.subtotalAmount)} MXN`);
+        lines.push(`• (+) IVA 16%: ${fmtMXN(p.ivaAmount)} MXN`);
+        if (p.useResico) lines.push(`• (-) Ret. ISR RESICO: -${fmtMXN(p.resicoAmount)} MXN`);
+      }
+      lines.push(`• Total general de servicios: ${fmtMXN(p.totalAmount)} MXN`);
+      p.payments.forEach(pay => {
+        lines.push(`• ( - ) ${pay.concept || 'Abono'} (${fmtShortDateEs(pay.date)}): -${fmtMXN(pay.amount)} MXN`);
+      });
+      lines.push(`👉 Total pagado a la cuenta: -${fmtMXN(p.paidAmount)} MXN`);
+      lines.push(`📌 SALDO RESTANTE POR LIQUIDAR: ${fmtMXN(p.balanceAmount)} MXN`);
+      if (p.mercadopagoUrl && p.balanceAmount > 0.01) {
+        lines.push('');
+        lines.push(`💳 Enlace para pago con tarjeta / transferencia / Mercado Pago: ${p.mercadopagoUrl}`);
+      }
+      lines.push('');
+      lines.push('Quedo a tus órdenes para cualquier detalle técnico o aclaración. ¡Excelente día!');
+      lines.push('Atentamente,');
+      lines.push('Ing. Jose Miguel Gamboa');
+      lines.push('Gaso Ingeniería');
+      return lines.join('\n');
+    }
+
+    function copyProjectWhatsApp() {
+      const p = getActiveProject();
+      if (!p) return;
+      const txt = buildProjectWhatsAppText(p);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(() => showToast('📋 Mensaje de WhatsApp copiado al portapapeles.'));
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); ta.remove();
+        showToast('📋 Mensaje copiado.');
+      }
+    }
+
+    function openProjectWhatsApp(projectId, openWa) {
+      const p = projectId ? (projectsHistory || []).find(x => x.id === projectId) : getActiveProject();
+      if (!p) return;
+      const txt = buildProjectWhatsAppText(p);
+      try { if (navigator.clipboard) navigator.clipboard.writeText(txt); } catch (e) {}
+      if (!openWa) { showToast('📋 Mensaje copiado.'); return; }
+      const phone = typeof formatMexicanWhatsAppPhone === 'function' ? formatMexicanWhatsAppPhone(p.clientPhone) : '';
+      const url = phone
+        ? `https://wa.me/${phone}?text=${encodeURIComponent(txt)}`
+        : `https://wa.me/?text=${encodeURIComponent(txt)}`;
+      window.open(url, '_blank', 'noopener');
+      showToast('📲 Abriendo WhatsApp (mensaje también copiado).');
+    }
+
+    /* ---- Tabulador Rápido Mano de Obra ---- */
+    function openLaborCatalogModal(insertMode = false) {
+      _laborModalInsertMode = !!insertMode;
+      renderLaborCatalogList();
+      openModal('modal-labor-catalog');
+    }
+
+    function renderLaborCatalogList() {
+      const el = document.getElementById('labor-catalog-list');
+      if (!el) return;
+      el.innerHTML = (laborCatalog || []).map((item, idx) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem; padding:0.55rem 0.75rem; border:1px solid #e2e8f0; border-radius:8px; background:#fff;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:800; font-size:0.84rem; color:#0f172a;">${escPrj(item.title)}</div>
+            <div style="font-size:0.75rem; color:#64748b;">${escPrj(item.desc)}</div>
+          </div>
+          <div style="font-weight:900; color:#023e8a; font-size:0.88rem; white-space:nowrap;">${fmtMXN(item.price)}</div>
+          <div style="display:flex; gap:0.3rem;">
+            ${_laborModalInsertMode && activeProjectId ? `<button type="button" class="btn btn-primary btn-sm" onclick="addProjectItem(laborCatalog[${idx}]); showToast('➕ Partida agregada desde tabulador.');" style="background:#16a34a; border-color:#16a34a; font-weight:700;">+ Sumar</button>` : ''}
+            <button type="button" class="btn btn-outline btn-sm" onclick="removeLaborCatalogEntry(${idx})" style="color:#dc2626; padding:0.2rem 0.45rem;" title="Quitar del tabulador">✕</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function addLaborCatalogEntry() {
+      const t = (document.getElementById('lc-new-title')?.value || '').trim();
+      const d = (document.getElementById('lc-new-desc')?.value || '').trim();
+      const p = parseFloat(document.getElementById('lc-new-price')?.value || '0') || 0;
+      if (!t || p <= 0) { showToast('Ingresa nombre del servicio y precio válido.'); return; }
+      laborCatalog.unshift({ id: 'lc-' + Date.now(), title: t, desc: d || t, price: p });
+      safeStorage.setItem('gaso_labor_catalog', JSON.stringify(laborCatalog));
+      document.getElementById('lc-new-title').value = '';
+      document.getElementById('lc-new-desc').value = '';
+      document.getElementById('lc-new-price').value = '';
+      renderLaborCatalogList();
+      showToast('⚡ Servicio guardado en el tabulador rápido.');
+    }
+
+    function removeLaborCatalogEntry(idx) {
+      laborCatalog.splice(idx, 1);
+      safeStorage.setItem('gaso_labor_catalog', JSON.stringify(laborCatalog));
+      renderLaborCatalogList();
+    }
+
+    /* ---- Generador Rápido con IA (/gemini) ---- */
+    async function parseProjectAINote(mode) {
+      const isGlobal = mode === 'global';
+      const inputEl = document.getElementById(isGlobal ? 'prj-global-ai-input' : 'prj-det-ai-input');
+      const btnEl = document.getElementById(isGlobal ? 'btn-prj-global-ai' : 'btn-prj-det-ai');
+      const prevEl = document.getElementById(isGlobal ? 'prj-global-ai-preview' : 'prj-det-ai-preview');
+      const text = (inputEl?.value || '').trim();
+      if (!text) { showToast('Escribe o dicta una nota primero.'); return; }
+
+      const activeP = !isGlobal ? getActiveProject() : null;
+      const existingSummary = (projectsHistory || []).map(p => ({ id: p.id, folioNum: p.folioNum, clientName: p.clientName, status: p.status }));
+      const todayIso = new Date().toISOString().slice(0, 10);
+
+      const oldBtn = btnEl ? btnEl.innerHTML : '';
+      if (btnEl) { btnEl.disabled = true; btnEl.innerHTML = '⏳ Analizando...'; }
+      try {
+        const prompt = [
+          'Eres el asistente administrativo y técnico de GASO INGENIERÍA (telecomunicaciones RF/DMR, redes Wi-Fi Ruijie, videovigilancia CCTV, electricidad, control de acceso BioTime, soporte TI y reparaciones).',
+          `Fecha de hoy: ${todayIso}.`,
+          isGlobal
+            ? `Proyectos actuales: ${JSON.stringify(existingSummary)}.`
+            : `Proyecto abierto actual: Folio N.º ${activeP?.folioNum}, Cliente: ${activeP?.clientName}, Estatus: ${activeP?.status}.`,
+          'Convierte la siguiente nota de campo en un JSON ESTRICTO con esta estructura:',
+          '{',
+          '  "targetProjectId": string|null (ID del proyecto existente si coincide por folio o cliente, o null si es proyecto nuevo),',
+          '  "clientName": string (nombre del cliente),',
+          '  "concept": string (resumen general breve si es proyecto nuevo o vacío si no cambia),',
+          '  "suggestedStatus": "Cotizado"|"En ejecución / Con saldo"|"En ejecución / Por cobrar"|"Ejecutado / Por cobrar"|"Liquidado"|null,',
+          '  "items": [{"title": string, "desc": string, "qty": number, "unit": string, "unitPrice": number}],',
+          '  "payments": [{"date": "YYYY-MM-DD", "concept": string, "amount": number}]',
+          '}',
+          'Reglas: Redacta cada partida con un título corto y una descripción técnica clara y profesional que respalde la tarifa. Si la nota menciona "a $X c/u", unitPrice es X y qty es la cantidad. Si menciona "en $X" o "total $X" para 1 unidad, qty=1 y unitPrice=X. Los abonos/anticipos/pagos van en payments con amount positivo.',
+          `Nota del ingeniero: """${text}"""`
+        ].join('\n');
+
+        const res = await fetch('/gemini', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, json: true, temperature: 0.2, maxTokens: 2048 })
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error((data.error && data.error.message) || 'Error en IA');
+        const rawText = (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) || '';
+        const cleanJson = rawText.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+        const parsed = JSON.parse(cleanJson);
+
+        _pendingAIParsedNote = { mode, parsed };
+        renderProjectAIPreview(prevEl, parsed, isGlobal);
+      } catch (err) {
+        console.error('Error parseProjectAINote:', err);
+        showToast('❌ No se pudo procesar con IA: ' + (err.message || err));
+      } finally {
+        if (btnEl) { btnEl.disabled = false; btnEl.innerHTML = oldBtn; }
+      }
+    }
+
+    function renderProjectAIPreview(container, parsed, isGlobal) {
+      if (!container) return;
+      const targetPrj = parsed.targetProjectId ? (projectsHistory || []).find(x => x.id === parsed.targetProjectId) : null;
+      const itemsHtml = (parsed.items || []).map(it =>
+        `<li><strong>${escPrj(it.title)}</strong> (${it.qty || 1} × ${fmtMXN(it.unitPrice)}) — <span style="color:#475569;">${escPrj(it.desc)}</span></li>`
+      ).join('') || '<li><em>Sin partidas nuevas detectadas</em></li>';
+      const paysHtml = (parsed.payments || []).map(pay =>
+        `<li style="color:#15803d;"><strong>${escPrj(pay.date || '')}</strong> · ${escPrj(pay.concept)}: <strong>-${fmtMXN(pay.amount)}</strong></li>`
+      ).join('') || '';
+      const targetLabel = isGlobal
+        ? (targetPrj ? `Sumar al proyecto existente <strong>N.º ${targetPrj.folioNum} — ${escPrj(targetPrj.clientName)}</strong>` : `Crear <strong>NUEVO proyecto N.º ${getNextProjectFolio()}</strong> para <strong>${escPrj(parsed.clientName || 'Cliente')}</strong>`)
+        : `Sumar al proyecto actual`;
+
+      container.style.display = 'block';
+      container.innerHTML = `
+        <div style="background:#ffffff; border:2px solid #0284c7; border-radius:10px; padding:0.8rem 0.95rem; font-size:0.82rem;">
+          <div style="font-weight:800; color:#0369a1; margin-bottom:0.4rem;">✅ Propuesta lista · ${targetLabel}</div>
+          <ul style="margin:0 0 0.5rem 1.15rem; padding:0;">${itemsHtml}${paysHtml}</ul>
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="discardProjectAIPreview()">Descartar</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="applyProjectAIPreview()" style="background:#16a34a; border-color:#16a34a; font-weight:800;">✓ Confirmar y Aplicar</button>
+          </div>
+        </div>`;
+    }
+
+    function discardProjectAIPreview() {
+      _pendingAIParsedNote = null;
+      const g = document.getElementById('prj-global-ai-preview'); if (g) g.style.display = 'none';
+      const d = document.getElementById('prj-det-ai-preview'); if (d) d.style.display = 'none';
+    }
+
+    function applyProjectAIPreview() {
+      if (!_pendingAIParsedNote) return;
+      const { mode, parsed } = _pendingAIParsedNote;
+      let target = mode === 'detail' ? getActiveProject() : (parsed.targetProjectId ? projectsHistory.find(x => x.id === parsed.targetProjectId) : null);
+
+      if (!target) {
+        const nextFolio = getNextProjectFolio();
+        target = {
+          id: 'prj-' + nextFolio + '-' + Date.now().toString(36),
+          folioNum: nextFolio,
+          date: new Date().toISOString().slice(0, 10),
+          clientName: (parsed.clientName || 'Cliente Nuevo').trim(),
+          clientPhone: '',
+          concept: parsed.concept || '',
+          status: parsed.suggestedStatus || 'En ejecución / Por cobrar',
+          useIva: false,
+          useResico: false,
+          items: [],
+          payments: [],
+          _u: Date.now()
+        };
+        projectsHistory.push(target);
+      }
+
+      (parsed.items || []).forEach(it => {
+        target.items.push({
+          title: it.title || 'Servicio técnico',
+          desc: it.desc || '',
+          qty: parseFloat(it.qty) || 1,
+          unit: it.unit || 'Serv.',
+          unitPrice: parseFloat(it.unitPrice) || 0
+        });
+      });
+      (parsed.payments || []).forEach(pay => {
+        target.payments.push({
+          date: pay.date || new Date().toISOString().slice(0, 10),
+          concept: pay.concept || 'Abono aplicado',
+          amount: parseFloat(pay.amount) || 0
+        });
+      });
+      if (parsed.concept && !target.concept) target.concept = parsed.concept;
+      if (parsed.suggestedStatus) target.status = parsed.suggestedStatus;
+      target._u = Date.now();
+      recomputeProjectTotals(target);
+      if (target.balanceAmount <= 0.01 && target.totalAmount > 0) target.status = 'Liquidado';
+
+      discardProjectAIPreview();
+      const inp = document.getElementById(mode === 'global' ? 'prj-global-ai-input' : 'prj-det-ai-input');
+      if (inp) inp.value = '';
+      persistProjects(`✅ Cambios aplicados al Proyecto N.º ${target.folioNum}.`);
+
+      if (mode === 'detail') {
+        openProjectDetail(target.id);
+      } else {
+        renderProjectsDashboard();
+      }
+    }
+
+    /* ---- Mercado Pago por Saldo Pendiente del Proyecto ---- */
+    async function openProjectMercadoPago() {
+      const p = getActiveProject();
+      if (!p) return;
+      recomputeProjectTotals(p);
+      const amount = p.balanceAmount > 0.01 ? p.balanceAmount : p.totalAmount;
+      if (!amount || amount <= 0) {
+        showToast('El proyecto no tiene saldo pendiente mayor a $0.00 MXN.');
+        return;
+      }
+
+      openModal('modal-mercadopago');
+      const loadingView = document.getElementById('mp-loading-view');
+      const readyView = document.getElementById('mp-ready-view');
+      const errorView = document.getElementById('mp-error-view');
+      if (loadingView) loadingView.style.display = 'block';
+      if (readyView) readyView.style.display = 'none';
+      if (errorView) errorView.style.display = 'none';
+
+      try {
+        const res = await fetch('/mercadopago', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            quoteNumber: `NOTA-${p.folioNum}`,
+            clientName: p.clientName || 'Cliente',
+            clientEmail: '',
+            total: amount,
+            backUrl: window.location.href.split('#')[0]
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || 'No se pudo generar el link de pago.');
+
+        p.mercadopagoUrl = data.checkoutUrl;
+        p._u = Date.now();
+        persistProjects();
+        renderProjectMPBadge(p);
+        renderProjectFinancialSummary();
+
+        if (loadingView) loadingView.style.display = 'none';
+        if (readyView) readyView.style.display = 'block';
+        document.getElementById('mp-modal-total').textContent = `${fmtMXN(amount)} MXN`;
+        document.getElementById('mp-modal-folio').textContent = `Estado de Cuenta N.º ${p.folioNum} • ${p.clientName || 'Cliente'}`;
+        document.getElementById('mp-checkout-link').value = data.checkoutUrl;
+        const openBtn = document.getElementById('btn-mp-open-direct');
+        if (openBtn) openBtn.href = data.checkoutUrl;
+        const canvas = document.getElementById('mp-qr-canvas');
+        if (canvas && typeof window.renderQRCodeToCanvas === 'function') {
+          window.renderQRCodeToCanvas(canvas, data.checkoutUrl, 160);
+        }
+      } catch (err) {
+        if (loadingView) loadingView.style.display = 'none';
+        if (errorView) errorView.style.display = 'block';
+        const errMsg = document.getElementById('mp-error-msg');
+        if (errMsg) errMsg.textContent = err.message;
+      }
+    }
+
+    /* ---- PDF Multipágina Alta Resolución: Estado de Cuenta y Nota de Servicio ---- */
+    async function exportProjectPDF(projectId) {
+      const p = projectId ? (projectsHistory || []).find(x => x.id === projectId) : getActiveProject();
+      if (!p) return;
+      recomputeProjectTotals(p);
+
+      const btn = document.getElementById('btn-prj-export-pdf');
+      const oldBtn = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ PDF...'; }
+
+      try {
+        const W = 1700, H = 2200, M = 56, contentW = W - M * 2, PAGE_FOOT_H = 44;
+        const canvas = document.createElement('canvas');
+        canvas.width = W; canvas.height = H;
+        const ctx = canvas.getContext('2d');
+        const pageBuffers = [], pageTextsList = [], pageLinksList = [];
+        let currentPageTexts = [], currentPageLinks = [];
+
+        const origFillText = ctx.fillText.bind(ctx);
+        ctx.fillText = function(text, x, y, maxW) {
+          origFillText(text, x, y, maxW);
+          const s = text == null ? '' : String(text).trim();
+          if (s) {
+            const m = String(ctx.font).match(/(\d+(?:\.\d+)?)\s*px/);
+            currentPageTexts.push({ text: s, x, y, size: m ? parseFloat(m[1]) : 14 });
+          }
+        };
+
+        function clearWhite() { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H); }
+        function pushPage() {
+          const snap = document.createElement('canvas');
+          snap.width = W; snap.height = H;
+          snap.getContext('2d').drawImage(canvas, 0, 0);
+          pageBuffers.push(snap);
+          pageTextsList.push(currentPageTexts.slice());
+          pageLinksList.push(currentPageLinks.slice());
+          currentPageTexts = []; currentPageLinks = [];
+        }
+        function roundRect(x, y, w, h, r, fill, stroke, lineW = 1.5) {
+          ctx.beginPath();
+          ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+          ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+          ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+          if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+          if (stroke) { ctx.lineWidth = lineW; ctx.strokeStyle = stroke; ctx.stroke(); }
+        }
+        function wrapText(str, maxW, fontStr) {
+          ctx.font = fontStr;
+          const words = String(str || '').split(/\s+/);
+          const out = []; let line = '';
+          words.forEach(w => {
+            const test = line ? line + ' ' + w : w;
+            if (ctx.measureText(test).width > maxW && line) { out.push(line); line = w; }
+            else line = test;
+          });
+          if (line) out.push(line);
+          return out.length ? out : [''];
+        }
+
+        clearWhite();
+        let curY = M;
+
+        // Encabezado oficial GASO Ingeniería
+        const headerH = 210, logoBoxW = 240, metaBoxW = 500, gap = 22;
+        const midX = M + logoBoxW + gap, midW = contentW - logoBoxW - metaBoxW - gap * 2, metaX = W - M - metaBoxW;
+        roundRect(M, curY, logoBoxW, headerH, 12, '#f8fafc', '#cbd5e1', 2);
+        const logoImg = document.querySelector('.nav-logo-img');
+        if (logoImg && logoImg.complete && logoImg.naturalWidth) {
+          const pad = 18;
+          const sc = Math.min((logoBoxW - pad * 2) / logoImg.naturalWidth, (headerH - pad * 2) / logoImg.naturalHeight);
+          const lw = logoImg.naturalWidth * sc, lh = logoImg.naturalHeight * sc;
+          ctx.drawImage(logoImg, M + (logoBoxW - lw) / 2, curY + (headerH - lh) / 2, lw, lh);
+        }
+
+        const compName = (document.getElementById('company-name')?.value || 'GASO INGENIERÍA').trim();
+        const compRfc = (document.getElementById('company-rfc')?.value || 'GATM851209T92').trim();
+        const compPhone = (document.getElementById('company-phone')?.value || '22.23.76.31.95').trim();
+        const compEmail = (document.getElementById('company-email')?.value || 'admin@gaso-e.com').trim();
+        const compAddr = (document.getElementById('company-address')?.value || 'Aldama No.2 Sanctorum, Cuautlancingo, Puebla. C.P.72730').trim();
+        const compPro = (document.getElementById('company-professional')?.value || 'Ing. Jose Miguel Gamboa Torres | Cédula: 14285574').trim();
+
+        let my = curY + 34;
+        ctx.font = '800 30px -apple-system, sans-serif'; ctx.fillStyle = '#023e8a';
+        ctx.fillText(compName, midX, my);
+        my += 32;
+        ctx.font = '700 17px -apple-system, sans-serif'; ctx.fillStyle = '#0f172a';
+        ctx.fillText(compPro, midX, my);
+        my += 28;
+        ctx.font = '600 16.5px -apple-system, sans-serif'; ctx.fillStyle = '#334155';
+        ctx.fillText(`RFC: ${compRfc}   |   Cel: ${compPhone}`, midX, my);
+        my += 26;
+        wrapText(compAddr, midW, '500 16px -apple-system, sans-serif').slice(0, 2).forEach(ln => {
+          ctx.fillText(ln, midX, my); my += 22;
+        });
+        ctx.fillText(`Correo: ${compEmail}   |   Web: www.gaso-e.com`, midX, my + 4);
+
+        roundRect(metaX, curY, metaBoxW, headerH, 12, '#f8fafc', '#cbd5e1', 2);
+        roundRect(metaX, curY, metaBoxW, 56, 12, '#023e8a', null);
+        ctx.fillStyle = '#023e8a'; ctx.fillRect(metaX, curY + 40, metaBoxW, 16);
+        ctx.font = '800 17px -apple-system, sans-serif'; ctx.fillStyle = '#ffffff';
+        ctx.fillText('ESTADO DE CUENTA Y NOTA DE SERVICIO', metaX + 16, curY + 35);
+        ctx.font = '900 28px -apple-system, sans-serif'; ctx.fillStyle = '#0f172a';
+        ctx.fillText(`N.º ${p.folioNum}`, metaX + 18, curY + 98);
+        ctx.font = '600 17px -apple-system, sans-serif'; ctx.fillStyle = '#334155';
+        ctx.fillText(`Fecha: ${fmtLongDateEs(p.date)}`, metaX + 18, curY + 134);
+        ctx.font = '700 17px -apple-system, sans-serif'; ctx.fillStyle = '#0369a1';
+        ctx.fillText(`Estatus: ${p.status}`, metaX + 18, curY + 168);
+
+        curY += headerH + 22;
+
+        // Caja Cliente y Concepto
+        const conceptLines = wrapText(p.concept || 'Servicios Técnicos Integrales', contentW - 180, '500 18px -apple-system, sans-serif');
+        const cliBoxH = 66 + Math.max(1, conceptLines.length) * 24;
+        roundRect(M, curY, contentW, cliBoxH, 10, '#f8fafc', '#cbd5e1', 1.5);
+        ctx.font = '700 18px -apple-system, sans-serif'; ctx.fillStyle = '#023e8a';
+        ctx.fillText('Cliente:', M + 18, curY + 34);
+        ctx.font = '800 20px -apple-system, sans-serif'; ctx.fillStyle = '#0f172a';
+        ctx.fillText(p.clientName || 'Cliente', M + 100, curY + 34);
+        ctx.font = '700 18px -apple-system, sans-serif'; ctx.fillStyle = '#023e8a';
+        ctx.fillText('Concepto:', M + 18, curY + 66);
+        ctx.font = '500 18px -apple-system, sans-serif'; ctx.fillStyle = '#1e293b';
+        conceptLines.forEach((ln, i) => ctx.fillText(ln, M + 120, curY + 66 + i * 24));
+        curY += cliBoxH + 22;
+
+        // 1. Tabla de Partidas
+        function drawItemsHeader() {
+          ctx.font = '800 20px -apple-system, sans-serif'; ctx.fillStyle = '#023e8a';
+          ctx.fillText(`1. DETALLE TÉCNICO Y DESGLOSE DE PARTIDAS (${p.items.length} SERVICIOS)`, M, curY);
+          curY += 14;
+          roundRect(M, curY, contentW, 42, 6, '#0f172a', null);
+          ctx.font = '700 16px -apple-system, sans-serif'; ctx.fillStyle = '#ffffff';
+          ctx.fillText('Partida', M + 14, curY + 27);
+          ctx.fillText('Descripción del Servicio Técnico', M + 110, curY + 27);
+          ctx.textAlign = 'center'; ctx.fillText('Cantidad', M + 1100, curY + 27);
+          ctx.textAlign = 'right'; ctx.fillText('P. Unitario', M + 1350, curY + 27);
+          ctx.fillText('Importe Total', M + contentW - 18, curY + 27);
+          ctx.textAlign = 'left';
+          curY += 46;
+        }
+        drawItemsHeader();
+
+        const maxY = H - PAGE_FOOT_H - 36;
+        function ensureSpace(need, repeatItemsHeader = false) {
+          if (curY + need <= maxY) return;
+          pushPage();
+          clearWhite();
+          curY = M;
+          if (repeatItemsHeader) drawItemsHeader();
+        }
+
+        p.items.forEach((it, idx) => {
+          const titleFont = '700 17.5px -apple-system, sans-serif';
+          const descFont = '500 16.5px -apple-system, sans-serif';
+          const fullTitle = (it.title || '') + (it.desc ? ':' : '');
+          const tLines = wrapText(fullTitle, 900, titleFont);
+          const dLines = it.desc ? wrapText(it.desc, 900, descFont) : [];
+          const rowH = Math.max(48, 18 + tLines.length * 22 + dLines.length * 21 + 10);
+          ensureSpace(rowH, true);
+
+          if (idx % 2 === 1) { ctx.fillStyle = '#f8fafc'; ctx.fillRect(M, curY, contentW, rowH); }
+          ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(M, curY + rowH); ctx.lineTo(M + contentW, curY + rowH); ctx.stroke();
+
+          ctx.font = '800 17.5px -apple-system, sans-serif'; ctx.fillStyle = '#023e8a';
+          ctx.textAlign = 'center'; ctx.fillText(String(idx + 1), M + 45, curY + 28); ctx.textAlign = 'left';
+
+          let ty = curY + 26;
+          ctx.font = titleFont; ctx.fillStyle = '#0f172a';
+          tLines.forEach(ln => { ctx.fillText(ln, M + 110, ty); ty += 22; });
+          ctx.font = descFont; ctx.fillStyle = '#475569';
+          dLines.forEach(ln => { ctx.fillText(ln, M + 110, ty); ty += 21; });
+
+          ctx.font = '600 17px -apple-system, sans-serif'; ctx.fillStyle = '#1e293b';
+          ctx.textAlign = 'center'; ctx.fillText(`${it.qty ?? 1} ${it.unit || 'Serv.'}`, M + 1100, curY + 28);
+          ctx.textAlign = 'right'; ctx.fillText(fmtMXN(it.unitPrice), M + 1350, curY + 28);
+          ctx.font = '800 17.5px -apple-system, sans-serif'; ctx.fillStyle = '#0f172a';
+          ctx.fillText(fmtMXN(it.total), M + contentW - 18, curY + 28);
+          ctx.textAlign = 'left';
+          curY += rowH;
+        });
+
+        // Fila Subtotal de Partidas
+        ensureSpace(56);
+        roundRect(M, curY + 4, contentW, 44, 6, '#eff6ff', '#bfdbfe', 1.5);
+        ctx.font = '800 18px -apple-system, sans-serif'; ctx.fillStyle = '#023e8a';
+        ctx.fillText('SUBTOTAL DE SERVICIOS ESPECIALIZADOS', M + 18, curY + 32);
+        ctx.textAlign = 'right';
+        ctx.fillText(`${fmtMXN(p.subtotalAmount)} MXN`, M + contentW - 18, curY + 32);
+        ctx.textAlign = 'left';
+        curY += 68;
+
+        // 2. Control Financiero e Historial de Abonos
+        const finNeeded = 150 + p.payments.length * 42 + (p.useIva ? 70 : 0);
+        ensureSpace(Math.min(finNeeded, 420));
+        ctx.font = '800 20px -apple-system, sans-serif'; ctx.fillStyle = '#023e8a';
+        ctx.fillText('2. CONTROL FINANCIERO E HISTORIAL DE ABONOS', M, curY);
+        curY += 14;
+        roundRect(M, curY, contentW, 40, 6, '#0f172a', null);
+        ctx.font = '700 16px -apple-system, sans-serif'; ctx.fillStyle = '#ffffff';
+        ctx.fillText('Fecha / Movimiento', M + 16, curY + 26);
+        ctx.fillText('Concepto del Movimiento', M + 360, curY + 26);
+        ctx.textAlign = 'right'; ctx.fillText('Importe', M + contentW - 18, curY + 26);
+        ctx.textAlign = 'left';
+        curY += 44;
+
+        const finRows = [
+          { d: `Partidas 1 a ${p.items.length}`, c: p.useIva ? 'Total Acumulado de Servicios (incluye ajustes fiscales)' : 'Total Acumulado de Servicios', a: `${fmtMXN(p.totalAmount)} MXN`, col: '#0f172a' }
+        ];
+        if (p.useIva) {
+          finRows.unshift({ d: 'Desglose Fiscal', c: `Subtotal ${fmtMXN(p.subtotalAmount)} + IVA 16% (${fmtMXN(p.ivaAmount)})${p.useResico ? ' - RESICO (' + fmtMXN(p.resicoAmount) + ')' : ''}`, a: `${fmtMXN(p.totalAmount)} MXN`, col: '#0369a1' });
+        }
+        p.payments.forEach(pay => {
+          finRows.push({ d: fmtLongDateEs(pay.date) || pay.date || '-', c: pay.concept || 'Abono', a: `-${fmtMXN(pay.amount)} MXN`, col: '#15803d' });
+        });
+
+        finRows.forEach((r, i) => {
+          ensureSpace(42);
+          if (i % 2 === 1) { ctx.fillStyle = '#f8fafc'; ctx.fillRect(M, curY, contentW, 38); }
+          ctx.strokeStyle = '#e2e8f0'; ctx.beginPath(); ctx.moveTo(M, curY + 38); ctx.lineTo(M + contentW, curY + 38); ctx.stroke();
+          ctx.font = '600 16.5px -apple-system, sans-serif'; ctx.fillStyle = '#334155';
+          ctx.fillText(r.d, M + 16, curY + 25);
+          ctx.fillText(r.c, M + 360, curY + 25);
+          ctx.font = '800 17px -apple-system, sans-serif'; ctx.fillStyle = r.col;
+          ctx.textAlign = 'right'; ctx.fillText(r.a, M + contentW - 18, curY + 25);
+          ctx.textAlign = 'left';
+          curY += 38;
+        });
+
+        ensureSpace(140);
+        curY += 10;
+        roundRect(M, curY, contentW, 44, 6, '#ecfdf5', '#86efac', 1.5);
+        ctx.font = '800 18px -apple-system, sans-serif'; ctx.fillStyle = '#15803d';
+        ctx.fillText('TOTAL ACREDITADO (Suma total de abonos aplicados)', M + 18, curY + 29);
+        ctx.textAlign = 'right'; ctx.fillText(`-${fmtMXN(p.paidAmount)} MXN`, M + contentW - 18, curY + 29);
+        ctx.textAlign = 'left';
+        curY += 54;
+
+        const balFill = p.balanceAmount > 0.01 ? '#fef3c7' : '#dcfce7';
+        const balStroke = p.balanceAmount > 0.01 ? '#f59e0b' : '#16a34a';
+        const balCol = p.balanceAmount > 0.01 ? '#92400e' : '#166534';
+        roundRect(M, curY, contentW, 74, 8, balFill, balStroke, 2);
+        ctx.font = '900 22px -apple-system, sans-serif'; ctx.fillStyle = balCol;
+        ctx.fillText('SALDO PENDIENTE POR LIQUIDAR', M + 20, curY + 34);
+        ctx.textAlign = 'right'; ctx.fillText(`${fmtMXN(p.balanceAmount)} MXN`, M + contentW - 20, curY + 34);
+        ctx.textAlign = 'left';
+        const words = typeof numberToWordsSpanish === 'function' ? numberToWordsSpanish(Math.max(0, p.balanceAmount), 'MXN') : '';
+        ctx.font = '600 15.5px -apple-system, sans-serif';
+        ctx.fillText(`(${words})`, M + 20, curY + 60);
+        curY += 94;
+
+        if (p.mercadopagoUrl && p.balanceAmount > 0.01) {
+          ensureSpace(70);
+          roundRect(M, curY, contentW, 50, 8, '#f0f9ff', '#38bdf8', 1.5);
+          ctx.font = '700 16px -apple-system, sans-serif'; ctx.fillStyle = '#0369a1';
+          ctx.fillText(`💳 Pago en línea habilitado (Mercado Pago): ${p.mercadopagoUrl}`, M + 18, curY + 31);
+          currentPageLinks.push({ url: p.mercadopagoUrl, x: M, y: curY, w: contentW, h: 50 });
+          curY += 60;
+        }
+
+        pushPage();
+        const totalP = pageBuffers.length;
+        const pdfPages = pageBuffers.map((snap, i) => {
+          const sctx = snap.getContext('2d');
+          sctx.fillStyle = '#ffffff'; sctx.fillRect(0, H - PAGE_FOOT_H, W, PAGE_FOOT_H);
+          sctx.textAlign = 'center'; sctx.font = '700 16px -apple-system, sans-serif'; sctx.fillStyle = '#64748b';
+          sctx.fillText(`GASO INGENIERÍA · Estado de Cuenta N.º ${p.folioNum} · Página ${i + 1} de ${totalP}`, W / 2, H - 15);
+          return { jpegDataUrl: snap.toDataURL('image/jpeg', 0.96), width: W, height: H, texts: pageTextsList[i] || [], links: pageLinksList[i] || [] };
+        });
+
+        const blob = buildPDFBytesFromJpegPages(pdfPages);
+        const safeClient = (p.clientName || 'Cliente').replace(/[^a-zA-Z0-9_-]+/g, '_');
+        const fname = `Estado_Cuenta_N${p.folioNum}_${safeClient}.pdf`;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = fname;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 6000);
+        showToast(`📥 PDF descargado: ${fname}`);
+      } catch (err) {
+        console.error('Error exportProjectPDF:', err);
+        showToast('❌ Error generando PDF: ' + (err.message || err));
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = oldBtn; }
+      }
+    }
+    </script>
 </body>
 </html>
