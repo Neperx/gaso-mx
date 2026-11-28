@@ -4133,6 +4133,9 @@ CLABE: 722969010514249300</textarea>
               <p style="font-size:0.84rem; color:var(--gray-500); margin:0.2rem 0 0;">Cuentas abiertas por proyecto, partidas acumuladas con IA, historial multi-abono, WhatsApp de cobro y Estado de Cuenta PDF.</p>
             </div>
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="openResetProjectsControlModal()" title="Reiniciar control o numeración de notas" style="color:#475569;">
+                🔄 Reiniciar Control
+              </button>
               <button type="button" class="btn btn-outline btn-sm" onclick="openLaborCatalogModal()" title="Administrar tabulador rápido de precios de mano de obra">
                 ⚡ Tabulador Mano de Obra
               </button>
@@ -4174,6 +4177,7 @@ CLABE: 722969010514249300</textarea>
                 <button type="button" class="prj-pill" data-filter="exec_due" onclick="setProjectFilter('exec_due')">🚨 Ejecutado / Por Cobrar</button>
                 <button type="button" class="prj-pill" data-filter="quoted" onclick="setProjectFilter('quoted')">📝 Cotizados</button>
                 <button type="button" class="prj-pill" data-filter="paid" onclick="setProjectFilter('paid')">✅ Liquidados</button>
+                <button type="button" class="prj-pill" data-filter="cuts" onclick="setProjectFilter('cuts')">✂️ Cortes Cerrados</button>
               </div>
               <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
                 <input type="text" id="prj-search-input" class="form-input no-uppercase" oninput="renderProjectsDashboard()" placeholder="🔍 Buscar N.º, cliente o alcance..." style="min-width:220px; font-size:0.82rem; padding:0.4rem 0.65rem;">
@@ -4218,15 +4222,32 @@ CLABE: 722969010514249300</textarea>
                 <option value="En ejecución / Por cobrar">⏳ En ejecución / Por cobrar</option>
                 <option value="Ejecutado / Por cobrar">🚨 Ejecutado / Por cobrar</option>
                 <option value="Liquidado">✅ Liquidado</option>
+                <option value="Corte Cerrado">✂️ Corte Cerrado</option>
                 <option value="Cancelado">⛔ Cancelado</option>
               </select>
             </div>
-            <div style="display:flex; gap:0.45rem; flex-wrap:wrap;">
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
               <button type="button" class="btn btn-outline btn-sm" onclick="saveActiveProjectNow(true)" style="font-weight:700; color:#15803d; border-color:#86efac;">💾 Guardar</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="cutProjectToNewNote()" style="font-weight:800; color:#9a3412; border-color:#fdba74; background:#fff7ed;" title="Cerrar esta nota y abrir una nueva arrastrando el saldo pendiente">✂️ Hacer Corte / Nueva Nota</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="convertProjectToSalesNote()" style="font-weight:700; color:#0f172a; border-color:#94a3b8;" title="Enviar partidas y saldo al Cotizador como Nota de Venta oficial (NV)">🧾 Pasar a Nota de Venta</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="openProjectPortalModal()" style="font-weight:800; color:#6d28d9; border-color:#c4b5fd; background:#f5f3ff;" title="Generar o administrar link único seguro para que tu cliente vea sus cuentas">🔗 Link Único Cliente</button>
               <button type="button" class="btn btn-outline btn-sm" onclick="openProjectMercadoPago()" style="font-weight:700; color:#0284c7; border-color:#7dd3fc;">💳 Link Mercado Pago</button>
               <button type="button" class="btn btn-outline btn-sm" onclick="openProjectWhatsApp(null, true)" style="font-weight:700; color:#16a34a; border-color:#86efac;">📲 WhatsApp</button>
               <button type="button" class="btn btn-primary btn-sm" id="btn-prj-export-pdf" onclick="exportProjectPDF()" style="background:#023e8a; border-color:#023e8a; font-weight:800;">📥 Descargar PDF</button>
               <button type="button" class="btn btn-outline btn-sm" onclick="deleteActiveProject()" style="color:#dc2626; border-color:#fca5a5;" title="Eliminar proyecto">🗑️</button>
+            </div>
+          </div>
+
+          <!-- Banner de Saldo de Nota Anterior (si proviene de un Corte) -->
+          <div id="prj-det-prev-cut-banner" class="prj-card" style="display:none; background:#fffbeb; border:1.5px solid #f59e0b; padding:0.75rem 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <div style="font-size:0.86rem; color:#92400e; font-weight:800;">
+                📌 Saldo de Nota Anterior (<span id="prj-det-prev-folio-lbl">N.º -</span>):
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <input type="number" id="prj-det-prev-balance" class="form-input" min="0" step="10" oninput="onProjectPrevBalanceInput()" style="width:145px; text-align:right; font-weight:900; color:#92400e; background:#fff;" title="Saldo arrastrado del corte anterior">
+                <span style="font-size:0.78rem; font-weight:700; color:#78350f;">MXN</span>
+              </div>
             </div>
           </div>
 
@@ -5424,6 +5445,94 @@ CLABE: 722969010514249300</textarea>
       </div>
       <div class="modal-footer" style="padding:0.75rem 1rem; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end;">
         <button type="button" class="btn btn-outline" onclick="closeModal('modal-labor-catalog')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LINK ÚNICO SEGURO PARA PORTAL DEL CLIENTE -->
+  <div class="modal-backdrop no-print" id="modal-project-portal" style="display:none;">
+    <div class="modal-box" style="max-width:520px; background:#ffffff; border-radius:14px; overflow:hidden;">
+      <div class="modal-header" style="background:linear-gradient(135deg, #4c1d95, #6d28d9); color:#ffffff;">
+        <div>
+          <h3 style="color:#ffffff; margin:0; font-size:1.05rem;">🔗 Link Único Seguro para Cliente</h3>
+          <div id="portal-modal-sub" style="font-size:0.75rem; color:#ede9fe;">Solo lectura exclusiva de sus cuentas, cortes y abonos</div>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-project-portal')" style="color:#ffffff;">✕</button>
+      </div>
+      <div class="modal-body" style="padding:1.15rem; display:flex; flex-direction:column; gap:0.85rem;">
+        <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:8px; padding:0.75rem; font-size:0.78rem; color:#4c1d95; line-height:1.4;">
+          🛡️ Tu cliente entra a una página aislada (<code>cuenta.html</code>) que únicamente muestra <strong>sus propias notas y cortes</strong>. No puede ver otros clientes, editar montos ni acceder a tu plataforma GASO. Puedes revocar o cambiar el link cuando quieras.
+        </div>
+
+        <div id="portal-modal-existing" style="display:none; background:#ecfdf5; border:1px solid #86efac; border-radius:8px; padding:0.75rem; font-size:0.8rem; color:#065f46;">
+          <div style="font-weight:800; margin-bottom:0.25rem;">✅ Este cliente ya tiene un enlace activo</div>
+          <div id="portal-modal-existing-url" style="font-family:monospace; font-size:0.74rem; word-break:break-all; background:#fff; padding:0.4rem; border-radius:6px; border:1px solid #bbf7d0; margin:0.35rem 0;"></div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.45rem;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyCurrentPortalUrl()" style="font-weight:700;">📋 Copiar Link</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="revokeProjectPortalLink()" style="color:#dc2626; border-color:#fca5a5; font-weight:700;">🚫 Revocar Acceso</button>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.8rem;">
+          <label style="display:flex; align-items:center; gap:0.45rem; font-weight:800; font-size:0.82rem; color:#0f172a; cursor:pointer; margin-bottom:0.5rem;">
+            <input type="checkbox" id="portal-use-pin-chk" checked onchange="document.getElementById('portal-custom-pin-wrap').style.display = this.checked ? 'block' : 'none'">
+            🔐 Exigir NIP de 4 dígitos al abrir el link (Doble Seguridad Bancaria)
+          </label>
+          <div id="portal-custom-pin-wrap">
+            <label style="font-size:0.75rem; color:#475569; font-weight:700; display:block; margin-bottom:0.25rem;">NIP personalizado (déjalo vacío para generar uno aleatorio):</label>
+            <input type="text" id="portal-custom-pin" maxlength="6" inputmode="numeric" class="form-input no-uppercase" placeholder="Ej. 4821 (opcional)" style="width:180px; font-weight:800; letter-spacing:3px; text-align:center;">
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="btn-portal-generate" onclick="generateProjectPortalLink()" style="background:#6d28d9; border-color:#6d28d9; font-weight:800; justify-content:center;">
+          ✨ Generar / Renovar Link Único Seguro
+        </button>
+
+        <div id="portal-modal-generated" style="display:none; background:#eff6ff; border:2px solid #38bdf8; border-radius:10px; padding:0.85rem;">
+          <div style="font-weight:800; color:#0369a1; font-size:0.84rem; margin-bottom:0.35rem;">🎉 Nuevo Link Único Listo (el anterior quedó invalidado):</div>
+          <textarea id="portal-generated-invite" class="form-input no-uppercase" rows="4" readonly style="width:100%; font-size:0.78rem; background:#fff;"></textarea>
+          <div style="display:flex; gap:0.5rem; margin-top:0.5rem; justify-content:flex-end;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="copyProjectPortalInvite()" style="font-weight:700;">📋 Copiar Invitación</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="sendProjectPortalWhatsApp()" style="background:#16a34a; border-color:#16a34a; font-weight:700;">📲 Enviar por WhatsApp</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding:0.75rem 1rem; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-project-portal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REINICIAR CONTROL DE NOTAS Y PROYECTOS -->
+  <div class="modal-backdrop no-print" id="modal-reset-projects" style="display:none;">
+    <div class="modal-box" style="max-width:480px; background:#ffffff; border-radius:14px; overflow:hidden;">
+      <div class="modal-header" style="background:#0f172a; color:#ffffff;">
+        <div>
+          <h3 style="color:#ffffff; margin:0; font-size:1.05rem;">🔄 Reiniciar Control de Notas</h3>
+          <div style="font-size:0.74rem; color:#cbd5e1;">Inicia un nuevo ciclo limpio o restaura los folios iniciales</div>
+        </div>
+        <button class="modal-close" onclick="closeModal('modal-reset-projects')" style="color:#ffffff;">✕</button>
+      </div>
+      <div class="modal-body" style="padding:1.15rem; display:flex; flex-direction:column; gap:0.9rem;">
+        <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:8px; padding:0.75rem; font-size:0.8rem; color:#9a3412;">
+          <strong>Opción A — Iniciar control desde cero (en limpio):</strong><br>
+          Limpia las cuentas actuales de la pestaña Cuentas (también en la nube D1) y arranca el consecutivo desde el folio que indiques:
+          <div style="display:flex; gap:0.5rem; align-items:center; margin-top:0.55rem;">
+            <label style="font-weight:700;">Siguiente Folio N.º:</label>
+            <input type="number" id="reset-start-folio" class="form-input" value="1" min="1" step="1" style="width:110px; font-weight:800; text-align:center;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="executeResetProjectsControl('clean')" style="background:#dc2626; border-color:#dc2626; font-weight:800;">Reiniciar en Limpio</button>
+          </div>
+        </div>
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:0.75rem; font-size:0.8rem; color:#0369a1;">
+          <strong>Opción B — Restaurar tus 6 proyectos base (350–358):</strong><br>
+          Vuelve a cargar el control con tus 6 clientes y desgloses iniciales exactos.
+          <div style="margin-top:0.55rem;">
+            <button type="button" class="btn btn-primary btn-sm" onclick="executeResetProjectsControl('seed')" style="background:#023e8a; border-color:#023e8a; font-weight:800;">Restaurar Proyectos 350–358</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding:0.75rem 1rem; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end;">
+        <button type="button" class="btn btn-outline" onclick="closeModal('modal-reset-projects')">Cancelar</button>
       </div>
     </div>
   </div>
@@ -15753,17 +15862,24 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       sub = round2(sub);
       const iva = p.useIva ? round2(sub * 0.16) : 0;
       const resico = (p.useIva && p.useResico) ? round2(sub * 0.0125) : 0;
-      const total = round2(sub + iva - resico);
+      const prevBal = round2(parseFloat(p.prevBalanceAmount) || 0);
+      const total = round2(sub + iva - resico + prevBal);
       let paid = 0;
       p.payments.forEach(pay => { paid += parseFloat(pay.amount) || 0; });
       paid = round2(paid);
-      const balance = round2(total - paid);
+      const rawBalance = round2(total - paid);
       p.subtotalAmount = sub;
       p.ivaAmount = iva;
       p.resicoAmount = resico;
+      p.prevBalanceAmount = prevBal;
       p.totalAmount = total;
       p.paidAmount = paid;
-      p.balanceAmount = balance;
+      if (p.status === 'Corte Cerrado') {
+        p.carriedOverBalance = p.carriedOverBalance !== undefined ? round2(p.carriedOverBalance) : rawBalance;
+        p.balanceAmount = 0;
+      } else {
+        p.balanceAmount = rawBalance;
+      }
       return p;
     }
 
@@ -15954,7 +16070,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
     function updateProjectsBadge() {
       const el = document.getElementById('projects-badge-count');
-      if (el) el.textContent = (projectsHistory || []).filter(p => p && p.status !== 'Liquidado' && p.status !== 'Cancelado').length;
+      if (el) el.textContent = (projectsHistory || []).filter(p => p && p.status !== 'Liquidado' && p.status !== 'Corte Cerrado' && p.status !== 'Cancelado').length;
     }
 
     function getNextProjectFolio() {
@@ -15963,7 +16079,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         const fn = parseInt(p.folioNum, 10) || 0;
         if (fn > mx) mx = fn;
       });
-      return Math.max(mx, 358) + 1;
+      const minNext = parseInt(safeStorage.getItem('gaso_project_next_min') || '0', 10) || 0;
+      return Math.max(mx + 1, minNext, 1);
     }
 
     function persistProjects(msg) {
@@ -15981,6 +16098,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         'En ejecución / Por cobrar': ['#ffedd5', '#c2410c'],
         'Ejecutado / Por cobrar': ['#fee2e2', '#b91c1c'],
         'Liquidado': ['#dcfce7', '#15803d'],
+        'Corte Cerrado': ['#e2e8f0', '#334155'],
         'Cancelado': ['#f1f5f9', '#475569']
       };
       const pair = map[status] || ['#f1f5f9', '#334155'];
@@ -16003,9 +16121,13 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const execDueNames = [];
       list.forEach(p => {
         if (p.status === 'Cancelado') return;
-        totalContracted += p.totalAmount || 0;
+        if (p.status !== 'Corte Cerrado') {
+          totalContracted += p.subtotalAmount + (p.ivaAmount || 0) - (p.resicoAmount || 0);
+          if ((p.balanceAmount || 0) > 0.01) totalPend += p.balanceAmount;
+        } else {
+          totalContracted += p.subtotalAmount + (p.ivaAmount || 0) - (p.resicoAmount || 0);
+        }
         totalPaid += p.paidAmount || 0;
-        if ((p.balanceAmount || 0) > 0.01) totalPend += p.balanceAmount;
         if (p.status === 'Ejecutado / Por cobrar' && (p.balanceAmount || 0) > 0.01) {
           totalExecDue += p.balanceAmount;
           totalExecCount++;
@@ -16059,10 +16181,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       const sortMode = document.getElementById('prj-sort-select')?.value || 'folio_asc';
 
       let filtered = list.filter(p => {
-        if (projectFilterMode === 'pending' && !(p.status !== 'Cancelado' && (p.balanceAmount || 0) > 0.01)) return false;
+        if (projectFilterMode === 'pending' && !(p.status !== 'Cancelado' && p.status !== 'Corte Cerrado' && (p.balanceAmount || 0) > 0.01)) return false;
         if (projectFilterMode === 'exec_due' && p.status !== 'Ejecutado / Por cobrar') return false;
         if (projectFilterMode === 'quoted' && p.status !== 'Cotizado') return false;
-        if (projectFilterMode === 'paid' && p.status !== 'Liquidado' && (p.balanceAmount || 0) > 0.01) return false;
+        if (projectFilterMode === 'paid' && p.status !== 'Liquidado') return false;
+        if (projectFilterMode === 'cuts' && p.status !== 'Corte Cerrado') return false;
         if (q) {
           const hay = `${p.folioNum} ${p.clientName} ${p.concept} ${p.status}`.toLowerCase();
           if (!hay.includes(q)) return false;
@@ -16086,15 +16209,19 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       tbody.innerHTML = filtered.map(p => {
         const paidTxt = (p.paidAmount || 0) > 0 ? '-' + fmtMXN(p.paidAmount) : '$0.00';
         const scope = p.concept || (p.items && p.items[0] ? p.items[0].title : 'Sin descripción');
+        const isCut = p.status === 'Corte Cerrado';
+        const balCell = isCut
+          ? `<span style="font-size:0.74rem; color:#64748b;">A N.º ${p.closedToFolio || '-'} (${fmtMXN(p.carriedOverBalance || 0)})</span>`
+          : fmtMXN(p.balanceAmount);
         return `
-          <tr style="cursor:pointer;" onclick="openProjectDetail('${escPrj(p.id)}')">
+          <tr style="cursor:pointer; ${isCut ? 'opacity:0.78;' : ''}" onclick="openProjectDetail('${escPrj(p.id)}')">
             <td style="text-align:center; font-weight:900; color:#023e8a;">${p.folioNum}</td>
             <td style="font-weight:800; color:#0f172a;">${escPrj(p.clientName)}</td>
-            <td style="font-size:0.78rem; color:#475569; max-width:340px;">${escPrj(scope)}</td>
+            <td style="font-size:0.78rem; color:#475569; max-width:340px;">${p.prevFolioRef ? `<span style="color:#b45309; font-weight:700;">[De N.º ${p.prevFolioRef}]</span> ` : ''}${escPrj(scope)}</td>
             <td>${getProjectStatusBadge(p.status)}</td>
             <td style="text-align:right; font-weight:700;">${fmtMXN(p.totalAmount)}</td>
             <td style="text-align:right; color:${p.paidAmount > 0 ? '#15803d' : '#64748b'}; font-weight:700;">${paidTxt}</td>
-            <td style="text-align:right; font-weight:900; color:${p.balanceAmount > 0.01 ? '#b45309' : '#15803d'};">${fmtMXN(p.balanceAmount)}</td>
+            <td style="text-align:right; font-weight:900; color:${!isCut && p.balanceAmount > 0.01 ? '#b45309' : '#15803d'};">${balCell}</td>
             <td style="text-align:center; white-space:nowrap;" onclick="event.stopPropagation()">
               <button type="button" class="btn btn-outline btn-sm" onclick="openProjectDetail('${escPrj(p.id)}')" title="Abrir estado de cuenta">✏️</button>
               <button type="button" class="btn btn-outline btn-sm" onclick="openProjectWhatsApp('${escPrj(p.id)}', true)" title="Enviar estado de cuenta por WhatsApp" style="color:#16a34a;">📲</button>
@@ -16162,6 +16289,17 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       document.getElementById('prj-det-use-iva').checked = !!p.useIva;
       document.getElementById('prj-det-use-resico').checked = !!p.useResico;
       document.getElementById('prj-det-resico-wrap').style.display = p.useIva ? 'inline-flex' : 'none';
+
+      const prevBanner = document.getElementById('prj-det-prev-cut-banner');
+      if (prevBanner) {
+        if ((p.prevBalanceAmount || 0) > 0 || p.prevFolioRef) {
+          prevBanner.style.display = 'block';
+          document.getElementById('prj-det-prev-folio-lbl').textContent = p.prevFolioRef ? `N.º ${p.prevFolioRef}` : 'Corte anterior';
+          document.getElementById('prj-det-prev-balance').value = p.prevBalanceAmount || 0;
+        } else {
+          prevBanner.style.display = 'none';
+        }
+      }
 
       renderProjectMPBadge(p);
       renderProjectItems();
@@ -16402,8 +16540,11 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       recomputeProjectTotals(p);
       const box = document.getElementById('prj-det-totals-box');
       if (box) {
-        const words = typeof numberToWordsSpanish === 'function' ? numberToWordsSpanish(Math.max(0, p.balanceAmount), 'MXN') : '';
+        const isCut = p.status === 'Corte Cerrado';
+        const showAmt = isCut ? (p.carriedOverBalance || 0) : p.balanceAmount;
+        const words = typeof numberToWordsSpanish === 'function' ? numberToWordsSpanish(Math.max(0, showAmt), 'MXN') : '';
         box.innerHTML = `
+          ${p.prevBalanceAmount > 0 ? `<div style="display:flex; justify-content:space-between; margin-bottom:0.3rem; color:#92400e; background:#fef3c7; padding:0.25rem 0.5rem; border-radius:6px;"><span style="font-weight:800;">📌 Saldo Nota Anterior (${p.prevFolioRef ? 'N.º ' + p.prevFolioRef : 'Corte'}):</span><strong>${fmtMXN(p.prevBalanceAmount)} MXN</strong></div>` : ''}
           <div style="display:flex; justify-content:space-between; margin-bottom:0.3rem;">
             <span style="color:#475569; font-weight:700;">Subtotal de Servicios (${p.items.length} partidas):</span>
             <strong>${fmtMXN(p.subtotalAmount)} MXN</strong>
@@ -16418,9 +16559,9 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             <span style="font-weight:700;">(-) TOTAL ACREDITADO (Abonos):</span>
             <strong>-${fmtMXN(p.paidAmount)} MXN</strong>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; background:${p.balanceAmount > 0.01 ? '#fef3c7' : '#dcfce7'}; border:1.5px solid ${p.balanceAmount > 0.01 ? '#f59e0b' : '#22c55e'}; padding:0.55rem 0.75rem; border-radius:8px; color:${p.balanceAmount > 0.01 ? '#92400e' : '#166534'}; font-weight:900; font-size:1rem;">
-            <span>SALDO PENDIENTE:</span>
-            <span>${fmtMXN(p.balanceAmount)} MXN</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; background:${isCut ? '#e2e8f0' : (p.balanceAmount > 0.01 ? '#fef3c7' : '#dcfce7')}; border:1.5px solid ${isCut ? '#94a3b8' : (p.balanceAmount > 0.01 ? '#f59e0b' : '#22c55e')}; padding:0.55rem 0.75rem; border-radius:8px; color:${isCut ? '#334155' : (p.balanceAmount > 0.01 ? '#92400e' : '#166534')}; font-weight:900; font-size:1rem;">
+            <span>${isCut ? `SALDO TRASPASADO A NOTA N.º ${p.closedToFolio || '-'}:` : 'SALDO PENDIENTE:'}</span>
+            <span>${fmtMXN(showAmt)} MXN</span>
           </div>
           ${words ? `<div style="font-size:0.72rem; color:#64748b; margin-top:0.35rem; text-align:right; font-weight:600;">(${escPrj(words)})</div>` : ''}
         `;
@@ -16460,17 +16601,22 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       });
       lines.push('');
       lines.push('💵 BALANCE FINANCIERO AL DÍA:');
+      if (p.prevBalanceAmount > 0) {
+        lines.push(`• Saldo nota anterior (${p.prevFolioRef ? 'N.º ' + p.prevFolioRef : 'Corte'}): ${fmtMXN(p.prevBalanceAmount)} MXN`);
+      }
+      if (p.items.length > 0) {
+        lines.push(`• Nuevos servicios (${p.items.length} partidas): ${fmtMXN(p.subtotalAmount)} MXN`);
+      }
       if (p.useIva) {
-        lines.push(`• Subtotal servicios: ${fmtMXN(p.subtotalAmount)} MXN`);
         lines.push(`• (+) IVA 16%: ${fmtMXN(p.ivaAmount)} MXN`);
         if (p.useResico) lines.push(`• (-) Ret. ISR RESICO: -${fmtMXN(p.resicoAmount)} MXN`);
       }
-      lines.push(`• Total general de servicios: ${fmtMXN(p.totalAmount)} MXN`);
+      lines.push(`• Total general de cuenta: ${fmtMXN(p.totalAmount)} MXN`);
       p.payments.forEach(pay => {
         lines.push(`• ( - ) ${pay.concept || 'Abono'} (${fmtShortDateEs(pay.date)}): -${fmtMXN(pay.amount)} MXN`);
       });
-      lines.push(`👉 Total pagado a la cuenta: -${fmtMXN(p.paidAmount)} MXN`);
-      lines.push(`📌 SALDO RESTANTE POR LIQUIDAR: ${fmtMXN(p.balanceAmount)} MXN`);
+      lines.push(`👉 Total pagado en esta nota: -${fmtMXN(p.paidAmount)} MXN`);
+      lines.push(`📌 SALDO RESTANTE POR LIQUIDAR: ${fmtMXN(p.status === 'Corte Cerrado' ? (p.carriedOverBalance || 0) : p.balanceAmount)} MXN`);
       if (p.mercadopagoUrl && p.balanceAmount > 0.01) {
         lines.push('');
         lines.push(`💳 Enlace para pago con tarjeta / transferencia / Mercado Pago: ${p.mercadopagoUrl}`);
@@ -16967,12 +17113,12 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         ctx.textAlign = 'left';
         curY += 44;
 
-        const finRows = [
-          { d: `Partidas 1 a ${p.items.length}`, c: p.useIva ? 'Total Acumulado de Servicios (incluye ajustes fiscales)' : 'Total Acumulado de Servicios', a: `${fmtMXN(p.totalAmount)} MXN`, col: '#0f172a' }
-        ];
-        if (p.useIva) {
-          finRows.unshift({ d: 'Desglose Fiscal', c: `Subtotal ${fmtMXN(p.subtotalAmount)} + IVA 16% (${fmtMXN(p.ivaAmount)})${p.useResico ? ' - RESICO (' + fmtMXN(p.resicoAmount) + ')' : ''}`, a: `${fmtMXN(p.totalAmount)} MXN`, col: '#0369a1' });
+        const finRows = [];
+        if (p.prevBalanceAmount > 0) {
+          finRows.push({ d: `Corte Anterior (N.º ${p.prevFolioRef || '-'})`, c: 'Saldo traspasado de nota anterior', a: `${fmtMXN(p.prevBalanceAmount)} MXN`, col: '#92400e' });
         }
+        finRows.push({ d: `Partidas 1 a ${p.items.length}`, c: p.useIva ? `Servicios (${fmtMXN(p.subtotalAmount)}) + IVA${p.useResico ? ' - RESICO' : ''}` : 'Servicios de esta nota', a: `${fmtMXN(p.subtotalAmount + (p.ivaAmount || 0) - (p.resicoAmount || 0))} MXN`, col: '#0f172a' });
+        finRows.push({ d: 'Total Acumulado', c: 'Saldo anterior + servicios actuales', a: `${fmtMXN(p.totalAmount)} MXN`, col: '#023e8a' });
         p.payments.forEach(pay => {
           finRows.push({ d: fmtLongDateEs(pay.date) || pay.date || '-', c: pay.concept || 'Abono', a: `-${fmtMXN(pay.amount)} MXN`, col: '#15803d' });
         });
@@ -17045,6 +17191,314 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = oldBtn; }
       }
+    }
+
+    /* ---- Cortes de Cuenta, Paso a Nota de Venta (NV), Reinicio y Link Único Cliente ---- */
+    function onProjectPrevBalanceInput() {
+      const p = getActiveProject();
+      if (!p) return;
+      p.prevBalanceAmount = parseFloat(document.getElementById('prj-det-prev-balance')?.value || '0') || 0;
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      renderProjectFinancialSummary();
+      clearTimeout(window._prjSaveDeb);
+      window._prjSaveDeb = setTimeout(() => persistProjects(), 700);
+    }
+
+    function cutProjectToNewNote() {
+      const p = getActiveProject();
+      if (!p) return;
+      if (p.status === 'Corte Cerrado') {
+        showToast(`Esta nota ya fue cerrada y traspasada a la N.º ${p.closedToFolio || '-'}.`);
+        return;
+      }
+      recomputeProjectTotals(p);
+      const nextFolio = getNextProjectFolio();
+      const carry = Math.max(0, p.balanceAmount || 0);
+      const msg = carry > 0
+        ? `¿Hacer corte en la Nota N.º ${p.folioNum}?\n\n• La Nota N.º ${p.folioNum} quedará guardada como "Corte Cerrado" con sus ${p.items.length} partidas y ${p.payments.length} abonos.\n• Se abrirá la NUEVA Nota N.º ${nextFolio} para ${p.clientName || 'este cliente'} iniciando con:\n  "Saldo Nota Anterior (N.º ${p.folioNum}): ${fmtMXN(carry)} MXN".`
+        : `La Nota N.º ${p.folioNum} tiene saldo $0.00. ¿Deseas cerrarla como "Corte Cerrado" y abrir una nueva Nota N.º ${nextFolio} en limpio?`;
+      if (!confirm(msg)) return;
+
+      const now = Date.now();
+      p.status = 'Corte Cerrado';
+      p.closedToFolio = nextFolio;
+      p.carriedOverBalance = carry;
+      p._u = now;
+      recomputeProjectTotals(p);
+
+      const newNote = recomputeProjectTotals({
+        id: 'prj-' + nextFolio + '-' + now.toString(36),
+        folioNum: nextFolio,
+        date: new Date().toISOString().slice(0, 10),
+        clientName: p.clientName || '',
+        clientPhone: p.clientPhone || '',
+        concept: `Continuación de cuenta (Corte Nota N.º ${p.folioNum})${carry > 0 ? ' — Saldo anterior: ' + fmtMXN(carry) : ''}`,
+        status: carry > 0 ? 'En ejecución / Con saldo' : 'En ejecución / Por cobrar',
+        prevFolioRef: p.folioNum,
+        prevBalanceAmount: carry,
+        useIva: !!p.useIva,
+        useResico: !!p.useResico,
+        items: [],
+        payments: [],
+        _u: now
+      });
+
+      projectsHistory.push(newNote);
+      persistProjects(`✂️ Corte realizado: Nota N.º ${p.folioNum} cerrada → Nueva Nota N.º ${nextFolio} abierta.`);
+      openProjectDetail(newNote.id);
+    }
+
+    function convertProjectToSalesNote() {
+      const p = getActiveProject();
+      if (!p) return;
+      recomputeProjectTotals(p);
+      if ((p.items.length === 0) && (p.prevBalanceAmount || 0) <= 0) {
+        showToast('Agrega al menos una partida o saldo antes de pasar a Nota de Venta.');
+        return;
+      }
+      if (!confirm(`¿Pasar el Proyecto N.º ${p.folioNum} (${p.clientName || 'Cliente'}) al Cotizador como Nota de Venta oficial (NV)?\n\nPodrás aplicar sellos oficiales, firma del cliente y descargar el PDF formato NV.`)) return;
+
+      startNewQuote();
+      QUOTE_AUTOSAVE.suppress = true;
+      document.getElementById('quote-status').value = 'sales_note';
+      handleStatusChange();
+
+      document.getElementById('client-name').value = p.clientName || 'VENTA AL PÚBLICO EN GENERAL';
+      if (p.clientPhone) document.getElementById('client-phone').value = p.clientPhone;
+      document.getElementById('quote-date').value = p.date || new Date().toISOString().slice(0, 10);
+
+      const billingToggle = document.getElementById('billing-mode-toggle');
+      if (billingToggle) {
+        billingToggle.checked = !!p.useIva;
+        toggleBillingMode();
+      }
+      const resicoChk = document.getElementById('resico-retention-toggle');
+      if (resicoChk) {
+        resicoChk.checked = !!(p.useIva && p.useResico);
+      }
+
+      const tbody = document.getElementById('items-body');
+      if (tbody) tbody.innerHTML = '';
+
+      if ((p.prevBalanceAmount || 0) > 0) {
+        addNewRow({
+          category: 'SERVICIO',
+          concept: `Saldo pendiente de Nota Anterior (N.º ${p.prevFolioRef || '-'})`,
+          description: `Saldo traspasado del corte anterior (${p.clientName || ''}).`,
+          quantity: 1,
+          unit: 'Serv.',
+          priceCurrency: 'MXN',
+          price: p.prevBalanceAmount,
+          applyIva: !!p.useIva
+        });
+      }
+      (p.items || []).forEach(it => {
+        addNewRow({
+          category: 'SERVICIO',
+          concept: it.title || 'Servicio técnico',
+          description: it.desc || '',
+          quantity: parseFloat(it.qty) || 1,
+          unit: it.unit || 'Serv.',
+          priceCurrency: 'MXN',
+          price: parseFloat(it.unitPrice) || 0,
+          applyIva: !!p.useIva
+        });
+      });
+
+      if ((p.paidAmount || 0) > 0) {
+        const advChk = document.getElementById('stamp-advance-chk');
+        const advAmt = document.getElementById('stamp-advance-amount');
+        if (advChk) advChk.checked = true;
+        if (advAmt) advAmt.value = p.paidAmount;
+      }
+
+      calculateTotals();
+      updateSalesNoteStampsPreview();
+      QUOTE_AUTOSAVE.suppress = false;
+      saveCurrentQuote({ silent: true });
+      switchTab('cotizador');
+      showToast(`🧾 Proyecto N.º ${p.folioNum} convertido a Nota de Venta en el Cotizador.`);
+    }
+
+    function openResetProjectsControlModal() {
+      openModal('modal-reset-projects');
+    }
+
+    async function executeResetProjectsControl(mode) {
+      const startFolio = Math.max(1, parseInt(document.getElementById('reset-start-folio')?.value || '1', 10) || 1);
+      if (mode === 'clean') {
+        if (!confirm(`⚠️ ¿Seguro que deseas REINICIAR en limpio toda la pestaña Cuentas?\n\nSe borrarán las cuentas actuales locales y en la nube (D1) y el siguiente folio empezará desde N.º ${startFolio}.`)) return;
+        projectsHistory = [];
+        safeStorage.setItem('gaso_projects_seeded_v1', 'true');
+        safeStorage.setItem('gaso_projects_seeded_v2', 'true');
+        safeStorage.setItem('gaso_project_next_min', String(startFolio));
+        safeStorage.setItem('gaso_projects_history', '[]');
+        try {
+          const snap = cloudSnapLoad() || { c: {}, q: {}, p: {} };
+          snap.p = {};
+          cloudSnapSave(snap);
+          await fetch('/crm', {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ op: 'reset-projects', startFolio, projects: [] })
+          });
+        } catch (e) {}
+        closeModal('modal-reset-projects');
+        closeProjectDetail();
+        showToast(`🔄 Control reiniciado en limpio. Siguiente folio: N.º ${startFolio}.`);
+      } else if (mode === 'seed') {
+        if (!confirm('¿Restaurar tus 6 proyectos iniciales (350 al 358) con sus desgloses completos?')) return;
+        const seeds = buildSeedProjects();
+        projectsHistory = seeds;
+        safeStorage.removeItem('gaso_project_next_min');
+        safeStorage.setItem('gaso_projects_seeded_v1', 'true');
+        safeStorage.setItem('gaso_projects_seeded_v2', 'true');
+        safeStorage.setItem('gaso_projects_history', JSON.stringify(seeds));
+        try {
+          await fetch('/crm', {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ op: 'reset-projects', startFolio: 359, projects: seeds })
+          });
+        } catch (e) {}
+        closeModal('modal-reset-projects');
+        closeProjectDetail();
+        showToast('📥 Proyectos base 350–358 restaurados.');
+      }
+    }
+
+    /* ---- Portal Único Seguro para Clientes (/cuenta.html + /portal) ---- */
+    let _portalLinksCache = [];
+    let _lastGeneratedPortalData = null;
+
+    function normPortalKeyClient(name) {
+      return String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    async function refreshPortalLinksCache() {
+      try {
+        const res = await fetch('/crm', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ op: 'portal-list' })
+        });
+        const d = await res.json();
+        if (d && d.status && Array.isArray(d.links)) {
+          _portalLinksCache = d.links;
+        }
+      } catch (e) {}
+    }
+
+    async function openProjectPortalModal() {
+      const p = getActiveProject();
+      if (!p) return;
+      if (!p.clientName || !p.clientName.trim()) {
+        showToast('Primero asigna el nombre del cliente para generar su enlace único.');
+        return;
+      }
+      _lastGeneratedPortalData = null;
+      document.getElementById('portal-modal-sub').textContent = `Cliente: ${p.clientName} (incluye sus cuentas activas y cortes)`;
+      document.getElementById('portal-modal-generated').style.display = 'none';
+      document.getElementById('portal-custom-pin').value = '';
+      openModal('modal-project-portal');
+
+      await refreshPortalLinksCache();
+      const key = normPortalKeyClient(p.clientName);
+      const existing = _portalLinksCache.find(l => l.client_key === key);
+      const exBox = document.getElementById('portal-modal-existing');
+      if (existing) {
+        const url = `${window.location.origin}/cuenta.html?t=${existing.token}`;
+        exBox.style.display = 'block';
+        document.getElementById('portal-modal-existing-url').textContent = url + (existing.has_pin ? '  [🔐 Protegido con NIP]' : '  [🔓 Acceso directo]');
+        exBox.dataset.url = url;
+      } else {
+        exBox.style.display = 'none';
+      }
+    }
+
+    async function generateProjectPortalLink() {
+      const p = getActiveProject();
+      if (!p || !p.clientName) return;
+      const btn = document.getElementById('btn-portal-generate');
+      const usePin = !!document.getElementById('portal-use-pin-chk')?.checked;
+      const customPin = (document.getElementById('portal-custom-pin')?.value || '').trim();
+      const oldTxt = btn.innerHTML;
+      btn.disabled = true; btn.innerHTML = '⏳ Generando enlace criptográfico...';
+      try {
+        // Asegurar que la BD tenga la versión más reciente antes de compartir
+        await cloudSync();
+        const res = await fetch('/crm', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ op: 'portal-create', clientName: p.clientName, usePin, customPin })
+        });
+        const d = await res.json();
+        if (!res.ok || !d.status) throw new Error(d.message || 'Error al generar link');
+
+        const portalUrl = `${window.location.origin}/cuenta.html?t=${d.token}`;
+        const inviteLines = [
+          `Hola ${(p.clientName || 'Cliente').split(/\s+/)[0]}, te comparto tu enlace privado de GASO Ingeniería para consultar tus estados de cuenta, partidas y abonos en tiempo real:`,
+          ``,
+          `🔗 ${portalUrl}`,
+          ...(d.hasPin ? [`🔐 NIP de acceso: ${d.pin}`] : []),
+          ``,
+          `Solo tú tienes acceso con este enlace privado.`
+        ].join('\n');
+
+        _lastGeneratedPortalData = { url: portalUrl, pin: d.pin, hasPin: d.hasPin, inviteText: inviteLines };
+        const genBox = document.getElementById('portal-modal-generated');
+        genBox.style.display = 'block';
+        document.getElementById('portal-generated-invite').value = inviteLines;
+
+        const exBox = document.getElementById('portal-modal-existing');
+        exBox.style.display = 'block';
+        exBox.dataset.url = portalUrl;
+        document.getElementById('portal-modal-existing-url').textContent = portalUrl + (d.hasPin ? '  [🔐 Protegido con NIP]' : '  [🔓 Acceso directo]');
+        showToast('🔗 Link único seguro generado.');
+      } catch (err) {
+        showToast('❌ ' + (err.message || 'No se pudo generar el enlace'));
+      } finally {
+        btn.disabled = false; btn.innerHTML = oldTxt;
+      }
+    }
+
+    async function revokeProjectPortalLink() {
+      const p = getActiveProject();
+      if (!p || !p.clientName) return;
+      if (!confirm(`¿Revocar el enlace actual de ${p.clientName}? El cliente dejará de tener acceso de inmediato.`)) return;
+      try {
+        await fetch('/crm', {
+          method: 'POST', credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ op: 'portal-revoke', clientName: p.clientName })
+        });
+        document.getElementById('portal-modal-existing').style.display = 'none';
+        document.getElementById('portal-modal-generated').style.display = 'none';
+        _lastGeneratedPortalData = null;
+        showToast('🚫 Enlace revocado. Ya nadie puede consultar con ese link.');
+      } catch (e) { showToast('❌ Error al revocar enlace.'); }
+    }
+
+    function copyCurrentPortalUrl() {
+      const u = document.getElementById('portal-modal-existing')?.dataset?.url;
+      if (!u) return;
+      navigator.clipboard?.writeText(u).then(() => showToast('📋 Link copiado.'));
+    }
+
+    function copyProjectPortalInvite() {
+      const txt = document.getElementById('portal-generated-invite')?.value;
+      if (!txt) return;
+      navigator.clipboard?.writeText(txt).then(() => showToast('📋 Invitación + NIP copiada.'));
+    }
+
+    function sendProjectPortalWhatsApp() {
+      const p = getActiveProject();
+      const txt = document.getElementById('portal-generated-invite')?.value;
+      if (!p || !txt) return;
+      const phone = typeof formatMexicanWhatsAppPhone === 'function' ? formatMexicanWhatsAppPhone(p.clientPhone) : '';
+      const url = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(txt)}` : `https://wa.me/?text=${encodeURIComponent(txt)}`;
+      window.open(url, '_blank', 'noopener');
     }
     </script>
 </body>

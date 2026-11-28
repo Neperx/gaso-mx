@@ -5,6 +5,13 @@
 /index.html
   Cache-Control: no-cache, no-store, must-revalidate
 
+/cuenta.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Content-Type-Options: nosniff
+
+/portal
+  Cache-Control: no-store
+
 /auth
   Cache-Control: no-store
 

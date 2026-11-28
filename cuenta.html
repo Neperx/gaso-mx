@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estado de Cuenta · GASO Ingeniería</title>
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      line-height: 1.45;
+    }
+    .topbar {
+      background: linear-gradient(135deg, #0f172a 0%, #023e8a 100%);
+      color: #fff;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25);
+    }
+    .topbar-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand img { height: 42px; background: #fff; border-radius: 8px; padding: 3px; }
+    .wrap { max-width: 980px; margin: 1.25rem auto 3rem; padding: 0 0.85rem; }
+    .card {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+      margin-bottom: 1rem;
+    }
+    .pin-gate { max-width: 420px; margin: 2.5rem auto; text-align: center; }
+    .pin-input {
+      width: 190px;
+      text-align: center;
+      font-size: 1.7rem;
+      letter-spacing: 10px;
+      font-weight: 900;
+      padding: 0.65rem;
+      border: 2px solid #0284c7;
+      border-radius: 10px;
+      margin: 0.85rem auto;
+      display: block;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn-primary { background: #023e8a; border-color: #023e8a; color: #fff; }
+    .btn-green { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem 1rem; }
+    .kpi-l { font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase; }
+    .kpi-v { font-size: 1.4rem; font-weight: 900; margin-top: 0.2rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin-top: 0.5rem; }
+    th { background: #0f172a; color: #fff; text-align: left; padding: 0.55rem 0.65rem; font-size: 0.76rem; }
+    td { padding: 0.55rem 0.65rem; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .prev-cut-banner {
+      background: #fef3c7;
+      border: 1.5px solid #f59e0b;
+      color: #92400e;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.75rem 0;
+    }
+    .balance-box {
+      background: #eff6ff;
+      border: 2px solid #0284c7;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-top: 0.85rem;
+    }
+    .muted { color: #64748b; font-size: 0.8rem; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff; }
+      .card { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="logo.png" alt="GASO">
+        <div>
+          <div style="font-weight:900; font-size:1.05rem;">GASO INGENIERÍA</div>
+          <div style="font-size:0.74rem; color:#bae6fd;">Portal Seguro de Estado de Cuenta · Solo Lectura</div>
+        </div>
+      </div>
+      <div style="font-size:0.78rem; color:#e2e8f0; text-align:right;">
+        Ing. Jose Miguel Gamboa Torres · Cédula: 14285574<br>
+        Tel / WhatsApp: 22.23.76.31.95
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="portal-loading" class="card" style="text-align:center; padding:2rem;">
+      ⏳ Verificando enlace seguro...
+    </div>
+
+    <div id="portal-error" class="card" style="display:none; text-align:center; border-color:#fca5a5; background:#fef2f2; color:#991b1b; padding:2rem;">
+      <div style="font-size:2rem; margin-bottom:0.5rem;">🔒</div>
+      <h2 style="margin:0 0 0.4rem;">Acceso no disponible</h2>
+      <p id="portal-error-msg" style="margin:0;">Este enlace expiró o fue desactivado.</p>
+    </div>
+
+    <div id="portal-pin-gate" class="card pin-gate" style="display:none;">
+      <div style="font-size:2.2rem;">🔐</div>
+      <h2 style="margin:0.35rem 0 0.25rem; font-size:1.15rem;">Estado de Cuenta Privado</h2>
+      <p class="muted" id="portal-pin-client" style="margin:0;">Ingresa tu NIP de 4 dígitos para consultar tus cuentas.</p>
+      <form onsubmit="submitPortalPin(event)">
+        <input type="password" id="portal-pin-input" class="pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••" required autofocus>
+        <div id="portal-pin-err" style="display:none; color:#b91c1c; font-size:0.82rem; font-weight:700; margin-bottom:0.6rem;"></div>
+        <button type="submit" id="portal-pin-btn" class="btn btn-primary" style="width:100%;">🔓 Ver Mi Estado de Cuenta</button>
+      </form>
+    </div>
+
+    <div id="portal-content" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.65rem; margin-bottom:0.85rem;">
+        <div>
+          <div class="muted" style="font-weight:700; text-transform:uppercase;">Cuenta Exclusiva de Cliente</div>
+          <h1 id="portal-client-title" style="margin:0; font-size:1.4rem; color:#0f172a;"></h1>
+        </div>
+        <div class="no-print" style="display:flex; gap:0.5rem;">
+          <button type="button" class="btn" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+          <a class="btn btn-green" href="https://wa.me/522223763195" target="_blank" rel="noopener">📲 Contactar a GASO</a>
+        </div>
+      </div>
+
+      <div class="kpi-row" id="portal-kpis"></div>
+      <div id="portal-active-list"></div>
+      <div id="portal-closed-wrap" style="display:none;">
+        <h3 style="font-size:1rem; color:#475569; margin:1.25rem 0 0.5rem;">📂 Cortes Anteriores Cerrados (Historial)</h3>
+        <div id="portal-closed-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const PORTAL_TOKEN = (urlParams.get("t") || "").trim();
+
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function mxn(n) {
+      return "$" + (Number(n) || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function statusBadge(st) {
+      const m = {
+        "Cotizado": ["#e0f2fe", "#0369a1"],
+        "En ejecución / Con saldo": ["#fef3c7", "#b45309"],
+        "En ejecución / Por cobrar": ["#ffedd5", "#c2410c"],
+        "Ejecutado / Por cobrar": ["#fee2e2", "#b91c1c"],
+        "Liquidado": ["#dcfce7", "#15803d"],
+        "Corte Cerrado": ["#f1f5f9", "#475569"]
+      };
+      const pair = m[st] || ["#f1f5f9", "#334155"];
+      return `<span class="badge" style="background:${pair[0]}; color:${pair[1]};">${esc(st)}</span>`;
+    }
+
+    function renderNoteCard(p) {
+      const itemsHtml = (p.items || []).map(it => `
+        <tr>
+          <td style="text-align:center; font-weight:800; color:#023e8a; width:50px;">${it.n}</td>
+          <td>
+            <div style="font-weight:700; color:#0f172a;">${esc(it.title)}</div>
+            ${it.desc ? `<div class="muted">${esc(it.desc)}</div>` : ""}
+          </td>
+          <td style="text-align:center; white-space:nowrap;">${it.qty} ${esc(it.unit)}</td>
+          <td style="text-align:right; white-space:nowrap;">${mxn(it.unitPrice)}</td>
+          <td style="text-align:right; font-weight:800; white-space:nowrap;">${mxn(it.total)}</td>
+        </tr>`).join("") || `<tr><td colspan="5" class="muted" style="text-align:center;">Sin servicios nuevos agregados en este corte.</td></tr>`;
+
+      const paysHtml = (p.payments || []).map(pay => `
+        <tr>
+          <td style="white-space:nowrap;">${esc(pay.date || "-")}</td>
+          <td>${esc(pay.concept || "Abono")}</td>
+          <td style="text-align:right; font-weight:800; color:#15803d;">-${mxn(pay.amount)} MXN</td>
+        </tr>`).join("") || `<tr><td colspan="3" class="muted" style="text-align:center;">Sin abonos aplicados en esta nota.</td></tr>`;
+
+      const isClosed = p.status === "Corte Cerrado";
+      return `
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.65rem;">
+            <div>
+              <div style="font-size:1.05rem; font-weight:900; color:#023e8a;">Nota de Servicio N.º ${p.folioNum}</div>
+              <div class="muted">Fecha: ${esc(p.date)}</div>
+            </div>
+            <div>${statusBadge(p.status)}</div>
+          </div>
+
+          ${p.concept ? `<p style="font-size:0.86rem; color:#334155; margin:0.65rem 0;"><strong>Concepto:</strong> ${esc(p.concept)}</p>` : ""}
+
+          ${p.prevBalanceAmount > 0 ? `
+            <div class="prev-cut-banner">
+              <span>📌 Saldo traspasado de Nota Anterior (N.º ${p.prevFolioRef || "-"})</span>
+              <span>${mxn(p.prevBalanceAmount)} MXN</span>
+            </div>` : ""}
+
+          <div style="font-weight:800; font-size:0.86rem; color:#023e8a; margin-top:0.75rem;">1. Detalle Técnico y Partidas (${(p.items || []).length})</div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="text-align:center;">N.º</th>
+                  <th>Descripción del Servicio</th>
+                  <th style="text-align:center;">Cant.</th>
+                  <th style="text-align:right;">P. Unitario</th>
+                  <th style="text-align:right;">Importe</th>
+                </tr>
+              </thead>
+              <tbody>${itemsHtml}</tbody>
+            </table>
+          </div>
+
+          <div style="font-weight:800; font-size:0.86rem; color:#023e8a; margin-top:1rem;">2. Historial de Abonos y Pagos</div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Concepto del Movimiento</th>
+                  <th style="text-align:right;">Importe</th>
+                </tr>
+              </thead>
+              <tbody>${paysHtml}</tbody>
+            </table>
+          </div>
+
+          <div class="balance-box">
+            ${p.prevBalanceAmount > 0 ? `<div style="display:flex; justify-content:space-between; font-size:0.84rem; margin-bottom:0.2rem;"><span>Saldo Nota Anterior (N.º ${p.prevFolioRef || "-"}):</span><strong>${mxn(p.prevBalanceAmount)} MXN</strong></div>` : ""}
+            <div style="display:flex; justify-content:space-between; font-size:0.84rem; margin-bottom:0.2rem;"><span>Servicios en esta nota:</span><strong>${mxn(p.subtotalAmount)} MXN</strong></div>
+            ${p.useIva ? `<div style="display:flex; justify-content:space-between; font-size:0.84rem; margin-bottom:0.2rem;"><span>(+) IVA 16%:</span><strong>${mxn(p.ivaAmount)} MXN</strong></div>` : ""}
+            ${(p.useIva && p.useResico) ? `<div style="display:flex; justify-content:space-between; font-size:0.84rem; margin-bottom:0.2rem;"><span>(-) Ret. ISR RESICO:</span><strong>-${mxn(p.resicoAmount)} MXN</strong></div>` : ""}
+            <div style="display:flex; justify-content:space-between; font-size:0.86rem; margin-bottom:0.2rem; padding-top:0.25rem; border-top:1px dashed #93c5fd;"><span>Total Acumulado:</span><strong>${mxn(p.totalAmount)} MXN</strong></div>
+            <div style="display:flex; justify-content:space-between; font-size:0.86rem; color:#15803d; margin-bottom:0.35rem;"><span>(-) Total Acreditado:</span><strong>-${mxn(p.paidAmount)} MXN</strong></div>
+            <div style="display:flex; justify-content:space-between; font-size:1.08rem; font-weight:900; color:#023e8a; border-top:1.5px solid #38bdf8; padding-top:0.4rem;">
+              <span>${isClosed ? "SALDO TRASPASADO AL CORTE (N.º " + (p.closedToFolio || "-") + "):" : "SALDO PENDIENTE:"}</span>
+              <span>${mxn(isClosed ? p.carriedOverBalance : p.balanceAmount)} MXN</span>
+            </div>
+            ${(!isClosed && p.mercadopagoUrl && p.balanceAmount > 0.01) ? `<div class="no-print" style="margin-top:0.75rem; text-align:right;"><a href="${esc(p.mercadopagoUrl)}" target="_blank" rel="noopener" class="btn btn-primary">💳 Pagar Saldo en Línea (Mercado Pago)</a></div>` : ""}
+          </div>
+        </div>`;
+    }
+
+    function renderPortal(data) {
+      document.getElementById("portal-loading").style.display = "none";
+      document.getElementById("portal-pin-gate").style.display = "none";
+      document.getElementById("portal-content").style.display = "block";
+      document.getElementById("portal-client-title").textContent = data.clientName || "Cliente";
+
+      const all = Array.isArray(data.projects) ? data.projects : [];
+      const active = all.filter(p => p.status !== "Corte Cerrado");
+      const closed = all.filter(p => p.status === "Corte Cerrado");
+
+      const totalSaldo = active.reduce((s, p) => s + (Number(p.balanceAmount) || 0), 0);
+      const totalPaid = all.reduce((s, p) => s + (Number(p.paidAmount) || 0), 0);
+
+      document.getElementById("portal-kpis").innerHTML = `
+        <div class="kpi" style="border-left:4px solid #d97706;">
+          <div class="kpi-l">Saldo Pendiente Total</div>
+          <div class="kpi-v" style="color:#b45309;">${mxn(totalSaldo)} MXN</div>
+        </div>
+        <div class="kpi" style="border-left:4px solid #16a34a;">
+          <div class="kpi-l">Total Abonado Histórico</div>
+          <div class="kpi-v" style="color:#15803d;">${mxn(totalPaid)} MXN</div>
+        </div>
+        <div class="kpi" style="border-left:4px solid #023e8a;">
+          <div class="kpi-l">Notas Activas</div>
+          <div class="kpi-v" style="color:#023e8a;">${active.length}</div>
+        </div>`;
+
+      document.getElementById("portal-active-list").innerHTML = active.length
+        ? active.map(renderNoteCard).join("")
+        : `<div class="card muted" style="text-align:center;">No hay cuentas activas pendientes por mostrar.</div>`;
+
+      const closedWrap = document.getElementById("portal-closed-wrap");
+      if (closed.length) {
+        closedWrap.style.display = "block";
+        document.getElementById("portal-closed-list").innerHTML = closed.map(renderNoteCard).join("");
+      } else {
+        closedWrap.style.display = "none";
+      }
+    }
+
+    async function initPortal() {
+      if (!PORTAL_TOKEN) {
+        document.getElementById("portal-loading").style.display = "none";
+        document.getElementById("portal-error").style.display = "block";
+        document.getElementById("portal-error-msg").textContent = "Falta el token de acceso en el enlace.";
+        return;
+      }
+      try {
+        const res = await fetch("/portal?t=" + encodeURIComponent(PORTAL_TOKEN), { cache: "no-store" });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || "Enlace inválido");
+        if (data.requiresPin) {
+          document.getElementById("portal-loading").style.display = "none";
+          document.getElementById("portal-pin-gate").style.display = "block";
+          document.getElementById("portal-pin-client").textContent = `Cliente: ${data.clientName} · Ingresa el NIP de 4 dígitos enviado por GASO Ingeniería.`;
+          const inp = document.getElementById("portal-pin-input");
+          if (inp) {
+            inp.focus();
+            inp.addEventListener("input", () => { if (inp.value.replace(/\D/g, "").length === 4) submitPortalPin(); });
+          }
+        } else {
+          renderPortal(data);
+        }
+      } catch (err) {
+        document.getElementById("portal-loading").style.display = "none";
+        document.getElementById("portal-error").style.display = "block";
+        document.getElementById("portal-error-msg").textContent = err.message;
+      }
+    }
+
+    async function submitPortalPin(e) {
+      if (e) e.preventDefault();
+      const inp = document.getElementById("portal-pin-input");
+      const errEl = document.getElementById("portal-pin-err");
+      const btn = document.getElementById("portal-pin-btn");
+      const pin = (inp.value || "").replace(/\D/g, "");
+      if (pin.length < 4) return;
+      errEl.style.display = "none";
+      btn.disabled = true; btn.textContent = "⏳ Verificando...";
+      try {
+        const res = await fetch("/portal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: PORTAL_TOKEN, pin })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          errEl.textContent = data.message || "NIP incorrecto.";
+          errEl.style.display = "block";
+          inp.value = ""; inp.focus();
+          return;
+        }
+        renderPortal(data);
+      } catch (err) {
+        errEl.textContent = "Error de conexión. Intenta de nuevo.";
+        errEl.style.display = "block";
+      } finally {
+        btn.disabled = false; btn.textContent = "🔓 Ver Mi Estado de Cuenta";
+      }
+    }
+
+    initPortal();
+  </script>
+</body>
+</html>
