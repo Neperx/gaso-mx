@@ -1150,7 +1150,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 100;
+      z-index: 2500;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s ease;
@@ -5390,7 +5390,7 @@ CLABE: 722969010514249300</textarea>
   </div>
 
   <!-- MODAL: CONFIGURAR HUELLA / BIOMETRÍA (SOLO MÓVIL / APK) -->
-  <div class="modal-backdrop mobile-only-ui no-print" id="modal-bio-setup" style="display:none;">
+  <div class="modal-backdrop mobile-only-ui no-print" id="modal-bio-setup">
     <div class="modal-box" style="max-width:440px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
       <div class="modal-header" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; padding:1rem 1.25rem;">
         <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -5437,7 +5437,7 @@ CLABE: 722969010514249300</textarea>
   </div>
 
   <!-- MODAL: CONFIGURAR PIN RÁPIDO (4 DÍGITOS - SOLO MÓVIL / APK) -->
-  <div class="modal-backdrop mobile-only-ui no-print" id="modal-pin-setup" style="display:none;">
+  <div class="modal-backdrop mobile-only-ui no-print" id="modal-pin-setup">
     <div class="modal-box" style="max-width:440px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
       <div class="modal-header" style="background:linear-gradient(135deg, #15803d, #166534); color:#ffffff; padding:1rem 1.25rem;">
         <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -5488,7 +5488,7 @@ CLABE: 722969010514249300</textarea>
   </div>
 
   <!-- MODAL: TABULADOR RÁPIDO DE MANO DE OBRA GASO -->
-  <div class="modal-backdrop no-print" id="modal-labor-catalog" style="display:none;">
+  <div class="modal-backdrop no-print" id="modal-labor-catalog">
     <div class="modal-box" style="max-width:720px; background:#ffffff; border-radius:14px; overflow:hidden;">
       <div class="modal-header" style="background:#023e8a; color:#ffffff;">
         <div>
@@ -5513,7 +5513,7 @@ CLABE: 722969010514249300</textarea>
   </div>
 
   <!-- MODAL: LINK ÚNICO SEGURO PARA PORTAL DEL CLIENTE -->
-  <div class="modal-backdrop no-print" id="modal-project-portal" style="display:none;">
+  <div class="modal-backdrop no-print" id="modal-project-portal">
     <div class="modal-box" style="max-width:520px; background:#ffffff; border-radius:14px; overflow:hidden;">
       <div class="modal-header" style="background:linear-gradient(135deg, #4c1d95, #6d28d9); color:#ffffff;">
         <div>
@@ -5567,7 +5567,7 @@ CLABE: 722969010514249300</textarea>
   </div>
 
   <!-- MODAL: REINICIAR CONTROL DE NOTAS Y PROYECTOS -->
-  <div class="modal-backdrop no-print" id="modal-reset-projects" style="display:none;">
+  <div class="modal-backdrop no-print" id="modal-reset-projects">
     <div class="modal-box" style="max-width:480px; background:#ffffff; border-radius:14px; overflow:hidden;">
       <div class="modal-header" style="background:#0f172a; color:#ffffff;">
         <div>
@@ -10030,8 +10030,16 @@ function updateDashboardKPIs() { renderDashboard(); }
       if (canvasClient && ctxClient) ctxClient.clearRect(0, 0, canvasClient.width, canvasClient.height);
     }
 
-    function openModal(modalId) { document.getElementById(modalId).classList.add('open'); }
-    function closeModal(modalId) { document.getElementById(modalId).classList.remove('open'); }
+    function openModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (!el) return;
+      if (el.style.display === 'none') el.style.removeProperty('display');
+      el.classList.add('open');
+    }
+    function closeModal(modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.remove('open');
+    }
 
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
@@ -17620,16 +17628,38 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       } catch (e) { showToast('❌ Error al revocar enlace.'); }
     }
 
+    async function copyTextWithFallback(txt, okMsg) {
+      if (!txt) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(txt);
+          showToast(okMsg);
+          return;
+        }
+      } catch (e) {}
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = txt;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast(okMsg);
+      } catch (e) {
+        showToast('❌ No se pudo copiar automáticamente.');
+      }
+    }
+
     function copyCurrentPortalUrl() {
       const u = document.getElementById('portal-modal-existing')?.dataset?.url;
-      if (!u) return;
-      navigator.clipboard?.writeText(u).then(() => showToast('📋 Link copiado.'));
+      copyTextWithFallback(u, '📋 Link copiado.');
     }
 
     function copyProjectPortalInvite() {
       const txt = document.getElementById('portal-generated-invite')?.value;
-      if (!txt) return;
-      navigator.clipboard?.writeText(txt).then(() => showToast('📋 Invitación + NIP copiada.'));
+      copyTextWithFallback(txt, '📋 Invitación + NIP copiada.');
     }
 
     function sendProjectPortalWhatsApp() {
