@@ -18,18 +18,20 @@
         navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW error:', err));
       });
     }
-    // Detección inmediata de Aplicación / APK para mostrar DIRECTAMENTE la plataforma sin entrar a la página web
+    // Detección inmediata de Aplicación Móvil / APK / Pantalla pequeña vs Escritorio
     (function() {
-      var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      try { window.localStorage.removeItem('gaso_prefer_app_mode'); } catch(e) {}
+      var isStandaloneApp = window.matchMedia('(display-mode: standalone)').matches
         || window.navigator.standalone === true
         || (document.referrer && document.referrer.includes('android-app://'))
-        || window.location.search.indexOf('source=pwa') !== -1
-        || (window.location.hash && window.location.hash.length > 1)
-        || window.localStorage.getItem('gaso_prefer_app_mode') === 'true';
-      if (isStandalone) {
+        || window.location.search.indexOf('source=pwa') !== -1;
+      var isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+      var isMobileScreen = window.matchMedia('(max-width: 900px)').matches;
+      var isMobileEnv = isStandaloneApp || isMobileUA || isMobileScreen;
+      if (isStandaloneApp) {
         document.documentElement.classList.add('is-app-mode');
-        try { window.localStorage.setItem('gaso_prefer_app_mode', 'true'); } catch(e) {}
       }
+      document.documentElement.classList.add(isMobileEnv ? 'is-mobile-mode' : 'is-desktop-mode');
     })();
   </script>
   <style>
@@ -1873,6 +1875,49 @@
     body.is-app-mode .hide-in-app-mode {
       display: none !important;
     }
+    /* Separación estricta Modo Escritorio vs Modo Móvil / APK */
+    html.is-desktop-mode .mobile-only-ui,
+    body.is-desktop-mode .mobile-only-ui,
+    html.is-desktop-mode .hide-in-desktop-mode,
+    body.is-desktop-mode .hide-in-desktop-mode,
+    html.is-desktop-mode #login-bio-area,
+    body.is-desktop-mode #login-bio-area,
+    html.is-desktop-mode #login-pin-area,
+    body.is-desktop-mode #login-pin-area,
+    html.is-desktop-mode #bio-enroll-prompt-banner,
+    body.is-desktop-mode #bio-enroll-prompt-banner,
+    html.is-desktop-mode #cfg-biometrics-card,
+    body.is-desktop-mode #cfg-biometrics-card,
+    html.is-desktop-mode #cfg-pin-card,
+    body.is-desktop-mode #cfg-pin-card,
+    html.is-desktop-mode #cfg-banking-lock-card,
+    body.is-desktop-mode #cfg-banking-lock-card,
+    html.is-desktop-mode #vault-bio-unlock-card,
+    body.is-desktop-mode #vault-bio-unlock-card,
+    html.is-desktop-mode #vault-bio-toggle-btn,
+    body.is-desktop-mode #vault-bio-toggle-btn,
+    html.is-desktop-mode #bottom-nav-dock,
+    body.is-desktop-mode #bottom-nav-dock,
+    html.is-desktop-mode #mobile-more-sheet,
+    body.is-desktop-mode #mobile-more-sheet,
+    html.is-desktop-mode #mobile-more-backdrop,
+    body.is-desktop-mode #mobile-more-backdrop,
+    html.is-desktop-mode #modal-bio-setup,
+    body.is-desktop-mode #modal-bio-setup,
+    html.is-desktop-mode #modal-pin-setup,
+    body.is-desktop-mode #modal-pin-setup {
+      display: none !important;
+    }
+    html.is-mobile-mode .desktop-only-ui,
+    body.is-mobile-mode .desktop-only-ui,
+    html.is-mobile-mode .hide-in-mobile-mode,
+    body.is-mobile-mode .hide-in-mobile-mode,
+    html.is-mobile-mode .top-bar-inner .nav-tabs,
+    body.is-mobile-mode .top-bar-inner .nav-tabs,
+    html.is-mobile-mode .top-bar-inner .user-chip-top,
+    body.is-mobile-mode .top-bar-inner .user-chip-top {
+      display: none !important;
+    }
     body:not(.app-authenticated) > header.top-bar,
     body:not(.app-authenticated) > main.app-container,
     body:not(.app-authenticated) > #bottom-nav-dock,
@@ -3390,13 +3435,13 @@
           </button>
         </div>
 
-        <!-- Acceso Biométrico por Huella / Rostro Windows Hello -->
-        <div id="login-bio-area" style="display:none; background:#f0f9ff; border:2px solid #0284c7; border-radius:12px; padding:1.35rem 1.25rem; margin-bottom:1.25rem; text-align:center;">
-          <div style="font-size:2.8rem; margin-bottom:0.35rem;">👤</div>
-          <div style="font-size:1.1rem; font-weight:800; color:#0369a1; margin-bottom:0.25rem;">Acceso con Rostro o Huella (Windows Hello)</div>
-          <div style="font-size:0.78rem; color:#64748b; margin-bottom:1.15rem;">Usa el reconocimiento facial de tu Surface o tu sensor biométrico para ingresar</div>
+        <!-- Acceso Biométrico por Huella / Rostro (Solo Móvil / APK) -->
+        <div id="login-bio-area" class="mobile-only-ui" style="display:none; background:#f0f9ff; border:2px solid #0284c7; border-radius:12px; padding:1.35rem 1.25rem; margin-bottom:1.25rem; text-align:center;">
+          <div style="font-size:2.8rem; margin-bottom:0.35rem;">👆</div>
+          <div style="font-size:1.1rem; font-weight:800; color:#0369a1; margin-bottom:0.25rem;">Acceso con Huella Digital / Biometría</div>
+          <div style="font-size:0.78rem; color:#64748b; margin-bottom:1.15rem;">Usa el sensor biométrico de tu teléfono para ingresar al instante</div>
           <button type="button" class="btn btn-primary" onclick="appLoginWithBiometrics()" style="width:100%; background:#0284c7; border-color:#0284c7; font-weight:800; font-size:1rem; padding:0.8rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; box-shadow:0 4px 14px rgba(2,132,199,0.35);">
-            👤 / 👆 Desbloquear con Rostro o Huella
+            👆 Desbloquear con Huella o Biometría
           </button>
           <div style="margin-top:1rem; display:flex; justify-content:center; gap:1.25rem; font-size:0.8rem;">
             <a href="javascript:void(0)" id="link-bio-to-pin" onclick="showPinLoginForm()" style="color:#15803d; text-decoration:underline; font-weight:700; display:none;">
@@ -3408,8 +3453,8 @@
           </div>
         </div>
 
-        <!-- Acceso Rápido con PIN de 4 Dígitos -->
-        <div id="login-pin-area" style="display:none; background:#f0fdf4; border:2px solid #16a34a; border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; text-align:center;">
+        <!-- Acceso Rápido con PIN de 4 Dígitos (Solo Móvil / APK) -->
+        <div id="login-pin-area" class="mobile-only-ui" style="display:none; background:#f0fdf4; border:2px solid #16a34a; border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; text-align:center;">
           <div style="font-size:2.4rem; margin-bottom:0.35rem;">🔢</div>
           <div style="font-size:1.05rem; font-weight:800; color:#15803d; margin-bottom:0.25rem;">Acceso Rápido con PIN</div>
           <div style="font-size:0.76rem; color:#64748b; margin-bottom:0.9rem;">Teclea tus 4 dígitos para ingresar al instante (Protección Bancaria)</div>
@@ -4499,8 +4544,8 @@ CLABE: 722969010514249300</textarea>
 
           <!-- VISTA A: INGRESO DE CÓDIGO TOTP (CUANDO YA ESTÁ VINCULADO) -->
           <div id="vault-totp-login-view">
-            <!-- DESBLOQUEO RÁPIDO CON HUELLA DIGITAL (EN LUGAR DE GOOGLE AUTHENTICATOR) -->
-            <div id="vault-bio-unlock-card" style="display:none; background:#f0f9ff; border:2px solid #0284c7; border-radius:12px; padding:1.25rem; margin-bottom:1.4rem; text-align:center;">
+            <!-- DESBLOQUEO RÁPIDO CON HUELLA DIGITAL (SOLO MÓVIL) -->
+            <div id="vault-bio-unlock-card" class="mobile-only-ui" style="display:none; background:#f0f9ff; border:2px solid #0284c7; border-radius:12px; padding:1.25rem; margin-bottom:1.4rem; text-align:center;">
               <div style="font-size:2.4rem; margin-bottom:0.35rem;">👆</div>
               <h3 style="font-size:1.05rem; font-weight:800; color:#0369a1; margin:0 0 0.35rem;">Desbloquear con Huella Digital</h3>
               <p style="font-size:0.8rem; color:#475569; margin:0 0 1rem; line-height:1.35;">Toca el sensor de tu teléfono para abrir la Caja Fuerte sin escribir códigos.</p>
@@ -4584,7 +4629,7 @@ CLABE: 722969010514249300</textarea>
               <button class="btn btn-outline btn-sm" onclick="vaultLockNow()" title="Bloquear bóveda de inmediato">
                 🔒 Bloquear Bóveda
               </button>
-              <button id="vault-bio-toggle-btn" class="btn btn-outline btn-sm" onclick="vaultToggleBiometrics()" style="border-color:#0284c7; color:#0284c7; font-weight:700;">
+              <button id="vault-bio-toggle-btn" class="btn btn-outline btn-sm mobile-only-ui" onclick="vaultToggleBiometrics()" style="border-color:#0284c7; color:#0284c7; font-weight:700;">
                 👆 Activar Huella Digital
               </button>
               <button class="btn btn-outline btn-sm" onclick="vaultShowTotpSetup(true)" style="border-color:#cbd5e1;">
@@ -5030,17 +5075,14 @@ CLABE: 722969010514249300</textarea>
           </table>
         </div>
 
-        <!-- Configuración de Biometría / Rostro / Huella Windows Hello -->
-        <div id="cfg-biometrics-card" style="background:#ffffff; border:1px solid #bae6fd; border-radius:10px; padding:1.15rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+        <!-- Configuración de Biometría / Huella (Solo Móvil / APK) -->
+        <div id="cfg-biometrics-card" class="mobile-only-ui" style="background:#ffffff; border:1px solid #bae6fd; border-radius:10px; padding:1.15rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
           <div style="display:flex; align-items:center; gap:0.85rem;">
-            <div style="font-size:2.2rem; background:#f0f9ff; padding:0.4rem 0.65rem; border-radius:10px;">👤</div>
+            <div style="font-size:2.2rem; background:#f0f9ff; padding:0.4rem 0.65rem; border-radius:10px;">👆</div>
             <div>
-              <div style="font-weight:800; font-size:0.95rem; color:#0369a1;">Acceso con Rostro o Huella (Windows Hello / Passkeys)</div>
+              <div style="font-weight:800; font-size:0.95rem; color:#0369a1;">Acceso con Huella Digital / Biometría (Este Teléfono)</div>
               <div id="cfg-bio-status-text" style="font-size:0.78rem; color:#64748b; margin-top:0.2rem;">
-                Compatible con reconocimiento facial de Windows Hello (Surface, laptops), Touch ID y huella digital.
-              </div>
-              <div style="font-size:0.7rem; color:#0284c7; margin-top:0.25rem;">
-                💡 En tu Surface con Windows 11 abre en <strong>Microsoft Edge</strong> o <strong>Chrome</strong> para activar la cámara de Windows Hello (Firefox en Windows tiene restringida la biometría por cámara).
+                Compatible con el sensor de huella o biometría de tu teléfono móvil.
               </div>
             </div>
           </div>
@@ -5049,17 +5091,17 @@ CLABE: 722969010514249300</textarea>
               🗑️ Desvincular Biometría
             </button>
             <button type="button" class="btn btn-primary" id="btn-cfg-enroll-bio" onclick="openBioSetupModal()" style="background:#0284c7; border-color:#0284c7; font-weight:700; font-size:0.82rem;">
-              👤 Configurar Rostro / Huella
+              👆 Configurar Huella
             </button>
           </div>
         </div>
 
-        <!-- Configuración de PIN Rápido (4 Dígitos) en este Dispositivo -->
-        <div id="cfg-pin-card" style="background:#ffffff; border:1px solid #bbf7d0; border-radius:10px; padding:1.15rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+        <!-- Configuración de PIN Rápido (4 Dígitos) en este Teléfono (Solo Móvil / APK) -->
+        <div id="cfg-pin-card" class="mobile-only-ui" style="background:#ffffff; border:1px solid #bbf7d0; border-radius:10px; padding:1.15rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
           <div style="display:flex; align-items:center; gap:0.85rem;">
             <div style="font-size:2.2rem; background:#f0fdf4; padding:0.4rem 0.65rem; border-radius:10px;">🔢</div>
             <div>
-              <div style="font-weight:800; font-size:0.95rem; color:#15803d;">Acceso Rápido con PIN de 4 Dígitos (Este Dispositivo)</div>
+              <div style="font-weight:800; font-size:0.95rem; color:#15803d;">Acceso Rápido con PIN de 4 Dígitos (Este Teléfono)</div>
               <div id="cfg-pin-status-text" style="font-size:0.78rem; color:#64748b; margin-top:0.2rem;">
                 Código de 4 números para entrar en 1 segundo offline sin escribir contraseñas largas.
               </div>
@@ -5075,8 +5117,8 @@ CLABE: 722969010514249300</textarea>
           </div>
         </div>
 
-        <!-- Configuración de Bloqueo Bancario y Auto-Bloqueo de Pantalla -->
-        <div id="cfg-banking-lock-card" style="background:#ffffff; border:1px solid #fed7aa; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
+        <!-- Configuración de Bloqueo Bancario y Auto-Bloqueo de Pantalla (Solo Móvil / APK) -->
+        <div id="cfg-banking-lock-card" class="mobile-only-ui" style="background:#ffffff; border:1px solid #fed7aa; border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
           <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; border-bottom:1px solid #ffedd5; padding-bottom:0.75rem;">
             <div style="font-size:2.2rem; background:#fff7ed; padding:0.4rem 0.65rem; border-radius:10px;">🛡️</div>
             <div>
@@ -5251,7 +5293,7 @@ CLABE: 722969010514249300</textarea>
   </main>
 
   <!-- BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAV DOCK) PARA MÓVIL (PWA / SMARTPHONE) -->
-  <nav class="bottom-nav-dock no-print" id="bottom-nav-dock" aria-label="Navegación móvil principal">
+  <nav class="bottom-nav-dock mobile-only-ui no-print" id="bottom-nav-dock" aria-label="Navegación móvil principal">
     <button type="button" class="bottom-nav-item active" id="bnav-btn-cotizador" onclick="switchTab('cotizador')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       <span>Cotizador</span>
@@ -5289,8 +5331,8 @@ CLABE: 722969010514249300</textarea>
   </nav>
 
   <!-- Menú desplegable para opciones secundarias en móvil ("Más") -->
-  <div class="mobile-more-backdrop no-print" id="mobile-more-backdrop" onclick="closeMobileMoreMenu()"></div>
-  <div class="mobile-more-sheet no-print" id="mobile-more-sheet">
+  <div class="mobile-more-backdrop mobile-only-ui no-print" id="mobile-more-backdrop" onclick="closeMobileMoreMenu()"></div>
+  <div class="mobile-more-sheet mobile-only-ui no-print" id="mobile-more-sheet">
     <div style="font-weight:800; font-size:0.85rem; color:#0f172a; padding:0.4rem 0.5rem 0.75rem; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
       <span>⚙️ Opciones del Sistema</span>
       <button type="button" onclick="closeMobileMoreMenu()" style="border:none; background:none; font-size:1.2rem; color:#64748b;">✕</button>
@@ -5323,15 +5365,15 @@ CLABE: 722969010514249300</textarea>
     </div>
   </div>
 
-  <!-- MODAL: CONFIGURAR HUELLA / ROSTRO WINDOWS HELLO (SIN PROMPTS QUE BLOQUEEN EL SENSOR) -->
-  <div class="modal-backdrop no-print" id="modal-bio-setup" style="display:none;">
+  <!-- MODAL: CONFIGURAR HUELLA / BIOMETRÍA (SOLO MÓVIL / APK) -->
+  <div class="modal-backdrop mobile-only-ui no-print" id="modal-bio-setup" style="display:none;">
     <div class="modal-box" style="max-width:440px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
       <div class="modal-header" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#ffffff; padding:1rem 1.25rem;">
         <div style="display:flex; align-items:center; gap:0.5rem;">
-          <span style="font-size:1.5rem;">👤</span>
+          <span style="font-size:1.5rem;">👆</span>
           <div>
-            <h3 style="color:#ffffff; margin:0; font-size:1.05rem; font-weight:800;">Activar Rostro o Huella Digital</h3>
-            <div style="font-size:0.75rem; color:#e0f2fe;">Windows Hello (Surface / Windows 11) o sensor biométrico</div>
+            <h3 style="color:#ffffff; margin:0; font-size:1.05rem; font-weight:800;">Activar Huella Digital</h3>
+            <div style="font-size:0.75rem; color:#e0f2fe;">Sensor biométrico de tu dispositivo móvil</div>
           </div>
         </div>
         <button class="modal-close" onclick="closeModal('modal-bio-setup')" style="color:#ffffff; font-size:1.2rem; background:none; border:none; cursor:pointer;">✕</button>
@@ -5339,10 +5381,7 @@ CLABE: 722969010514249300</textarea>
       <form id="bio-setup-form" onsubmit="handleBioModalSubmit(event)" style="margin:0;">
         <div class="modal-body" style="padding:1.25rem; display:flex; flex-direction:column; gap:0.9rem;">
           <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:0.75rem; font-size:0.78rem; color:#0369a1; line-height:1.4;">
-            🛡️ Tus credenciales se guardarán <strong>encriptadas localmente en este dispositivo</strong> con hardware biométrico (TPM en Surface / Windows Hello). Nadie más podrá acceder sin tu rostro o huella.
-            <div style="margin-top:0.35rem; font-size:0.72rem; color:#0284c7; font-weight:600;">
-              💡 En tu Surface usa <strong>Microsoft Edge</strong> o <strong>Chrome</strong> para que Windows active la cámara facial. (Firefox en Windows no conecta con la cámara de Windows Hello).
-            </div>
+            🛡️ Tus credenciales se guardarán <strong>encriptadas localmente en este teléfono</strong> vinculadas a tu huella digital o biometría. Nadie más podrá acceder sin tu sensor.
           </div>
           <div>
             <label style="font-size:0.8rem; font-weight:700; color:#1e293b; display:block; margin-bottom:0.3rem;">Usuario:</label>
@@ -5373,8 +5412,8 @@ CLABE: 722969010514249300</textarea>
     </div>
   </div>
 
-  <!-- MODAL: CONFIGURAR PIN RÁPIDO (4 DÍGITOS) -->
-  <div class="modal-backdrop no-print" id="modal-pin-setup" style="display:none;">
+  <!-- MODAL: CONFIGURAR PIN RÁPIDO (4 DÍGITOS - SOLO MÓVIL / APK) -->
+  <div class="modal-backdrop mobile-only-ui no-print" id="modal-pin-setup" style="display:none;">
     <div class="modal-box" style="max-width:440px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.25);">
       <div class="modal-header" style="background:linear-gradient(135deg, #15803d, #166534); color:#ffffff; padding:1rem 1.25rem;">
         <div style="display:flex; align-items:center; gap:0.5rem;">
@@ -5537,8 +5576,8 @@ CLABE: 722969010514249300</textarea>
     </div>
   </div>
 
-  <!-- BANNER FLOTANTE POST-LOGIN PARA ACTIVAR HUELLA O PIN SIN PERDER ACTIVACIÓN DEL GESTO -->
-  <div id="bio-enroll-prompt-banner" class="no-print" style="display:none; position:fixed; bottom:75px; left:50%; transform:translateX(-50%); background:#0f172a; color:#ffffff; padding:0.85rem 1.15rem; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:99999; max-width:92vw; width:460px; border:1px solid #334155;">
+  <!-- BANNER FLOTANTE POST-LOGIN PARA ACTIVAR HUELLA O PIN SIN PERDER ACTIVACIÓN DEL GESTO (SOLO MÓVIL) -->
+  <div id="bio-enroll-prompt-banner" class="mobile-only-ui no-print" style="display:none; position:fixed; bottom:75px; left:50%; transform:translateX(-50%); background:#0f172a; color:#ffffff; padding:0.85rem 1.15rem; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5); z-index:99999; max-width:92vw; width:460px; border:1px solid #334155;">
     <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
       <span style="font-size:1.7rem;">⚡</span>
       <div style="flex:1; min-width:180px;">
@@ -9182,13 +9221,33 @@ function updateDashboardKPIs() { renderDashboard(); }
     // Consecutivo persistente: nunca depende del campo en pantalla ni se reinicia al recargar
     // Serie Móvil (M) para teléfonos / app offline y Serie Estándar para computadoras de oficina
     let currentLoadedQuoteNumber = null;
+    function isAppStandaloneMode() {
+      return window.matchMedia("(display-mode: standalone)").matches
+        || window.navigator.standalone === true
+        || (document.referrer && document.referrer.includes("android-app://"))
+        || window.location.search.indexOf("source=pwa") !== -1;
+    }
+
     function isMobileDeviceOrApp() {
-      const isAppMode = document.documentElement.classList.contains("is-app-mode") 
-        || document.body.classList.contains("is-app-mode")
-        || safeStorage.getItem("gaso_prefer_app_mode") === "true";
-      const isMobileScreen = window.matchMedia("(max-width: 768px)").matches;
+      const isAppMode = isAppStandaloneMode()
+        || document.documentElement.classList.contains("is-app-mode")
+        || (document.body && document.body.classList.contains("is-app-mode"));
+      const isMobileScreen = window.matchMedia("(max-width: 900px)").matches;
       const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
       return isAppMode || isMobileScreen || isMobileUA;
+    }
+
+    function syncPlatformModeClasses() {
+      const isStandalone = isAppStandaloneMode();
+      const isMobile = isMobileDeviceOrApp();
+      [document.documentElement, document.body].forEach(el => {
+        if (!el) return;
+        el.classList.toggle("is-app-mode", isStandalone);
+        el.classList.toggle("is-mobile-mode", isMobile);
+        el.classList.toggle("is-desktop-mode", !isMobile);
+      });
+      if (typeof updateAppBiometricUI === "function") updateAppBiometricUI();
+      if (typeof updateVaultBiometricUI === "function") updateVaultBiometricUI();
     }
 
     function maxFolioSeq(year, series = "") {
@@ -11487,14 +11546,21 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function updateVaultBiometricUI() {
+      const unlockCard = document.getElementById("vault-bio-unlock-card");
+      const toggleBtn = document.getElementById("vault-bio-toggle-btn");
+      if (!isMobileDeviceOrApp()) {
+        if (unlockCard) unlockCard.style.display = "none";
+        if (toggleBtn) toggleBtn.style.display = "none";
+        return;
+      }
+      if (toggleBtn) toggleBtn.style.display = "inline-flex";
+
       const appBio = safeStorage.getItem("gaso_app_bio_enabled") === "true";
       const vaultBio = safeStorage.getItem("gaso_vault_bio_enabled") === "true";
       const hasBio = appBio || vaultBio;
 
-      const unlockCard = document.getElementById("vault-bio-unlock-card");
       if (unlockCard) unlockCard.style.display = hasBio ? "block" : "none";
 
-      const toggleBtn = document.getElementById("vault-bio-toggle-btn");
       if (toggleBtn) {
         if (hasBio) {
           toggleBtn.innerHTML = "✅ Huella Activa en Caja Fuerte";
@@ -11508,8 +11574,12 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
     }
 
-    // --- Biometría para Inicio de Sesión de la Plataforma (App Login) ---
+    // --- Biometría para Inicio de Sesión de la Plataforma (Solo Móvil) ---
     function openBioSetupModal() {
+      if (!isMobileDeviceOrApp()) {
+        showToast("📱 La huella digital y el PIN rápido solo están disponibles en la versión móvil.");
+        return;
+      }
       const modal = document.getElementById("modal-bio-setup");
       if (!modal) return;
       const userInput = document.getElementById("bio-modal-user");
@@ -11579,7 +11649,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             safeStorage.setItem("gaso_app_bio_profile", JSON.stringify(currentAuthUser));
           }
 
-          showToast("🎉 ¡Biometría registrada con éxito! Podrás entrar con tu rostro (Windows Hello) o huella.");
+          showToast("🎉 ¡Biometría registrada con éxito! Podrás entrar con tu huella digital en este teléfono.");
           updateAppBiometricUI();
 
           // Si el usuario no estaba autenticado aún, validar y entrar
@@ -11669,6 +11739,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function openQuickPinSetupModal(user, pass) {
+      if (!isMobileDeviceOrApp()) {
+        showToast("📱 El PIN rápido solo está disponible en la versión móvil.");
+        return;
+      }
       const modal = document.getElementById("modal-pin-setup");
       if (!modal) return;
       const userInput = document.getElementById("pin-modal-user");
@@ -11833,6 +11907,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function showPinLoginForm() {
+      if (!isMobileDeviceOrApp()) {
+        toggleManualLoginForm(true);
+        return;
+      }
       const bioArea = document.getElementById("login-bio-area");
       const pinArea = document.getElementById("login-pin-area");
       const manualForm = document.getElementById("login-manual-form");
@@ -11859,6 +11937,10 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function showBioLoginForm() {
+      if (!isMobileDeviceOrApp()) {
+        toggleManualLoginForm(true);
+        return;
+      }
       const bioArea = document.getElementById("login-bio-area");
       const pinArea = document.getElementById("login-pin-area");
       const manualForm = document.getElementById("login-manual-form");
@@ -11891,13 +11973,24 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function updateAppBiometricUI() {
-      const bioEnabled = safeStorage.getItem("gaso_app_bio_enabled") === "true";
-      const pinEnabled = safeStorage.getItem("gaso_app_pin_enabled") === "true";
+      const isMobile = isMobileDeviceOrApp();
       const bioArea = document.getElementById("login-bio-area");
       const pinArea = document.getElementById("login-pin-area");
       const manualForm = document.getElementById("login-manual-form");
       const linkBioToPin = document.getElementById("link-bio-to-pin");
       const linkPinToBio = document.getElementById("link-pin-to-bio");
+
+      if (!isMobile) {
+        if (bioArea) bioArea.style.display = "none";
+        if (pinArea) pinArea.style.display = "none";
+        if (linkBioToPin) linkBioToPin.style.display = "none";
+        if (linkPinToBio) linkPinToBio.style.display = "none";
+        if (manualForm) manualForm.style.display = "block";
+        return;
+      }
+
+      const bioEnabled = safeStorage.getItem("gaso_app_bio_enabled") === "true";
+      const pinEnabled = safeStorage.getItem("gaso_app_pin_enabled") === "true";
 
       if (linkBioToPin) linkBioToPin.style.display = pinEnabled ? "inline" : "none";
       if (linkPinToBio) linkPinToBio.style.display = bioEnabled ? "inline" : "none";
@@ -12013,6 +12106,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     // --- Flujo interactivo post-login para activar huella o PIN ---
     let _pendingBioCreds = null;
     function showBioEnrollPostLoginBanner(user, pass) {
+      if (!isMobileDeviceOrApp()) return;
       _pendingBioCreds = { user, pass };
       const banner = document.getElementById("bio-enroll-prompt-banner");
       if (banner) {
@@ -13033,6 +13127,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         clearTimeout(_appInactivityTimer);
         _appInactivityTimer = null;
       }
+      if (!isMobileDeviceOrApp()) return;
       if (!document.body.classList.contains("app-authenticated") || _appIsLocked) return;
 
       safeStorage.setItem("gaso_last_active_ts", String(Date.now()));
@@ -13095,6 +13190,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
     }
 
     function checkBackgroundElapsedLock() {
+      if (!isMobileDeviceOrApp()) return;
       if (!document.body.classList.contains("app-authenticated") || _appIsLocked) return;
 
       const lastActive = parseInt(safeStorage.getItem("gaso_last_active_ts") || "0", 10);
@@ -13114,8 +13210,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       // 2. Si la app estuvo minimizada y la política de salida está activa
       const launchPolicy = safeStorage.getItem("gaso_autolock_on_launch") || "always";
-      const isMobileOrApp = isAppMode || (typeof isMobileDeviceOrApp === "function" && isMobileDeviceOrApp());
-      if (launchPolicy === "always" || (launchPolicy === "mobile_only" && isMobileOrApp)) {
+      if (launchPolicy === "always" || launchPolicy === "mobile_only") {
         const storedTs = parseInt(safeStorage.getItem("gaso_last_hidden_ts") || "0", 10);
         const lastHidden = _appLastHiddenTimestamp || storedTs;
         if (lastHidden && (now - lastHidden >= 120000)) { // 2 minutos fuera de la app
@@ -13196,8 +13291,15 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         }
       }
 
+      const isMobile = isMobileDeviceOrApp();
+
       if (badgeEl && descEl) {
-        if (reason === "inactivity") {
+        if (!isMobile) {
+          badgeEl.textContent = "🔒 Acceso a Plataforma (Escritorio)";
+          badgeEl.style.background = "rgba(56, 189, 248, 0.2)";
+          badgeEl.style.color = "#38bdf8";
+          descEl.textContent = "Ingresa tu usuario y contraseña para continuar en modo escritorio.";
+        } else if (reason === "inactivity") {
           badgeEl.textContent = "⏱️ Sesión Expirada por Inactividad";
           badgeEl.style.background = "rgba(245, 158, 11, 0.2)";
           badgeEl.style.color = "#f59e0b";
@@ -13225,6 +13327,15 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
 
       updateAppBiometricUI();
+
+      if (!isMobile) {
+        toggleManualLoginForm(true);
+        const uInp = document.getElementById("login-username");
+        const pInp = document.getElementById("login-password");
+        if (uInp && savedUser) uInp.value = savedUser;
+        if (pInp) setTimeout(() => pInp.focus(), 100);
+        return;
+      }
 
       const pinEnabled = safeStorage.getItem("gaso_app_pin_enabled") === "true";
       const bioEnabled = safeStorage.getItem("gaso_app_bio_enabled") === "true";
@@ -13278,26 +13389,18 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
         try { securityLogs = JSON.parse(storedLogs); } catch(e) { securityLogs = []; }
       }
 
-      // Inicializar vigilantes de inactividad, segundo plano y cargar ajustes
+      // Inicializar vigilantes de inactividad, segundo plano y modo de plataforma (Móvil vs Escritorio)
       initInactivityListeners();
       initBackgroundLockListeners();
       loadAutoLockSettings();
-
-      // Detección para que en la app / APK se muestre DIRECTAMENTE la plataforma sin entrar a la página web
-      const isAppMode = document.documentElement.classList.contains("is-app-mode") || (function() {
-        return window.matchMedia('(display-mode: standalone)').matches
-          || window.navigator.standalone === true
-          || (document.referrer && document.referrer.includes('android-app://'))
-          || window.location.search.indexOf('source=pwa') !== -1
-          || (window.location.hash && window.location.hash.length > 1)
-          || safeStorage.getItem('gaso_prefer_app_mode') === 'true';
-      })();
-
-      if (isAppMode) {
-        document.documentElement.classList.add("is-app-mode");
-        document.body.classList.add("is-app-mode");
-        safeStorage.setItem("gaso_prefer_app_mode", "true");
+      try { safeStorage.removeItem("gaso_prefer_app_mode"); } catch(e) {}
+      if (!window._gasoPlatformResizeBound) {
+        window._gasoPlatformResizeBound = true;
+        window.addEventListener("resize", syncPlatformModeClasses);
       }
+
+      const isAppMode = isAppStandaloneMode();
+      syncPlatformModeClasses();
 
       document.body.classList.remove("app-authenticated");
       const _ov = document.getElementById("auth-login-overlay");
@@ -13309,13 +13412,20 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       fetch("/auth", { credentials: "same-origin" })
         .then(r => r.json())
         .then(d => {
+          const isMobileOrApp = isMobileDeviceOrApp();
           if (d && d.authenticated && d.user) {
             currentAuthUser = { id: "srv_" + d.user.username, fullName: d.user.fullName, username: d.user.username,
               email: d.user.email || "", role: d.user.role, status: "active", lastLogin: "Sesión activa" };
             _sessRemember = !!d.remember;
             applyRolePermissions(currentAuthUser);
 
-            // DETECCIÓN DE CIERRE DE APK O EXPIRACIÓN POR INACTIVIDAD (MODO BANCO)
+            if (!isMobileOrApp) {
+              // En Escritorio: omitir PIN, Huella y bloqueo por cierre de APK
+              unlockAppForUser(currentAuthUser, false);
+              return;
+            }
+
+            // En Móvil / APK: DETECCIÓN DE CIERRE DE APK O EXPIRACIÓN POR INACTIVIDAD (MODO BANCO)
             let apkSessionAlive = false;
             try { apkSessionAlive = sessionStorage.getItem("gaso_apk_session_alive") === "true"; } catch(e) {}
             const lastActive = parseInt(safeStorage.getItem("gaso_last_active_ts") || "0", 10);
@@ -13324,8 +13434,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
             const isInactiveExpired = lastActive > 0 && (Date.now() - lastActive >= inactivityMins * 60 * 1000);
 
             const launchPolicy = safeStorage.getItem("gaso_autolock_on_launch") || "always";
-            const isMobileOrApp = isAppMode || (typeof isMobileDeviceOrApp === "function" && isMobileDeviceOrApp());
-            const shouldExpireOnLaunch = (launchPolicy === "always" || (launchPolicy === "mobile_only" && isMobileOrApp)) && (!apkSessionAlive || isInactiveExpired);
+            const shouldExpireOnLaunch = (launchPolicy === "always" || launchPolicy === "mobile_only") && (!apkSessionAlive || isInactiveExpired);
 
             if (shouldExpireOnLaunch) {
               appLockNow(isInactiveExpired ? "inactivity" : "launch");
@@ -13333,16 +13442,14 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
               unlockAppForUser(currentAuthUser, false);
             }
           } else {
-            // No está autenticado
-            const isMobileOrApp = isAppMode || (typeof isMobileDeviceOrApp === "function" && isMobileDeviceOrApp());
+            // No está autenticado: si es app móvil / pantalla móvil abrir login; en escritorio mostrar página web pública
             if (isMobileOrApp) {
               appLockNow("launch");
             }
           }
         }).catch(() => {
           // Fuera de línea / Error de red:
-          const isMobileOrApp = isAppMode || (typeof isMobileDeviceOrApp === "function" && isMobileDeviceOrApp());
-          if (isMobileOrApp) {
+          if (isMobileDeviceOrApp()) {
             appLockNow("launch");
           }
         });
@@ -13439,7 +13546,7 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
 
       const hasBio = safeStorage.getItem("gaso_app_bio_enabled") === "true";
       const hasPin = safeStorage.getItem("gaso_app_pin_enabled") === "true";
-      if (!hasBio && !hasPin) {
+      if (isMobileDeviceOrApp() && !hasBio && !hasPin) {
         showBioEnrollPostLoginBanner(userRaw, passRaw);
       }
     }
