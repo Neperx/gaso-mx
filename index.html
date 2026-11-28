@@ -1679,7 +1679,7 @@
     /* ========================================================= */
     /* CUENTAS ACTIVAS, PROYECTOS & COBRANZA IA                  */
     /* ========================================================= */
-    .prj-container { max-width: 1260px; margin: 0 auto; padding: 0.75rem 0.5rem 2.5rem; }
+    .prj-container { max-width: 1250px; margin: 0 auto; padding: 0.5rem 0 2.5rem; }
     .prj-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
     .prj-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.85rem; margin-bottom: 1rem; }
     .prj-kpi-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 10px; padding: 0.9rem 1rem; box-shadow: var(--shadow-sm); }
@@ -1691,8 +1691,26 @@
     .prj-pill-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
     .prj-pill { padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid var(--gray-300); background: #fff; color: var(--gray-700); font-size: 0.78rem; font-weight: 700; cursor: pointer; }
     .prj-pill.active { background: #023e8a; color: #fff; border-color: #023e8a; }
-    .prj-status-badge { display: inline-block; padding: 0.22rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; }
-    .prj-table-wrap { overflow-x: auto; border: 1px solid var(--gray-200); border-radius: 10px; background: #fff; }
+    .prj-status-badge { display: inline-block; max-width: 100%; padding: 0.22rem 0.52rem; border-radius: 999px; font-size: 0.69rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
+    .prj-table-wrap { overflow-x: auto; border: 1px solid var(--gray-200); border-radius: 10px; background: #fff; width: 100%; }
+    .prj-main-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.8rem; }
+    .prj-main-table th { padding: 0.6rem 0.5rem; font-size: 0.75rem; line-height: 1.2; vertical-align: middle; }
+    .prj-main-table td { padding: 0.65rem 0.5rem; vertical-align: middle; overflow-wrap: break-word; }
+    .prj-scope-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.35;
+      font-size: 0.77rem;
+      color: #475569;
+    }
+    .prj-money-cell { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .prj-actions-wrap { display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem; flex-wrap: nowrap; }
+    .prj-actions-wrap .btn { padding: 0.28rem 0.42rem !important; min-width: 30px; min-height: 30px !important; font-size: 0.82rem !important; line-height: 1; justify-content: center; }
+    @media (max-width: 900px) {
+      .prj-main-table { min-width: 780px; table-layout: auto; }
+    }
     .prj-detail-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1rem; align-items: start; }
     .prj-wa-preview { background: #ecfdf5; border: 1px solid #86efac; border-radius: 10px; padding: 0.85rem; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.8rem; white-space: pre-wrap; line-height: 1.45; color: #064e3b; max-height: 360px; overflow-y: auto; }
     @media (max-width: 900px) {
@@ -4261,17 +4279,17 @@ CLABE: 722969010514249300</textarea>
 
           <!-- Tabla Control General -->
           <div class="prj-table-wrap">
-            <table class="crm-table" style="width:100%; font-size:0.82rem;">
+            <table class="crm-table prj-main-table">
               <thead>
                 <tr>
-                  <th style="width:68px; text-align:center;">N.º</th>
-                  <th style="min-width:155px;">Cliente / Proyecto</th>
-                  <th style="min-width:250px;">Alcance Principal</th>
-                  <th style="width:145px;">Estatus</th>
-                  <th style="text-align:right; width:115px;">Monto Total</th>
-                  <th style="text-align:right; width:115px;">Abonos / A cuenta</th>
-                  <th style="text-align:right; width:120px;">Saldo Pendiente</th>
-                  <th style="text-align:center; width:175px;">Acciones</th>
+                  <th style="width:52px; text-align:center;">N.º</th>
+                  <th style="width:15%;">Cliente / Proyecto</th>
+                  <th>Alcance Principal</th>
+                  <th style="width:158px;">Estatus</th>
+                  <th style="text-align:right; width:104px;">Monto Total</th>
+                  <th style="text-align:right; width:112px;">Abonos / A cuenta</th>
+                  <th style="text-align:right; width:112px;">Saldo Pendiente</th>
+                  <th style="text-align:center; width:118px;">Acciones</th>
                 </tr>
               </thead>
               <tbody id="prj-list-tbody"></tbody>
@@ -16363,17 +16381,19 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
           : fmtMXN(p.balanceAmount);
         return `
           <tr style="cursor:pointer; ${isCut ? 'opacity:0.78;' : ''}" onclick="openProjectDetail('${escPrj(p.id)}')">
-            <td style="text-align:center; font-weight:900; color:#023e8a;">${p.folioNum}</td>
-            <td style="font-weight:800; color:#0f172a;">${escPrj(p.clientName)}</td>
-            <td style="font-size:0.78rem; color:#475569; max-width:340px;">${p.prevFolioRef ? `<span style="color:#b45309; font-weight:700;">[De N.º ${p.prevFolioRef}]</span> ` : ''}${escPrj(scope)}</td>
+            <td style="text-align:center; font-weight:900; color:#023e8a; white-space:nowrap;">${p.folioNum}</td>
+            <td style="font-weight:800; color:#0f172a; line-height:1.28;">${escPrj(p.clientName)}</td>
+            <td title="${escPrj(scope)}"><div class="prj-scope-clamp">${p.prevFolioRef ? `<span style="color:#b45309; font-weight:700;">[De N.º ${p.prevFolioRef}]</span> ` : ''}${escPrj(scope)}</div></td>
             <td>${getProjectStatusBadge(p.status)}</td>
-            <td style="text-align:right; font-weight:700;">${fmtMXN(p.totalAmount)}</td>
-            <td style="text-align:right; color:${p.paidAmount > 0 ? '#15803d' : '#64748b'}; font-weight:700;">${paidTxt}</td>
-            <td style="text-align:right; font-weight:900; color:${!isCut && p.balanceAmount > 0.01 ? '#b45309' : '#15803d'};">${balCell}</td>
+            <td class="prj-money-cell" style="font-weight:700;">${fmtMXN(p.totalAmount)}</td>
+            <td class="prj-money-cell" style="color:${p.paidAmount > 0 ? '#15803d' : '#64748b'}; font-weight:700;">${paidTxt}</td>
+            <td class="prj-money-cell" style="font-weight:900; color:${!isCut && p.balanceAmount > 0.01 ? '#b45309' : '#15803d'};">${balCell}</td>
             <td style="text-align:center; white-space:nowrap;" onclick="event.stopPropagation()">
-              <button type="button" class="btn btn-outline btn-sm" onclick="openProjectDetail('${escPrj(p.id)}')" title="Abrir estado de cuenta">✏️</button>
-              <button type="button" class="btn btn-outline btn-sm" onclick="openProjectWhatsApp('${escPrj(p.id)}', true)" title="Enviar estado de cuenta por WhatsApp" style="color:#16a34a;">📲</button>
-              <button type="button" class="btn btn-outline btn-sm" onclick="exportProjectPDF('${escPrj(p.id)}')" title="Descargar Estado de Cuenta PDF" style="color:#023e8a;">📥</button>
+              <div class="prj-actions-wrap">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openProjectDetail('${escPrj(p.id)}')" title="Abrir estado de cuenta">✏️</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="openProjectWhatsApp('${escPrj(p.id)}', true)" title="Enviar estado de cuenta por WhatsApp" style="color:#16a34a;">📲</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="exportProjectPDF('${escPrj(p.id)}')" title="Descargar Estado de Cuenta PDF" style="color:#023e8a;">📥</button>
+              </div>
             </td>
           </tr>`;
       }).join('');
