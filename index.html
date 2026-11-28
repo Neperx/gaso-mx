@@ -3842,6 +3842,11 @@
                   ➡️ Convertir a Nota de Venta (NV)
                 </button>
               </div>
+              <div class="meta-row no-print" id="row-btn-convert-project" style="padding-top:0.25rem;">
+                <button type="button" id="btn-quote-to-project" class="btn btn-primary btn-sm" style="width:100%; justify-content:center; font-size:0.72rem; padding:0.32rem; background:#4f46e5; border-color:#4f46e5; font-weight:800;" onclick="handleQuoteToProjectAction()" title="Aprobar y pasar esta cotización directamente a Proyecto / Cuentas por Cobrar">
+                  🚀 Convertir en Proyecto / Por Cobrar
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -4303,6 +4308,7 @@ CLABE: 722969010514249300</textarea>
             <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
               <button type="button" class="btn btn-outline btn-sm" onclick="closeProjectDetail()" style="font-weight:800;">← Volver al Control General</button>
               <span id="prj-det-folio-pill" style="background:#0f172a; color:#fff; padding:0.32rem 0.75rem; border-radius:8px; font-weight:900; font-size:0.9rem;">N.º 353</span>
+              <button type="button" id="prj-det-cot-ref-badge" class="btn btn-outline btn-sm" onclick="openSourceQuoteFromProject()" style="display:none; font-size:0.74rem; font-weight:800; color:#4f46e5; border-color:#c7d2fe; background:#eef2ff;" title="Ver la cotización origen en el Cotizador"></button>
               <select id="prj-det-status" class="form-input" onchange="onProjectMetaChanged()" style="font-size:0.82rem; font-weight:800; padding:0.35rem 0.6rem;">
                 <option value="Cotizado">📝 Cotizado</option>
                 <option value="En ejecución / Con saldo">🔧 En ejecución / Con saldo</option>
@@ -4312,6 +4318,7 @@ CLABE: 722969010514249300</textarea>
                 <option value="Corte Cerrado">✂️ Corte Cerrado</option>
                 <option value="Cancelado">⛔ Cancelado</option>
               </select>
+              <button type="button" id="btn-prj-approve-to-cobrar" class="btn btn-success btn-sm" onclick="approveQuotedProjectToCobrar()" style="display:none; font-weight:800; background:#16a34a; border-color:#16a34a;" title="Aprobar este proyecto cotizado y pasarlo a ejecución / cuentas por cobrar">✅ Aprobar → Por Cobrar</button>
             </div>
             <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
               <button type="button" class="btn btn-outline btn-sm" onclick="saveActiveProjectNow(true)" style="font-weight:700; color:#15803d; border-color:#86efac;">💾 Guardar</button>
@@ -6378,12 +6385,14 @@ CLABE: 722969010514249300</textarea>
       const days = parseInt(document.getElementById('quote-validity-days').value) || 15;
       updateExpiryFromValidityDays(days);
       updateQRStamp();
+      if (typeof updateQuoteToProjectButtonState === 'function') updateQuoteToProjectButtonState();
     }
 
     function handleValidityDaysChange() {
       const days = parseInt(document.getElementById('quote-validity-days').value) || 15;
       updateExpiryFromValidityDays(days);
       updateQRStamp();
+      if (typeof updateQuoteToProjectButtonState === 'function') updateQuoteToProjectButtonState();
     }
 
     function updateExpiryFromValidityDays(days) {
@@ -6410,6 +6419,7 @@ CLABE: 722969010514249300</textarea>
       }
       checkExpiryStatus();
       updateQRStamp();
+      if (typeof updateQuoteToProjectButtonState === 'function') updateQuoteToProjectButtonState();
     }
 
     function checkExpiryStatus() {
@@ -7558,6 +7568,7 @@ ${JSON.stringify(list)}`;
 
       syncPrintMirrors();
       updateQRStamp();
+      if (typeof updateQuoteToProjectButtonState === 'function') updateQuoteToProjectButtonState();
     }
 
     function updateTaxPreset() {
@@ -8046,9 +8057,15 @@ function updateDashboardKPIs() { renderDashboard(); }
         slice.map(({ r, idx }) => {
           const st = DASH_STATUS[r.status] || [r.status, '#475569'];
           const link = r.status === 'sales_note' && r.refCotFolio ? '<div style="font-size:0.66rem; color:#64748b;">↔ ' + escapeHtml(r.refCotFolio) + '</div>' : '';
+          const linkedPrj = typeof findLinkedProjectForQuote === 'function' ? findLinkedProjectForQuote(r.number, r.refCotFolio) : null;
+          const prjBtn = linkedPrj
+            ? '<button type="button" class="btn btn-outline btn-sm" style="color:#0f766e; border-color:#5eead4; background:#f0fdfa; font-weight:700;" onclick="switchTab(\'projects\'); openProjectDetail(\'' + escapeHtml(linkedPrj.id) + '\')" title="Abrir proyecto vinculado en Cuentas por Cobrar">📂 Proy. N.º ' + linkedPrj.folioNum + '</button> '
+            : ((r.status !== 'cancelled' && r.status !== 'rejected')
+                ? '<button type="button" class="btn btn-outline btn-sm" style="color:#4f46e5; border-color:#c7d2fe; background:#eef2ff; font-weight:700;" onclick="convertQuoteToProjectByIndex(' + idx + ')" title="Aprobar y pasar esta cotización a Proyecto / Cuenta por Cobrar">🚀 Proyecto</button> '
+                : '');
           const fbtn = (r.status === 'approved' || r.status === 'sales_note') ? '<button type="button" class="btn btn-primary btn-sm" onclick="openInvoiceSheet(' + idx + ')">🧾 Facturar</button> ' : '';
           const inv = r.invoice ? '<div style="font-size:0.66rem; color:#15803d;">🧾 Facturada ' + escapeHtml(r.invoice.date || '') + (r.invoice.uuid ? ' · ' + escapeHtml(String(r.invoice.uuid).slice(0, 8)) + '…' : '') + '</div>' : '';
-          const acts = '<button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + idx + ')" title="Cargar en el cotizador para seguir editando el mismo folio">✏️ Editar</button> ' + fbtn +
+          const acts = '<button type="button" class="btn btn-outline btn-sm" onclick="loadQuoteFromHistory(' + idx + ')" title="Cargar en el cotizador para seguir editando el mismo folio">✏️ Editar</button> ' + prjBtn + fbtn +
             (r.status === 'draft' ? (isAdmin ? '<button type="button" class="btn btn-outline btn-sm" style="color:#b91c1c;" onclick="dashDeleteQuote(' + idx + ')">🗑️ Eliminar</button>' : '')
               : r.status === 'cancelled' ? '<button type="button" class="btn btn-outline btn-sm" onclick="dashRestoreQuote(' + idx + ')">↩️ Restaurar</button>'
               : '<button type="button" class="btn btn-outline btn-sm" style="color:#b45309;" onclick="dashCancelQuote(' + idx + ')">🚫 Cancelar</button>');
@@ -9625,6 +9642,10 @@ function updateDashboardKPIs() { renderDashboard(); }
         bumpFolioSeq(data.number);
         data.updatedAt = new Date().toISOString();
         if (existingIdx >= 0 && quotesHistory[existingIdx].invoice) data.invoice = quotesHistory[existingIdx].invoice;
+        if (existingIdx >= 0 && quotesHistory[existingIdx].linkedProjectId) {
+          data.linkedProjectId = quotesHistory[existingIdx].linkedProjectId;
+          data.linkedProjectFolio = quotesHistory[existingIdx].linkedProjectFolio;
+        }
         if (existingIdx >= 0) {
           quotesHistory[existingIdx] = data;
         } else {
@@ -9714,6 +9735,7 @@ function updateDashboardKPIs() { renderDashboard(); }
         }
       }
       updateQRStamp();
+      if (typeof updateQuoteToProjectButtonState === 'function') updateQuoteToProjectButtonState();
     }
 
     function convertApprovedQuoteToSalesNote() {
@@ -16470,6 +16492,19 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
 
       renderProjectMPBadge(p);
+      const cotRefBtn = document.getElementById('prj-det-cot-ref-badge');
+      if (cotRefBtn) {
+        if (p.refCotFolio) {
+          cotRefBtn.style.display = 'inline-flex';
+          cotRefBtn.textContent = `📄 Origen: ${p.refCotFolio}`;
+        } else {
+          cotRefBtn.style.display = 'none';
+        }
+      }
+      const approveBtn = document.getElementById('btn-prj-approve-to-cobrar');
+      if (approveBtn) {
+        approveBtn.style.display = p.status === 'Cotizado' ? 'inline-flex' : 'none';
+      }
       renderProjectItems();
       renderProjectPayments();
       renderProjectFinancialSummary();
@@ -16539,6 +16574,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       p._u = Date.now();
       recomputeProjectTotals(p);
+      const approveBtn = document.getElementById('btn-prj-approve-to-cobrar');
+      if (approveBtn) approveBtn.style.display = p.status === 'Cotizado' ? 'inline-flex' : 'none';
       renderProjectFinancialSummary();
       persistProjects();
     }
@@ -16616,6 +16653,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       }
       p._u = Date.now();
       recomputeProjectTotals(p);
+      const approveBtn = document.getElementById('btn-prj-approve-to-cobrar');
+      if (approveBtn) approveBtn.style.display = p.status === 'Cotizado' ? 'inline-flex' : 'none';
       renderProjectFinancialSummary();
       clearTimeout(window._prjSaveDeb);
       window._prjSaveDeb = setTimeout(() => persistProjects(), 700);
@@ -16686,6 +16725,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       p.payments[idx][field] = field === 'amount' ? (parseFloat(val) || 0) : val;
       p._u = Date.now();
       recomputeProjectTotals(p);
+      const approveBtn = document.getElementById('btn-prj-approve-to-cobrar');
+      if (approveBtn) approveBtn.style.display = p.status === 'Cotizado' ? 'inline-flex' : 'none';
       renderProjectFinancialSummary();
       clearTimeout(window._prjSaveDeb);
       window._prjSaveDeb = setTimeout(() => persistProjects(), 700);
@@ -17368,6 +17409,8 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       p.prevBalanceAmount = parseFloat(document.getElementById('prj-det-prev-balance')?.value || '0') || 0;
       p._u = Date.now();
       recomputeProjectTotals(p);
+      const approveBtn = document.getElementById('btn-prj-approve-to-cobrar');
+      if (approveBtn) approveBtn.style.display = p.status === 'Cotizado' ? 'inline-flex' : 'none';
       renderProjectFinancialSummary();
       clearTimeout(window._prjSaveDeb);
       window._prjSaveDeb = setTimeout(() => persistProjects(), 700);
@@ -17487,6 +17530,225 @@ RESPONDE EXCLUSIVAMENTE UN OBJETO JSON VÁLIDO:
       saveCurrentQuote({ silent: true });
       switchTab('cotizador');
       showToast(`🧾 Proyecto N.º ${p.folioNum} convertido a Nota de Venta en el Cotizador.`);
+    }
+
+    /* ---- Flujo: Cotización -> Proyecto / Cuenta por Cobrar ---- */
+    function findLinkedProjectForQuote(quoteNumber, refCotFolio) {
+      const nums = [quoteNumber, refCotFolio].map(x => String(x || '').trim()).filter(Boolean);
+      if (!nums.length) return null;
+      return (projectsHistory || []).find(p =>
+        p && p.status !== 'Cancelado' && (nums.includes(String(p.refCotFolio || '').trim()) || (p.linkedQuoteNumbers || []).some(n => nums.includes(n)))
+      ) || null;
+    }
+
+    function updateQuoteToProjectButtonState() {
+      const row = document.getElementById('row-btn-convert-project');
+      const btn = document.getElementById('btn-quote-to-project');
+      if (!row || !btn) return;
+      const st = document.getElementById('quote-status')?.value || 'draft';
+      if (st === 'cancelled' || st === 'rejected') {
+        row.style.display = 'none';
+        return;
+      }
+      row.style.display = 'flex';
+      const folio = document.getElementById('quote-number')?.value || '';
+      const refCot = document.getElementById('ref-cot-folio')?.textContent || '';
+      const linked = findLinkedProjectForQuote(folio, refCot);
+      if (linked) {
+        btn.innerHTML = `📂 Ver Proyecto N.º ${linked.folioNum} (Cuentas)`;
+        btn.style.background = '#0f766e';
+        btn.style.borderColor = '#0f766e';
+        btn.title = `Esta cotización ya es el Proyecto N.º ${linked.folioNum}. Clic para darle seguimiento y cobrar.`;
+      } else {
+        btn.innerHTML = st === 'approved'
+          ? '🚀 Pasar a Proyecto / Por Cobrar'
+          : '🚀 Convertir en Proyecto / Por Cobrar';
+        btn.style.background = '#4f46e5';
+        btn.style.borderColor = '#4f46e5';
+        btn.title = 'Aprobar esta cotización y enviarla a Cuentas por Cobrar como Proyecto activo';
+      }
+    }
+
+    function handleQuoteToProjectAction() {
+      const folio = document.getElementById('quote-number')?.value || '';
+      const refCot = document.getElementById('ref-cot-folio')?.textContent || '';
+      const linked = findLinkedProjectForQuote(folio, refCot);
+      if (linked) {
+        switchTab('projects');
+        openProjectDetail(linked.id);
+        return;
+      }
+      convertCurrentQuoteToProject();
+    }
+
+    function convertCurrentQuoteToProject() {
+      const data = getQuoteData();
+      if ((!data.items || data.items.length === 0) && !(data.totalAmount > 0)) {
+        showToast('Agrega al menos una partida en la cotización antes de convertirla en proyecto.');
+        return;
+      }
+      const existing = findLinkedProjectForQuote(data.number, data.refCotFolio);
+      if (existing) {
+        switchTab('projects');
+        openProjectDetail(existing.id);
+        return;
+      }
+      if (!saveCurrentQuote({ silent: true })) {
+        // Asegurar registro en quotesHistory si es contenido mínimo
+        const idx = quotesHistory.findIndex(x => x.number === data.number);
+        if (idx < 0) quotesHistory.unshift(data);
+      }
+      const qIdx = quotesHistory.findIndex(x => x.number === data.number || (data.refCotFolio && x.number === data.refCotFolio));
+      const quoteObj = qIdx >= 0 ? quotesHistory[qIdx] : data;
+      const newPrj = convertQuoteObjToProject(quoteObj);
+      if (newPrj) {
+        if (quoteObj.status === 'draft' || quoteObj.status === 'sent' || quoteObj.status === 'approved') {
+          const stEl = document.getElementById('quote-status');
+          if (stEl && stEl.value !== 'sales_note') {
+            stEl.value = 'approved';
+            handleStatusChange();
+          }
+        }
+        updateQuoteToProjectButtonState();
+      }
+    }
+
+    function convertQuoteToProjectByIndex(idx) {
+      const q = quotesHistory[idx];
+      if (!q) return;
+      const existing = findLinkedProjectForQuote(q.number, q.refCotFolio);
+      if (existing) {
+        switchTab('projects');
+        openProjectDetail(existing.id);
+        return;
+      }
+      convertQuoteObjToProject(q);
+    }
+
+    function convertQuoteObjToProject(q) {
+      if (!q) return null;
+      const clientName = (q.client && q.client.name ? q.client.name.trim() : '') || 'Cliente';
+      const totalLabel = fmtMXN((parseFloat(q.totalAmount) || 0) * (q.currency === 'USD' ? (parseFloat(exchangeRate) || 1) : 1));
+      if (!confirm(`¿Aprobar y convertir la cotización ${q.number} (${clientName} · ${totalLabel}) en Proyecto / Cuenta por Cobrar?\n\n• Pasará automáticamente a la pestaña Cuentas con todas sus partidas y montos.\n• Podrás registrar anticipos, abonos, hacer cortes y enviar el link único al cliente.`)) {
+        return null;
+      }
+
+      const fx = q.currency === 'USD' ? (parseFloat(exchangeRate) || 1) : 1;
+      const discountPct = parseFloat(q.discountPct) || 0;
+      const discFactor = discountPct > 0 ? Math.max(0, 1 - discountPct / 100) : 1;
+      const rawItems = Array.isArray(q.items) ? q.items : [];
+      const prjItems = rawItems
+        .filter(it => it && (it.concept || it.description || parseFloat(it.price) > 0))
+        .map((it, i) => {
+          const isAnnex = it.itemCategory === 'ANEXO';
+          const unitPrice = isAnnex ? 0 : round2((parseFloat(it.price) || 0) * fx * discFactor);
+          return {
+            id: 'pi-' + Date.now().toString(36) + '-' + i,
+            title: String(it.concept || it.sku || `Partida ${i + 1}`).trim(),
+            desc: String(it.description || '').trim(),
+            qty: isAnnex ? 1 : (parseFloat(it.quantity) || 1),
+            unit: String(it.unit || 'Serv.').split(' - ')[0].trim() || 'Serv.',
+            unitPrice
+          };
+        });
+
+      const useIva = !!(q.billingWithInvoice !== false && rawItems.some(it => it.applyIva !== false));
+      const useResico = !!(useIva && q.clientType === 'moral' && q.resicoRet);
+      const today = new Date().toISOString().slice(0, 10);
+      const nextFolio = getNextProjectFolio();
+
+      const payments = [];
+      let status = 'En ejecución / Por cobrar';
+      const draftPrj = recomputeProjectTotals({
+        items: prjItems,
+        payments: [],
+        useIva,
+        useResico
+      });
+
+      if (q.stamps && q.stamps.paid && draftPrj.totalAmount > 0) {
+        payments.push({
+          id: 'pay-' + Date.now().toString(36),
+          date: q.stamps.paidDate || today,
+          concept: `Pago liquidado desde ${q.number}`,
+          amount: draftPrj.totalAmount
+        });
+        status = 'Liquidado';
+      } else if (q.stamps && q.stamps.advance && (parseFloat(q.stamps.advanceAmount) || 0) > 0) {
+        const advMxn = round2((parseFloat(q.stamps.advanceAmount) || 0) * fx);
+        payments.push({
+          id: 'pay-' + Date.now().toString(36),
+          date: q.stamps.advanceDate || today,
+          concept: `Anticipo inicial (${q.number})`,
+          amount: advMxn
+        });
+        status = advMxn >= draftPrj.totalAmount - 0.01 ? 'Liquidado' : 'En ejecución / Con saldo';
+      }
+
+      const conceptTitles = prjItems.filter(it => it.unitPrice > 0 || it.title).slice(0, 3).map(it => it.title);
+      const conceptSummary = (conceptTitles.length ? conceptTitles.join(' + ') : `Proyecto aprobado (${q.number})`)
+        + (prjItems.length > 3 ? ` (+${prjItems.length - 3} partidas)` : '');
+
+      const newPrj = recomputeProjectTotals({
+        id: 'prj-' + nextFolio + '-' + Date.now().toString(36),
+        folioNum: nextFolio,
+        date: q.date || today,
+        clientName,
+        clientPhone: (q.client && q.client.phone) || '',
+        concept: conceptSummary,
+        status,
+        refCotFolio: q.number,
+        clientType: q.clientType || 'fisica',
+        useIva,
+        useResico,
+        items: prjItems,
+        payments,
+        mercadopagoUrl: q.mercadopagoUrl || '',
+        _u: Date.now()
+      });
+
+      projectsHistory.push(newPrj);
+
+      if (q.status === 'draft' || q.status === 'sent') {
+        q.status = 'approved';
+      }
+      q.linkedProjectId = newPrj.id;
+      q.linkedProjectFolio = newPrj.folioNum;
+      q.updatedAt = new Date().toISOString();
+      safeStorage.setItem('gaso_quotes_history', JSON.stringify(quotesHistory));
+
+      persistProjects(`🚀 Cotización ${q.number} convertida al Proyecto N.º ${newPrj.folioNum} (Cuentas por Cobrar).`);
+      try { recomputeAllCRMStats(); } catch (e) {}
+      try { refreshCRMViews(); } catch (e) {}
+
+      switchTab('projects');
+      openProjectDetail(newPrj.id);
+      return newPrj;
+    }
+
+    function approveQuotedProjectToCobrar() {
+      const p = getActiveProject();
+      if (!p) return;
+      p.status = (p.paidAmount || 0) > 0 ? 'En ejecución / Con saldo' : 'En ejecución / Por cobrar';
+      p._u = Date.now();
+      recomputeProjectTotals(p);
+      const sel = document.getElementById('prj-det-status');
+      if (sel) sel.value = p.status;
+      const approveBtn = document.getElementById('btn-prj-approve-to-cobrar');
+      if (approveBtn) approveBtn.style.display = 'none';
+      renderProjectFinancialSummary();
+      persistProjects(`✅ Proyecto N.º ${p.folioNum} aprobado y pasado a Cuentas por Cobrar.`);
+    }
+
+    function openSourceQuoteFromProject() {
+      const p = getActiveProject();
+      if (!p || !p.refCotFolio) return;
+      const idx = (quotesHistory || []).findIndex(q => q && q.number === p.refCotFolio);
+      if (idx < 0) {
+        showToast(`No se encontró la cotización ${p.refCotFolio} en el historial local.`);
+        return;
+      }
+      loadQuoteFromHistory(idx);
     }
 
     function openResetProjectsControlModal() {
