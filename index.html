@@ -15,23 +15,39 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW error:', err));
+        const hadController = !!navigator.serviceWorker.controller;
+        let swReloaded = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (hadController && !swReloaded) {
+            swReloaded = true;
+            window.location.reload();
+          }
+        });
+        navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+          .then(reg => { try { reg.update(); } catch(e) {} })
+          .catch(err => console.warn('SW error:', err));
       });
     }
-    // Detección inmediata de Aplicación Móvil / APK / Pantalla pequeña vs Escritorio
+    // Detección inmediata de Móvil / APK vs Escritorio (solo dispositivos móviles reales o táctiles)
     (function() {
       try { window.localStorage.removeItem('gaso_prefer_app_mode'); } catch(e) {}
-      var isStandaloneApp = window.matchMedia('(display-mode: standalone)').matches
+      var ua = navigator.userAgent || '';
+      var isAndroidTWA = !!(document.referrer && document.referrer.includes('android-app://'));
+      var isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+      var isDesktopOS = /Windows NT|Macintosh|CrOS/i.test(ua) && !isMobileUA && !isAndroidTWA;
+      var isNarrowScreen = window.matchMedia('(max-width: 900px)').matches;
+      var isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+      var isMobileDevice = !isDesktopOS && (isAndroidTWA || isMobileUA || (isNarrowScreen && isCoarsePointer));
+      var isStandaloneMobile = isAndroidTWA || (isMobileDevice && (
+        window.matchMedia('(display-mode: standalone)').matches
         || window.navigator.standalone === true
-        || (document.referrer && document.referrer.includes('android-app://'))
-        || window.location.search.indexOf('source=pwa') !== -1;
-      var isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
-      var isMobileScreen = window.matchMedia('(max-width: 900px)').matches;
-      var isMobileEnv = isStandaloneApp || isMobileUA || isMobileScreen;
-      if (isStandaloneApp) {
+        || window.location.search.indexOf('source=pwa') !== -1
+      ));
+      if (isStandaloneMobile) {
         document.documentElement.classList.add('is-app-mode');
       }
-      document.documentElement.classList.add(isMobileEnv ? 'is-mobile-mode' : 'is-desktop-mode');
+      document.documentElement.classList.add(isMobileDevice ? 'is-mobile-mode' : 'is-desktop-mode');
+      document.documentElement.classList.add((isMobileDevice || isNarrowScreen) ? 'is-mobile-layout' : 'is-desktop-layout');
     })();
   </script>
   <style>
@@ -1908,10 +1924,18 @@
     body.is-desktop-mode #modal-pin-setup {
       display: none !important;
     }
+    html.is-mobile-layout .desktop-only-ui,
+    body.is-mobile-layout .desktop-only-ui,
+    html.is-mobile-layout .hide-in-mobile-mode,
+    body.is-mobile-layout .hide-in-mobile-mode,
     html.is-mobile-mode .desktop-only-ui,
     body.is-mobile-mode .desktop-only-ui,
     html.is-mobile-mode .hide-in-mobile-mode,
     body.is-mobile-mode .hide-in-mobile-mode,
+    html.is-mobile-layout .top-bar-inner .nav-tabs,
+    body.is-mobile-layout .top-bar-inner .nav-tabs,
+    html.is-mobile-layout .top-bar-inner .user-chip-top,
+    body.is-mobile-layout .top-bar-inner .user-chip-top,
     html.is-mobile-mode .top-bar-inner .nav-tabs,
     body.is-mobile-mode .top-bar-inner .nav-tabs,
     html.is-mobile-mode .top-bar-inner .user-chip-top,
@@ -9221,31 +9245,40 @@ function updateDashboardKPIs() { renderDashboard(); }
     // Consecutivo persistente: nunca depende del campo en pantalla ni se reinicia al recargar
     // Serie Móvil (M) para teléfonos / app offline y Serie Estándar para computadoras de oficina
     let currentLoadedQuoteNumber = null;
-    function isAppStandaloneMode() {
-      return window.matchMedia("(display-mode: standalone)").matches
-        || window.navigator.standalone === true
-        || (document.referrer && document.referrer.includes("android-app://"))
-        || window.location.search.indexOf("source=pwa") !== -1;
+    function isMobileDeviceOrApp() {
+      const ua = navigator.userAgent || "";
+      const isAndroidTWA = !!(document.referrer && document.referrer.includes("android-app://"));
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+      const isDesktopOS = /Windows NT|Macintosh|CrOS/i.test(ua) && !isMobileUA && !isAndroidTWA;
+      if (isDesktopOS) return false;
+      const isNarrowScreen = window.matchMedia("(max-width: 900px)").matches;
+      const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
+      return isAndroidTWA || isMobileUA || (isNarrowScreen && isCoarsePointer);
     }
 
-    function isMobileDeviceOrApp() {
-      const isAppMode = isAppStandaloneMode()
-        || document.documentElement.classList.contains("is-app-mode")
-        || (document.body && document.body.classList.contains("is-app-mode"));
-      const isMobileScreen = window.matchMedia("(max-width: 900px)").matches;
-      const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
-      return isAppMode || isMobileScreen || isMobileUA;
+    function isAppStandaloneMode() {
+      const isAndroidTWA = !!(document.referrer && document.referrer.includes("android-app://"));
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+        || window.navigator.standalone === true
+        || window.location.search.indexOf("source=pwa") !== -1;
+      return isAndroidTWA || (isMobileDeviceOrApp() && isStandalone);
     }
 
     function syncPlatformModeClasses() {
       const isStandalone = isAppStandaloneMode();
       const isMobile = isMobileDeviceOrApp();
+      const isMobileLayout = isMobile || window.matchMedia("(max-width: 900px)").matches;
       [document.documentElement, document.body].forEach(el => {
         if (!el) return;
         el.classList.toggle("is-app-mode", isStandalone);
         el.classList.toggle("is-mobile-mode", isMobile);
         el.classList.toggle("is-desktop-mode", !isMobile);
+        el.classList.toggle("is-mobile-layout", isMobileLayout);
+        el.classList.toggle("is-desktop-layout", !isMobileLayout);
       });
+      if (!isMobile && typeof closeBioEnrollBanner === "function") {
+        closeBioEnrollBanner();
+      }
       if (typeof updateAppBiometricUI === "function") updateAppBiometricUI();
       if (typeof updateVaultBiometricUI === "function") updateVaultBiometricUI();
     }

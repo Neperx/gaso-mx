@@ -1,5 +1,5 @@
 // Service Worker para GASO MX - PWA & Android TWA con soporte Offline robusto
-const CACHE_NAME = 'gaso-pwa-v14';
+const CACHE_NAME = 'gaso-pwa-v15';
 const STATIC_RESOURCES = [
   '/',
   '/index.html',
@@ -55,10 +55,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Para navegación a páginas HTML: estrategia Network-first con fallback a cache local
+  // Para navegación a páginas HTML: estrategia Network-first sin caché HTTP intermedia
   if (req.mode === 'navigate') {
     event.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'no-store' })
         .then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             const clone = networkResponse.clone();
